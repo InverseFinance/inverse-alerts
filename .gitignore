@@ -1,0 +1,3 @@
+*.env
+/contracts.xlsx
+/.idea
