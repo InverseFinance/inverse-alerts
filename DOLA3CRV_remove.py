@@ -1,5 +1,6 @@
 # import the following dependencies
 import json
+import asyncio
 import os
 from dotenv import load_dotenv
 from web3 import Web3
@@ -49,14 +50,16 @@ def handle_event(event):
                  "\n" + "Receiver : " + str(tx['args']['receiver']) +
                  "\n" + "Value : " + str(tx['args']['value']/1e18) +
                  "\n" + "Transaction Hash : " + tx['transactionHash'] +
-                 "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash'])
+                 "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash']+
+                 "\n" + "Full tx" + str(tx))
 
 # define worker to listen on a specific event of a specific contract
-def worker(contract):
+async def worker(contract):
     event_filter = contract.events.remove_liquidity.createFilter(fromBlock='latest')
     while True:
         for remove_liquidity in event_filter.get_new_entries():
             handle_event(remove_liquidity)
+        await asyncio.sleep(5)
 
 def main():
     for i in filters["id"]:

@@ -45,9 +45,7 @@ def handle_event(event):
 
     webhook.send("Token Transfer Detected" +
                  "\n" + "Block Number : " + str(tx['blockNumber']) +
-                 "\n" + "Event Type : " + tx['event'] +
-                 "\n" + "From : " + str(tx['args']) +
-                 "\n" + "Transaction Hash : " + tx['transactionHash'] +
+                 "\n" + "Full Tx : " + str(tx) +
                  "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash'])
 
 # define worker to listen on a specific event of a specific contract

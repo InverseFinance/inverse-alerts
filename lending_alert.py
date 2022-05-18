@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from web3 import Web3
 from threading import Thread
 import pandas as pd
+import asyncio
 from discord import Webhook, RequestsWebhookAdapter
 
 load_dotenv()
@@ -37,6 +38,7 @@ class MyThread(Thread):
             for Transfer in event_filter.get_new_entries():
                 handle_event(Transfer)
 
+
 # define function to handle events and print to the console
 def handle_event(event):
     print(Web3.toJSON(event))
@@ -47,14 +49,16 @@ def handle_event(event):
                  "\n" + "Event Type : " + tx['event'] +
                  "\n" + "Args : " + str(tx['args']) +
                  "\n" + "Transaction Hash : " + tx['transactionHash'] +
-                 "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash'])
+                 "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash']+
+                 "\n" + "Full tx : " + str(tx))
 
 # define worker to listen on a specific event of a specific contract
-def worker(contract):
+async def worker(contract):
     event_filter = contract.events.Borrow.createFilter(fromBlock='latest')
     while True:
         for Borrow in event_filter.get_new_entries():
             handle_event(Borrow)
+        await asyncio.sleep(5)
 
 def main():
     for i in filters["id"]:
