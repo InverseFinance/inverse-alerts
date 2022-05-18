@@ -19,6 +19,10 @@ webhook = Webhook.from_url(WEBHOOK, adapter=RequestsWebhookAdapter())
 contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
 contracts = contracts[contracts['tags'].str.contains("dola3crv")]
 
+functions = ['AddLiquidity',
+             'RemoveLiquidity',
+             'RemoveLiquidityOne']
+
 # Load token addresses and ABIs
 # Add contract in dictionnary to run main() iteratively
 filters ={"id":[]}
@@ -28,36 +32,38 @@ for i in range(0, len(contracts['contract_address'])):
     filters["id"].append(web3.eth.contract(address=contract_name, abi=contract_abi))
 
 class MyThread(Thread):
-    def __init__(self,argument, **kwargs):
+    def __init__(self,argument1,argument2, **kwargs):
         super(MyThread, self).__init__(**kwargs)
-        self.argument = argument
+        self.argument1 = argument1
+        self.argument2 = argument2
+        self.event_filter = []
 
     def run(self):
-        event_filter = self.argument.events.Transfer.createFilter(fromBlock='latest')
+        exec(f"self.event_filter = self.argument1.events.{self.argument2}.createFilter(fromBlock='latest')")
         while True:
-            for Transfer in event_filter.get_new_entries():
-                handle_event(Transfer)
+            for handler in self.event_filter.get_new_entries():
+                handle_event(handler)
+
 
 # define function to handle events and print to the console
 def handle_event(event):
     print(Web3.toJSON(event))
     tx = json.loads(Web3.toJSON(event))
+    title = "DOLA3CRV" + tx['event']+"Event Detected"
 
-    webhook.send("DOLA3CRV - Liquidity Removal Detected" +
-                 #"\n" + "Block Number : " + str(tx['blockNumber']) +
-                 #"\n" + "Event Type : " + tx['event'] +
-                 "\n" + "Sender : " + str(tx['args']['sender']) +
-                 "\n" + "Receiver : " + str(tx['args']['receiver']) +
-                 "\n" + "Value : " + str(tx['args']['value']/1e18) +
+    webhook.send(title +
+                 "\n" + "Block Number : " + str(tx['blockNumber']) +
                  "\n" + "Transaction Hash : " + tx['transactionHash'] +
                  "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash']+
-                 "\n" + "Full tx" + str(tx))
-
+                 "\n" + "Full tx" + str(tx)+
+                 "\n" + "Tag Test <@578956365205209098>")
 
 def main():
     for i in filters["id"]:
         contract = i
-        MyThread(contract).start()
+        for j in functions:
+            function = j
+            MyThread(contract, function).start()
 
 if __name__ == "__main__":
     main()

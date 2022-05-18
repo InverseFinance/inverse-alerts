@@ -50,7 +50,9 @@ def handle_event(event):
                  "\n" + "Args : " + str(tx['args']) +
                  "\n" + "Transaction Hash : " + tx['transactionHash'] +
                  "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash']+
-                 "\n" + "Full tx : " + str(tx))
+                 "\n" + "Full tx : " + str(tx)+
+                 "\n" + "Tag Test <@578956365205209098>"+
+                 "\n" + "Tag Test <@114168397121585152>")
 
 # define worker to listen on a specific event of a specific contract
 async def worker(contract):
