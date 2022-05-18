@@ -65,6 +65,7 @@ def main():
         for j in functions:
             function = j
             MyThread(contract, function).start()
+            print('Started listening at function '+function+' on contract '+contract.address)
 
 if __name__ == "__main__":
     main()
