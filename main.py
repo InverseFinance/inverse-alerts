@@ -2,11 +2,9 @@
 import json
 import os
 import pandas as pd
-
 from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
-
 from discord import Webhook, RequestsWebhookAdapter
 
 load_dotenv()
@@ -16,7 +14,7 @@ web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))
 alerts = ['dola3crv', 'lending', 'governance']
 
 # Function to monitor event on by alert tag
-functions_lending = ['Mint', 'Redeem', 'Borrow', 'RepayBorrow']
+functions_lending = ['Mint', 'Redeem', 'Borrow', 'RepayBorrow','LiquidateBorrow']
 functions_governance = ['ProposalCreated', 'ProposalCanceled', 'ProposalQueued', 'ProposalExecuted']
 functions_dola3crv = ['AddLiquidity', 'RemoveLiquidity', 'RemoveLiquidityOne']
 
@@ -60,11 +58,11 @@ for alert in alerts:
     for i in filters["id"]:
         contract = i
 
-        # Third loop to cover all functions
+        # Third loop to cover all functions, in contract, in alert tag
         for j in functions:
             function = j
 
-            # Initiate Threads
+            # Initiate Thread per alert/contract/function listened
             Listener(web3, alert, contract, function, state_functions, webhook).start()
             n_alert += 1
 
