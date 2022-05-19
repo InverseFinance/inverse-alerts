@@ -1,8 +1,12 @@
 import json
 import re
 import pandas as pd
+import logging
 from web3 import Web3
 from threading import Thread
+from datetime import datetime
+logger = logging.getLogger()
+
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class Listener(Thread):
@@ -17,21 +21,26 @@ class Listener(Thread):
         self.event_filter = []
 
     def run(self):
-        self.event_filter = eval(f"self.contract.events.{self.function}.createFilter(fromBlock='latest')")
-        while True:
-            for event in self.event_filter.get_new_entries():
-                handle_event(event, self.web3, self.alert, self.contract, self.function, self.state_functions,
-                             self.webhook)
+        try:
+            self.event_filter = eval(f"self.contract.events.{self.function}.createFilter(fromBlock='latest')")
+            while True:
+                for event in self.event_filter.get_new_entries():
+                    print(str(datetime.now())+" Event found in "+str(self.alert)+"-"+str(self.contract)+"-"+str(self.function))
+                    handle_event(event, self.web3, self.alert, self.contract, self.function, self.state_functions,self.webhook)
+        except:
+            print(str(datetime.now())+" Error in "+str(self.alert)+"-"+str(self.contract.address)+"-"+str(self.function))
+            print(str(datetime.now())+" Skipping to next event")
+            pass
 
 # Define function to handle events and print to the console/send to discord
 def handle_event(event, web3, alert, contract, function, state_functions, webhook):
     tx = json.loads(Web3.toJSON(event))
-    print(tx)
+    print(str(datetime.now())+" "+tx)
     results = []
 
     # Collect state function results
     for i in state_functions:
-        print(f'contract.functions.{i}.call()')
+
         state_result = eval(f'contract.functions.{i}.call()')
         results.append(state_result)
 
@@ -40,7 +49,7 @@ def handle_event(event, web3, alert, contract, function, state_functions, webhoo
     state_results = state_results.set_axis(state_functions, axis=1, inplace=False)
 
     # Print result table and go to trigger routine
-    print(state_results)
+    print(str(datetime.now())+" "+state_results)
     handle_trigger(alert, tx, function, state_results, webhook)
 
 
@@ -55,7 +64,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Sender : " + str(tx['args']['sender']) +
                     "\n" + "Receiver : " + str(tx['args']['receiver']) +
                     "\n" + "Value : " + str(tx['args']['value']) +
-                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply']) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
         elif (function == 'RemoveLiquidityOne'):
             title = 'DOLA3CRV Pool ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
@@ -149,9 +158,18 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Proposal Number : " + str(tx['args']['proposalId']) +
                     "\n" + "Proposal : https://www.inverse.finance/governance/proposals/mills/" + str(tx['args']['proposalId'])  +
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
+    elif (alert == 'dola3crv'):
+        if (function in ['Contraction','Expansion']):
+            title = 'DOLA3CRV Pool ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
+            body = ("Block Number : " + str(tx['blockNumber']) +
+                    "\n" + "Fed Address : " + str(tx['address']) +
+                    "\n" + "Sender : " + str(tx['args']['amount']) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'supply()']) +
+                    "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
 
     if (send ==True):
         message = title + "\n" + body
+
     # "\n" + "Tag Test <@578956365205209098>")
 
     webhook.send(message)

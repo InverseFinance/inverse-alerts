@@ -1,0 +1,1 @@
+geth --syncmode light --http --http.addr 0.0.0.0

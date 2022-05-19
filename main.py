@@ -2,11 +2,15 @@
 import json
 import os
 import pandas as pd
+
 from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
 from discord import Webhook, RequestsWebhookAdapter
+from threading import Thread
+from datetime import datetime
 
+#Thread(os.system('cmd /k "geth --syncmode light --http --http.addr 0.0.0.0"')).start()
 load_dotenv()
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
 
@@ -58,6 +62,6 @@ for alert in alerts:
             Listener(web3, alert, contract, function, state_functions, webhook).start()
             n_alert += 1
 
-            print('Alert ' + alert + ' started listening at function ' + function + ' on contract ' + contract.address + ' (n.' + str(n_alert) + ')')
+            print(str(datetime.now())+' '+ alert+'-'+contract.address+'-'+function+'-'+ str(n_alert) + ' started listening at function ' + function + ' on contract ' + contract.address)
 
-print('Alerts running : ' + str(n_alert))
+print(str(datetime.now())+' '+'Total alerts running : ' + str(n_alert))
