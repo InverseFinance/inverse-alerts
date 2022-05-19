@@ -1,88 +1,73 @@
 # import the following dependencies
 import json
-import asyncio
 import os
+import pandas as pd
+
+from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
-from threading import Thread
-import pandas as pd
+
 from discord import Webhook, RequestsWebhookAdapter
 
 load_dotenv()
-ENDPOINT = os.getenv('LOCALHOST')  # Add blockchain connection information
 
-web3 = Web3(Web3.HTTPProvider(ENDPOINT))
+web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))
 
 alerts = ['dola3crv', 'lending', 'governance']
 
-#TODO: include state variables reading at handling
-
+# Function to monitor event on by alert tag
 functions_lending = ['Mint', 'Redeem', 'Borrow', 'RepayBorrow']
 functions_governance = ['ProposalCreated', 'ProposalCanceled', 'ProposalQueued', 'ProposalExecuted']
 functions_dola3crv = ['AddLiquidity', 'RemoveLiquidity', 'RemoveLiquidityOne']
 
-state_lending = ['name','totalBorrows','totalReserves','totalSupply','getCash']
+# State variable to get the result from when event is triggered by alert tag
+state_lending = ['name', 'totalSupply']
 state_governance = ['proposalCount']
-state_dola3crv = ['name','symbol','totalSupply']
+state_dola3crv = ['name', 'symbol', 'totalSupply']
 
-webhook_dola3crv = os.getenv('webhook_dola3crv')
-webhook_governance = os.getenv('webhook_governance')
-webhook_lending = os.getenv('webhook_lending')
+# Webhook per alert tag
+webhook_dola3crv = os.getenv('WEBHOOK_DOLA3CRV')
+webhook_governance = os.getenv('WEBHOOK_GOVERNANCE')
+webhook_lending = os.getenv('WEBHOOK_LENDING')
+
+n_alert = 0
+
+# First loop to cover all alerts type
+for alert in alerts:
+    # Define webhook corresponding to alert
+    use_webhook = eval(f'webhook_{alert}')
+    webhook = Webhook.from_url(use_webhook, adapter=RequestsWebhookAdapter())
+
+    state_functions = eval(f'state_{alert}')
+
+    # Get contracts filter ABIs and contract by alert name
+    contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
+    contracts = contracts[contracts['tags'].str.contains(str(alert))]
+
+    # Load token addresses and ABIs corresponding to the alerts
+    filters = {"id": []}
+    for i in range(0, len(contracts['contract_address'])):
+
+        contract_name = web3.toChecksumAddress(contracts.iloc[i]['contract_address'])
+        contract_abi = json.loads(str(contracts.iloc[i]['ABI']))
+        contract = web3.eth.contract(address=contract_name, abi=contract_abi)
+        filters["id"].append(contract)
 
 
-class Listener(Thread):
-    def __init__(self, alert, contract, function, **kwargs):
-        super(Listener, self).__init__(**kwargs)
-        self.alert = alert
-        self.contract = contract
-        self.function = function
-        self.event_filter = []
+    functions = eval(f'functions_{alert}')
 
-    def run(self):
-        exec(f"self.event_filter = self.contract.events.{self.function}.createFilter(fromBlock='latest')")
-        while True:
-            for handler in self.event_filter.get_new_entries():
-                handle_event(handler, self.alert, self.contract)
+    # Second loop to cover all contracts in the alert tag
+    for i in filters["id"]:
+        contract = i
 
+        # Third loop to cover all functions
+        for j in functions:
+            function = j
 
-# define function to handle events and print to the console
-def handle_event(event, alert):
-    print(Web3.toJSON(event))
-    tx = json.loads(Web3.toJSON(event))
-    title = alert + ' :' + tx['event'] + "Event Detected"
+            # Initiate Threads
+            Listener(web3, alert, contract, function, state_functions, webhook).start()
+            n_alert += 1
 
-    webhook.send(title +
-                 "\n" + "Block Number : " + str(tx['blockNumber']) +
-                 "\n" + "Transaction Hash : " + tx['transactionHash'] +
-                 "\n" + "Etherscan : https://etherscan.io/tx/" + tx['transactionHash'] +
-                 "\n" + "Full tx" + str(tx)+
-                 "\n" +  Web3)
-                 #"\n" + "Tag Test <@578956365205209098>")
+            print('Alert ' + alert + ' started listening at function ' + function + ' on contract ' + contract.address + ' (n.' + str(n_alert) + ')')
 
-if __name__ == "__main__":
-    nalert = 0
-    for alert in alerts:
-        # Get contracts filter ABIs and contract by alert name
-        contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
-        contracts = contracts[contracts['tags'].str.contains(str(alert))]
-
-        # Load token addresses and ABIs
-        # Add contract in dictionnary to run main() iteratively
-        filters = {"id": []}
-        for i in range(0, len(contracts['contract_address'])):
-            contract_name = web3.toChecksumAddress(contracts.iloc[i]['contract_address'])
-            contract_abi = json.loads(contracts.iloc[i]['ABI'])
-            filters["id"].append(web3.eth.contract(address=contract_name, abi=contract_abi))
-
-        functions = ""
-        exec(f'functions = functions_{alert}')
-        exec(f'webhook = Webhook.from_url(webhook_{alert}, adapter=RequestsWebhookAdapter())')
-
-        for i in filters["id"]:
-            contract = i
-            for j in functions:
-                function = j
-                Listener(alert, contract, function).start()
-                nalert += 1
-                print('Alert '+ alert +' started listening at function ' + function + ' on contract ' + contract.address +' (n.'+ str(nalert) +')')
-    print('Alerts running : ' + str(nalert))
+print('Alerts running : ' + str(n_alert))
