@@ -8,25 +8,17 @@ from web3 import Web3
 from discord import Webhook, RequestsWebhookAdapter
 
 load_dotenv()
+web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
 
-web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))
+# Get alerts, functions, and state functions to read from
+functions = pd.read_excel('contracts.xlsx', sheet_name='alerts_func')
+state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
+alerts = functions.columns.array
 
-alerts = ['dola3crv', 'lending', 'governance']
-
-# Function to monitor event on by alert tag
-functions_lending = ['Mint', 'Redeem', 'Borrow', 'RepayBorrow','LiquidateBorrow']
-functions_governance = ['ProposalCreated', 'ProposalCanceled', 'ProposalQueued', 'ProposalExecuted']
-functions_dola3crv = ['AddLiquidity', 'RemoveLiquidity', 'RemoveLiquidityOne']
-
-# State variable to get the result from when event is triggered by alert tag
-state_lending = ['name', 'totalSupply']
-state_governance = ['proposalCount']
-state_dola3crv = ['name', 'symbol', 'totalSupply']
-
-# Webhook per alert tag
-webhook_dola3crv = os.getenv('WEBHOOK_DOLA3CRV')
-webhook_governance = os.getenv('WEBHOOK_GOVERNANCE')
-webhook_lending = os.getenv('WEBHOOK_LENDING')
+for alert in alerts:
+    exec(f"functions_{alert} = functions['{alert}'].dropna()")
+    exec(f"state_{alert} = state['{alert}'].dropna()")
+    exec(f"webhook_{alert} = os.getenv(str('webhook_{alert}').upper())")
 
 n_alert = 0
 
