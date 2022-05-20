@@ -5,6 +5,7 @@ import logging
 from web3 import Web3
 from threading import Thread
 from datetime import datetime
+import asyncio
 logger = logging.getLogger()
 
 
@@ -28,14 +29,15 @@ class Listener(Thread):
                     print(str(datetime.now())+" Event found in "+str(self.alert)+"-"+str(self.contract)+"-"+str(self.function))
                     handle_event(event, self.web3, self.alert, self.contract, self.function, self.state_functions,self.webhook)
         except:
-            print(str(datetime.now())+" Error in "+str(self.alert)+"-"+str(self.contract.address)+"-"+str(self.function))
-            print(str(datetime.now())+" Skipping to next event")
+            print(str(datetime.now())+" Error : Waiting for endpoint response...")
             pass
+
+
 
 # Define function to handle events and print to the console/send to discord
 def handle_event(event, web3, alert, contract, function, state_functions, webhook):
     tx = json.loads(Web3.toJSON(event))
-    print(str(datetime.now())+" "+tx)
+    print(str(datetime.now())+" "+str(tx))
     results = []
 
     # Collect state function results
@@ -49,7 +51,7 @@ def handle_event(event, web3, alert, contract, function, state_functions, webhoo
     state_results = state_results.set_axis(state_functions, axis=1, inplace=False)
 
     # Print result table and go to trigger routine
-    print(str(datetime.now())+" "+state_results)
+    print(str(datetime.now())+" "+str(state_results))
     handle_trigger(alert, tx, function, state_results, webhook)
 
 
@@ -94,7 +96,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
     elif (alert == 'lending'):
         if (function == 'Mint'):
-            title = 'Lending Market New : ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
+            title = 'Lending Market : New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
             body = ("Block Number : " + str(tx['blockNumber']) +
                     "\n" +"Minter : " + str(tx['args']['minter']) +
                     "\n" +"Address : " + str(tx['address']) +
@@ -103,7 +105,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" +"Total Supply : " + str(state_results.at[0,'totalSupply()']) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
         elif (function == 'Redeem'):
-            title = 'Lending Market New : ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
+            title = 'Lending Market : New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
             body = ("Block Number : " + str(tx['blockNumber']) +
                     "\n" +"Redeemer : " + str(tx['args']['redeemer']) +
                     "\n" +"Address : " + str(tx['address']) +
@@ -112,7 +114,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" +"Total Supply : " + str(state_results.at[0,'totalSupply()']) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
         elif (function == 'Borrow'):
-            title = 'Lending Market New : ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
+            title = 'Lending Market : New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
             body = ("Block Number : " + str(tx['blockNumber']) +
                     "\n" +"Borrower : " + str(tx['args']['borrower']) +
                     "\n" +"Address : " + str(tx['address']) +
@@ -122,7 +124,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" +"Total Supply : " + str(state_results.at[0,'totalSupply()']) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
         elif (function == 'RepayBorrow'):
-            title = 'Lending Market New : ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
+            title = 'Lending Market : New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected for " + str(state_results.at[0,'name()'])
             body = ("Block Number : " + str(tx['blockNumber']) +
                     "\n" +"Payer : " + str(tx['args']['payer']) +
                     "\n" +"Address : " + str(tx['address']) +
@@ -165,6 +167,58 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Fed Address : " + str(tx['address']) +
                     "\n" + "Sender : " + str(tx['args']['amount']) +
                     "\n" + "Total Supply : " + str(state_results.at[0, 'supply()']) +
+                    "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
+    elif (alert == 'sushi'):
+        if (function == 'Swap'):
+            title = 'Sushi New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
+            body = ("Block Number : " + str(tx['blockNumber']) +
+                    "\n" + "Address : " + str(tx['address']) +
+                    "\n" + "Sender : " + str(tx['args']['sender']) +
+                    "\n" + "To : " + str(tx['args']['to']) +
+                    "\n" + "Amount0In : " + str(tx['args']['amount0In']) +
+                    "\n" + "Amount0Out : " + str(tx['args']['amount0Out']) +
+                    "\n" + "Amount1In : " + str(tx['args']['amount1In']) +
+                    "\n" + "Amount1Out : " + str(tx['args']['amount1Out']) +
+                    "\n" + "Symbol : " + str(state_results.at[0, 'symbol()']) +
+                    "\n" + "Name : " + str(state_results.at[0, 'name()']) +
+                    "\n" + "price0CumulativeLast : " + str(state_results.at[0, 'price0CumulativeLast()']) +
+                    "\n" + "price1CumulativeLast : " + str(state_results.at[0, 'price1CumulativeLast()']) +
+                    "\n" + "Token 0 : " + str(state_results.at[0, 'token0()']) +
+                    "\n" + "Token 1 : " + str(state_results.at[0, 'token1()']) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
+                    "\n" + "Total Reserves : " + str(state_results.at[0, 'getReserves()']) +
+                    "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
+        elif (function in ['Mint']):
+            title = 'Sushi New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
+            body = ("Block Number : " + str(tx['blockNumber']) +
+                    "\n" + "Address : " + str(tx['address']) +
+                    "\n" + "Sender : " + str(tx['args']['sender']) +
+                    "\n" + "To : " + str(tx['args']['to']) +
+                    "\n" + "tokenA : " + str(tx['args']['tokenA']) +
+                    "\n" + "tokenB : " + str(tx['args']['tokenB']) +
+                    "\n" + "amountADesired : " + str(tx['args']['amountADesired']) +
+                    "\n" + "amountBDesired : " + str(tx['args']['amountBDesired']) +
+                    "\n" + "amountADesired : " + str(tx['args']['amountAMin']) +
+                    "\n" + "amountBDesired : " + str(tx['args']['amountBMin']) +
+                    "\n" + "price0CumulativeLast : " + str(state_results.at[0, 'price0CumulativeLast()']) +
+                    "\n" + "price1CumulativeLast : " + str(state_results.at[0, 'price1CumulativeLast()']) +
+                    "\n" + "Token 0 : " + str(state_results.at[0, 'token0()']) +
+                    "\n" + "Token 1 : " + str(state_results.at[0, 'token1()']) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
+                    "\n" + "Total Reserves : " + str(state_results.at[0, 'getReserves()']) +
+                    "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
+        elif (function in ['Redeem']):
+            title = 'Sushi New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
+            body = ("Block Number : " + str(tx['blockNumber']) +
+                    "\n" + "Address : " + str(tx['address']) +
+                    "\n" + "Sender : " + str(tx['args']['sender']) +
+                    "\n" + "To : " + str(tx['args']['to']) +
+                    "\n" + "token : " + str(tx['args']['token']) +
+                    "\n" + "liquidity : " + str(tx['args']['liquidity']) +
+                    "\n" + "amountTokenMin : " + str(tx['args']['amountTokenMin']) +
+                    "\n" + "amountETHMin : " + str(tx['args']['amountETHMin']) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
+                    "\n" + "Total Reserves : " + str(state_results.at[0, 'getReserves()']) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + tx['transactionHash'])
 
     if (send ==True):
