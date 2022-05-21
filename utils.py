@@ -228,7 +228,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Total Reserves 1 : " + str(state_results.at[0, 'getReserves()'][1]) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + str(tx['transactionHash']))
     elif (alert == 'unitroller'):
-        if (function in ['NewBorrowCap','NewSupplyCap','NewCollateralFactor','NewPriceOracle']):
+        if (function in ['NewBorrowCap','NewSupplyCap','NewCollateralFactor','NewPriceOracle','MarketListed','MarketUnlisted']):
             title = 'Comptroller Markets ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
             body = ("Block Number : " + str(tx['blockNumber']) +
                     "\n" + "Address : " + str(tx['address']) +
