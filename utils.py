@@ -179,18 +179,18 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Address : " + str(tx['address']) +
                     "\n" + "Sender : " + str(tx['args']['sender']) +
                     "\n" + "To : " + str(tx['args']['to']) +
-                    "\n" + "Amount0In : " + str(tx['args']['amount0In']) +
-                    "\n" + "Amount0Out : " + str(tx['args']['amount0Out']) +
-                    "\n" + "Amount1In : " + str(tx['args']['amount1In']) +
-                    "\n" + "Amount1Out : " + str(tx['args']['amount1Out']) +
+                    "\n" + "Amount0In : " + str(tx['args']['amount0In']/1e18) +
+                    "\n" + "Amount0Out : " + str(tx['args']['amount0Out']/1e18) +
+                    "\n" + "Amount1In : " + str(tx['args']['amount1In']/1e18) +
+                    "\n" + "Amount1Out : " + str(tx['args']['amount1Out']/1e18) +
                     "\n" + "Symbol : " + str(state_results.at[0, 'symbol()']) +
                     "\n" + "Name : " + str(state_results.at[0, 'name()']) +
-                    "\n" + "price0CumulativeLast : " + str(state_results.at[0, 'price0CumulativeLast()']) +
-                    "\n" + "price1CumulativeLast : " + str(state_results.at[0, 'price1CumulativeLast()']) +
+                    #"\n" + "price0CumulativeLast : " + str(state_results.at[0, 'price0CumulativeLast()']) +
+                    #"\n" + "price1CumulativeLast : " + str(state_results.at[0, 'price1CumulativeLast()']) +
                     "\n" + "Token 0 : " + str(state_results.at[0, 'token0()']) +
                     "\n" + "Token 1 : " + str(state_results.at[0, 'token1()']) +
-                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
-                    "\n" + "Total Reserves 0 : " + str(state_results.at[0, 'getReserves()'][0]) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']/1e18) +
+                    "\n" + "Total Reserves 0 : " + str(state_results.at[0, 'getReserves()'][0]/1e18) +
                     "\n" + "Total Reserves 1 : " + str(state_results.at[0, 'getReserves()'][1]) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + str(tx['transactionHash']))
         elif (function in ['Mint']):
@@ -201,17 +201,17 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "To : " + str(tx['args']['to']) +
                     "\n" + "tokenA : " + str(tx['args']['tokenA']) +
                     "\n" + "tokenB : " + str(tx['args']['tokenB']) +
-                    "\n" + "amountADesired : " + str(tx['args']['amountADesired']) +
-                    "\n" + "amountBDesired : " + str(tx['args']['amountBDesired']) +
-                    "\n" + "amountADesired : " + str(tx['args']['amountAMin']) +
-                    "\n" + "amountBDesired : " + str(tx['args']['amountBMin']) +
-                    "\n" + "price0CumulativeLast : " + str(state_results.at[0, 'price0CumulativeLast()']) +
-                    "\n" + "price1CumulativeLast : " + str(state_results.at[0, 'price1CumulativeLast()']) +
+                    "\n" + "amountADesired : " + str(tx['args']['amountADesired']/1e18) +
+                    "\n" + "amountBDesired : " + str(tx['args']['amountBDesired']/1e18) +
+                    "\n" + "amountADesired : " + str(tx['args']['amountAMin']/1e18) +
+                    "\n" + "amountBDesired : " + str(tx['args']['amountBMin']/1e18) +
+                    #"\n" + "price0CumulativeLast : " + str(state_results.at[0, 'price0CumulativeLast()']) +
+                    #"\n" + "price1CumulativeLast : " + str(state_results.at[0, 'price1CumulativeLast()']) +
                     "\n" + "Token 0 : " + str(state_results.at[0, 'token0()']) +
                     "\n" + "Token 1 : " + str(state_results.at[0, 'token1()']) +
-                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
-                    "\n" + "Total Reserves 0 : " + str(state_results.at[0, 'getReserves()'][0]) +
-                    "\n" + "Total Reserves 1 : " + str(state_results.at[0, 'getReserves()'][1]) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']/1e18) +
+                    "\n" + "Total Reserves 0 : " + str(state_results.at[0, 'getReserves()'][0]/1e18) +
+                    "\n" + "Total Reserves 1 : " + str(state_results.at[0, 'getReserves()'][1]/1e18) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + str(tx['transactionHash']))
         elif (function in ['Burn']):
             title = 'Sushi New ' + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx['event'])) + " event detected"
@@ -220,12 +220,12 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                     "\n" + "Sender : " + str(tx['args']['sender']) +
                     "\n" + "To : " + str(tx['args']['to']) +
                     "\n" + "token : " + str(tx['args']['token']) +
-                    "\n" + "liquidity : " + str(tx['args']['liquidity']) +
-                    "\n" + "amountTokenMin : " + str(tx['args']['amountTokenMin']) +
-                    "\n" + "amountETHMin : " + str(tx['args']['amountETHMin']) +
-                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']) +
-                    "\n" + "Total Reserves 0 : " + str(state_results.at[0, 'getReserves()'][0]) +
-                    "\n" + "Total Reserves 1 : " + str(state_results.at[0, 'getReserves()'][1]) +
+                    "\n" + "liquidity : " + str(tx['args']['liquidity']/1e18) +
+                    "\n" + "amountTokenMin : " + str(tx['args']['amountTokenMin']/1e18) +
+                    "\n" + "amountETHMin : " + str(tx['args']['amountETHMin']/1e18) +
+                    "\n" + "Total Supply : " + str(state_results.at[0, 'totalSupply()']/1e18) +
+                    "\n" + "Total Reserves 0 : " + str(state_results.at[0, 'getReserves()'][0]/1e18) +
+                    "\n" + "Total Reserves 1 : " + str(state_results.at[0, 'getReserves()'][1]/1e18) +
                     "\n" + "Transaction : https://etherscan.io/tx/" + str(tx['transactionHash']))
     elif (alert == 'unitroller'):
         if (function in ['NewBorrowCap','NewSupplyCap','NewCollateralFactor','NewPriceOracle','MarketListed','MarketUnlisted']):
