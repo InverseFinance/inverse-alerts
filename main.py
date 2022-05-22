@@ -2,7 +2,6 @@
 import json
 import os
 import pandas as pd
-
 from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
