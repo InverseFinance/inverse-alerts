@@ -28,6 +28,7 @@ n_alert = 0
 
 # First loop to cover all alerts type
 for alert in alerts:
+
     # Define webhook corresponding to alert
     use_webhook = eval(f'webhook_{alert}')
     webhook = Webhook.from_url(use_webhook, adapter=RequestsWebhookAdapter())
