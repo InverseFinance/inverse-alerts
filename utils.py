@@ -1,3 +1,4 @@
+import os
 import json
 import re
 import pandas as pd
@@ -239,3 +240,25 @@ def handle_trigger(alert, tx, function, state_results, webhook):
     # "\n" + "Tag Test <@578956365205209098>")
 
     webhook.send(message)
+
+def getUnderlyingPrice(address, oracle_address):
+    web3_oracle = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))  # Or infura key
+    address = web3_oracle.toChecksumAddress(address)
+    oracle_name = web3_oracle.toChecksumAddress(oracle_address)
+    oracle_ABI = json.loads('oracle.json')
+    contract = web3_oracle.eth.contract(address=oracle_name, abi=oracle_ABI)
+
+    price = contract.functions.getUnderlyingPrice(address).call()
+    if (price == 0): price =1
+    return price
+
+def getDecimals(address):
+    web3_oracle = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))  # Or infura key
+    address = web3_oracle.toChecksumAddress(address)
+    oracle_name = web3_oracle.toChecksumAddress(oracle_address)
+    oracle_ABI = json.loads('erc20.json')
+    contract = web3_oracle.eth.contract(address=oracle_name, abi=oracle_ABI)
+
+    price = contract.functions.getUnderlyingPrice(address).call()
+    if (price == 0): price =1
+    return price
