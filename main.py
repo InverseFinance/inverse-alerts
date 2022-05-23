@@ -8,6 +8,7 @@ from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
 from discord import Webhook, RequestsWebhookAdapter
+import requests
 from threading import Thread
 from datetime import datetime
 
@@ -28,30 +29,25 @@ for alert in alerts:
 
 n_alert = 0
 
-# First loop to cover all alerts type
+# First loop to cover all alert tags  (then contract and functions)
 for alert in alerts:
 
-    # Define webhook corresponding to alert
-    webhook = f'webhook_{alert}'
-    #webhook = Webhook.from_url(use_webhook, adapter=RequestsWebhookAdapter())
+    # Define webhook, functions and state functions corresponding to alert name
+    webhook = eval(f'webhook_{alert}')
+    state_functions = eval(f'state_{alert}')
+    functions = eval(f'functions_{alert}')
 
-    state_functions = f'state_{alert}'
-
-    # Get contracts filter ABIs and contract by alert name
+    # Get contracts filtering by alert tag and load their ABIs
     contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
     contracts = contracts[contracts['tags'].str.contains(str(alert))]
 
-    # Load token addresses and ABIs corresponding to the alerts
     filters = {"id": []}
     for i in range(0, len(contracts['contract_address'])):
-
         contract_name = web3.toChecksumAddress(contracts.iloc[i]['contract_address'])
         contract_abi = json.loads(str(contracts.iloc[i]['ABI']))
         contract = web3.eth.contract(address=contract_name, abi=contract_abi)
         filters["id"].append(contract)
 
-
-    functions = eval(f'functions_{alert}')
 
     # Second loop to cover all contracts in the alert tag
     for i in filters["id"]:
