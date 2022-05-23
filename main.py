@@ -12,6 +12,7 @@ from threading import Thread
 from datetime import datetime
 
 #Thread(os.system('cmd /k "geth --syncmode light --http --http.addr 0.0.0.0"')).start()
+
 load_dotenv()
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
 
@@ -31,10 +32,10 @@ n_alert = 0
 for alert in alerts:
 
     # Define webhook corresponding to alert
-    use_webhook = eval(f'webhook_{alert}')
-    webhook = Webhook.from_url(use_webhook, adapter=RequestsWebhookAdapter())
+    webhook = f'webhook_{alert}'
+    #webhook = Webhook.from_url(use_webhook, adapter=RequestsWebhookAdapter())
 
-    state_functions = eval(f'state_{alert}')
+    state_functions = f'state_{alert}'
 
     # Get contracts filter ABIs and contract by alert name
     contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
