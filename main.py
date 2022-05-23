@@ -11,6 +11,7 @@ from discord import Webhook, RequestsWebhookAdapter
 import requests
 from threading import Thread
 from datetime import datetime
+from utils import sendWebhook,makeFields
 
 #Thread(os.system('cmd /k "geth --syncmode light --http --http.addr 0.0.0.0"')).start()
 

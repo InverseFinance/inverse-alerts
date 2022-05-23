@@ -1,3 +1,6 @@
 *.env
 /.idea
 /venv
+test.py
+test2.py
+__pycache__/utils.cpython-310.pyc
