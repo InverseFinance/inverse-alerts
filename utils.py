@@ -58,6 +58,7 @@ class Listener(Thread):
 
                     handle_event(event, self.web3, self.alert, self.contract, self.function, self.state_functions,
                                  self.webhook)
+                    # Add triggers here
             except Exception as e:
                 print("Error in Event Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
                     self.function))
@@ -83,7 +84,7 @@ def handle_event(event, web3, alert, contract, function, state_functions, webhoo
 
         # Print result table and go to trigger routine
         print(str(datetime.now()) + " " + str(state_results))
-        handle_trigger(alert, tx, function, state_results, webhook)
+        handle_message(alert, tx, function, state_results, webhook)
 
     except Exception as e:
         print('Error in event handler')
@@ -92,7 +93,7 @@ def handle_event(event, web3, alert, contract, function, state_functions, webhoo
 
 
 # Get an event and define if it sends a message or not to the appropriate webhook
-def handle_trigger(alert, tx, function, state_results, webhook):
+def handle_message(alert, tx, function, state_results, webhook):
     send = False
     image = ''
     color = ''
@@ -101,26 +102,63 @@ def handle_trigger(alert, tx, function, state_results, webhook):
         image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/833844/1457892/bccc1e5b-4b60-4b28-85da-fbd558a2fd69.jpg"
         if (function == "RemoveLiquidity"):
             title = "DOLA3CRV Pool " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
-            fields = f'''makeFields(['Block :','Value :','Total Supply :','Address :','Sender :','Receiver :','Transaction :'],
-            ['{str(tx["blockNumber"])}', '{str(tx["args"]["value"]) / 1e18}','{str(state_results.at[0, "totalSupply()"] / 1e18)}', '{str(tx["address"])}',
-            '{str(tx["args"]["sender"])}', '{str(tx["args"]["receiver"])}', '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+            fields = f'''makeFields(
+            ['Block :',
+            'Value :',
+            'Total Supply :',
+            'Address :',
+            'Sender :',
+            'Receiver :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["value"]) / 1e18}',
+            '{str(state_results.at[0, "totalSupply()"] / 1e18)}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["sender"])}',
+            '{str(tx["args"]["receiver"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
             [True,True,True,False,True,True,False])'''
 
             color = colors.red
             send = True
         elif (function == "RemoveLiquidityOne"):
             title = "DOLA3CRV Pool " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
-            fields = f'''makeFields(['Block :','Token Amount :','Coin Amount :','Token Supply :','Provider :','Transaction :'],
-            ['{str(tx["blockNumber"])}', '{str(tx["args"]["token_amount"]) / 1e18}','{str(tx["args"]["coin_amount"]) / 1e18}','{str(tx["args"]["token_supply"]) / 1e18}',
-            '{str(tx["args"]["provider"])}', '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+            fields = f'''makeFields(
+            ['Block :',
+            'Token Amount :',
+            'Coin Amount :',
+            'Token Supply :',
+            'Provider :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["token_amount"]) / 1e18}',
+            '{str(tx["args"]["coin_amount"]) / 1e18}',
+            '{str(tx["args"]["token_supply"]) / 1e18}',
+            '{str(tx["args"]["provider"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
             [True,False,True,False,True,False])'''
             color = colors.red
             send = True
         elif (function == "AddLiquidity"):
             title = "DOLA3CRV Pool " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
-            fields = f'''makeFields(['Block :','Token 0 Amount :','Token 1 Amount :','Fees 0 Amount :','Fees 1 Amount :','Balance 0 :','Balance 1 :','Token Supply :','Address :','Transaction :'],
-            ['{str(tx["blockNumber"])}', '{str(tx["args"]["token_amounts"][0]) / 1e18}','{str(tx["args"]["token_amounts"][1]) / 1e18}','{str(tx["args"]["fees"][0] / 1e18)}',
-            '{str(tx["args"]["fees"][1] / 1e18)}','{str(state_results.at[0, "balances(0)"] / 1e18)}',{str(state_results.at[0, "balances(1)"] / 1e18)},
+            fields = f'''makeFields(
+            ['Block :',
+            'Token 0 Amount :',
+            'Token 1 Amount :',
+            'Fees 0 Amount :',
+            'Fees 1 Amount :',
+            'Balance 0 :',
+            'Balance 1 :',
+            'Token Supply :',
+            'Address :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["token_amounts"][0]) / 1e18}',
+            '{str(tx["args"]["token_amounts"][1]) / 1e18}',
+            '{str(tx["args"]["fees"][0] / 1e18)}',
+            '{str(tx["args"]["fees"][1] / 1e18)}',
+            '{str(state_results.at[0, "balances(0)"] / 1e18)}',
+            '{str(state_results.at[0, "balances(1)"] / 1e18)}',
             '{str(tx["address"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
             [False,True,True,True,True,False,True,True,False,False])'''
 
@@ -174,6 +212,7 @@ def handle_trigger(alert, tx, function, state_results, webhook):
             [True,False,False,True,True,True,True,False])'''
 
             color = colors.blurple
+            send = True
         elif (function == "LiquidateBorrow"):
             title = "Lending Market New : " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                      str(tx["event"])) + " event detected for " + str(
@@ -191,9 +230,21 @@ def handle_trigger(alert, tx, function, state_results, webhook):
             title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                      str(tx["event <@899302193608409178>"]))
 
-            fields = f'''makeFields(['Block Number :','Targets :','Values :','Signatures :','Call Data :','Description :','Transaction :'],
-            ['{str(tx["blockNumber"])}','{str(tx["args"]["targets"])}','{str(tx["args"]["values"])}','{str(tx["args"]["signatures"])}','{str(tx["args"]["calldatas"])}',
-            '{str(tx["args"]["description"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Targets :',
+            'Values :',
+            'Signatures :',
+            'Call Data :',
+            'Description :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["targets"])}',
+            '{str(tx["args"]["values"])}',
+            '{str(tx["args"]["signatures"])}',
+            '{str(tx["args"]["calldatas"])}',
+            '{str(tx["args"]["description"])[0:30]}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
             [False,False,False,False,False,False,False])'''
 
             color = colors.blurple
@@ -202,7 +253,10 @@ def handle_trigger(alert, tx, function, state_results, webhook):
             title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                      str(tx["event <@899302193608409178>"]))
 
-            fields = f'''makeFields(['Block Number :','Proposal :','Transaction :'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Proposal :',
+            'Transaction :'],
             ['{str(tx["blockNumber"])}',
             '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
@@ -214,7 +268,10 @@ def handle_trigger(alert, tx, function, state_results, webhook):
             title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                      str(tx["event <@899302193608409178>"]))
 
-            fields = f'''makeFields(['Block Number :','Proposal :','Transaction :'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Proposal :',
+            'Transaction :'],
             ['{str(tx["blockNumber"])}',
             '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
@@ -226,7 +283,10 @@ def handle_trigger(alert, tx, function, state_results, webhook):
             title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                      str(tx["event <@899302193608409178>"]))
 
-            fields = f'''makeFields(['Block Number :','Proposal :','Transaction :'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Proposal :',
+            'Transaction :'],
             ['{str(tx["blockNumber"])}',
             '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
@@ -257,7 +317,18 @@ def handle_trigger(alert, tx, function, state_results, webhook):
         if (function in ["Expansion"]):
             title = "Fed " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
 
-            fields = f'''makeFields(['Block Number :','Fed Address :','Sender :','Total Supply :','Transaction :'],['{str(tx["blockNumber"])}','{str(tx["address"])}','{str(tx["args"]["amount"] / 1e18)}','{str(state_results.at[0, "supply()"] / 1e18)}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],[False,False,False,False,False])'''
+            fields = f'''makeFields([
+            'Block Number :',
+            'Fed Address :',
+            'Sender :',
+            'Total Supply :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["amount"] / 1e18)}',
+            '{str(state_results.at[0, "supply()"] / 1e18)}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            [False,False,False,False,False])'''
 
             color = colors.dark_green
             send = True
@@ -372,7 +443,13 @@ def handle_trigger(alert, tx, function, state_results, webhook):
                          "MarketUnlisted"]):
             title = "Comptroller Markets " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
 
-            fields = f'''makeFields(['Block Number :','Address :','All Markets :','Comptroller :','Transaction :'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Address :',
+            'All Markets :',
+            'Comptroller :',
+            'Transaction :'],
+            
             ['{str(tx["blockNumber"])}',
             '{str(tx["address"])}',
             '{str(state_results.at[0, "getAllMarkets()"])}',

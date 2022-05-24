@@ -3,17 +3,11 @@ import json
 import os
 import pandas as pd
 import fetchers
-
+from threading import Thread
 from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
-from discord import Webhook, RequestsWebhookAdapter
-import requests
-from threading import Thread
 from datetime import datetime
-from utils import sendWebhook,makeFields
-
-#Thread(os.system('cmd /k "geth --syncmode light --http --http.addr 0.0.0.0"')).start()
 
 load_dotenv()
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
