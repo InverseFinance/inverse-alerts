@@ -8,20 +8,7 @@ from utils import Listener
 from dotenv import load_dotenv
 from web3 import Web3
 from datetime import datetime
-import logging
-import sys
-
-# Logger config
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("debug.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-# Mute warning when pool is full
-logging.getLogger("urllib3").setLevel(logging.ERROR)
+immport logger
 
 load_dotenv()
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
