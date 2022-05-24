@@ -1,6 +1,8 @@
 *.env
 /.idea
 /venv
+*.cmd
+debug.log
 test.py
 test2.py
 __pycache__/utils.cpython-310.pyc
