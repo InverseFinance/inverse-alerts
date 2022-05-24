@@ -170,9 +170,23 @@ def handle_message(alert, tx, function, state_results, webhook):
                                                      str(tx["event"])) + " event detected for " + str(
                 state_results.at[0, "name()"])
 
-            fields = f''''makeFields(['Block Number :','Minter :','Address :','Mint Amount :','Mint Tokens :','Total Supply','Total Cash :','Transaction :'],
-            ['{str(tx["blockNumber"])}','{str(tx["args"]["minter"])}','{str(tx["address"])}','{str(tx["args"]["mintAmount"])}','{str(tx["args"]["mintTokens"])}',
-            '{str(state_results.at[0, "totalSupply()"])}','{str(state_results.at[0, "getCash()"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Minter :',
+            'Address :',
+            'Mint Amount :',
+            'Mint Tokens :',
+            'Total Supply',
+            'Total Cash :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["minter"])}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["mintAmount"])}',
+            '{str(tx["args"]["mintTokens"])}',
+            '{str(state_results.at[0, "totalSupply()"])}',
+            '{str(state_results.at[0, "getCash()"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
             [True,True,True,False,True,True,True,False])'''
 
             color = colors.blurple
@@ -182,9 +196,23 @@ def handle_message(alert, tx, function, state_results, webhook):
                                                      str(tx["event"])) + " event detected for " + str(
                 state_results.at[0, "name()"])
 
-            fields = f''''makeFields(['Block Number :','Minter :','Address :','Redeem Amount :','Redeem Tokens :','Total Supply','Total Cash :','Transaction :'],
-            ['{str(tx["blockNumber"])}','{str(tx["args"]["redeemer"])}','{str(tx["address"])}','{str(tx["args"]["redeemAmount"])}','{str(tx["args"]["redeemTokens"])}',
-            '{str(state_results.at[0, "totalSupply()"])}','{str(state_results.at[0, "getCash()"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Minter :',
+            'Address :',
+            'Redeem Amount :',
+            'Redeem Tokens :',
+            'Total Supply',
+            'Total Cash :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["redeemer"])}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["redeemAmount"])}',
+            '{str(tx["args"]["redeemTokens"])}',
+            '{str(state_results.at[0, "totalSupply()"])}',
+            '{str(state_results.at[0, "getCash()"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
             [True,True,True,False,True,True,True,False])'''
 
             color = colors.blurple
@@ -194,9 +222,24 @@ def handle_message(alert, tx, function, state_results, webhook):
                                                      str(tx["event"])) + " event detected for " + str(
                 state_results.at[0, "name()"])
 
-            fields = f'''makeFields(['Block Number :','Borrower :','Address :','Borrow Amount :','Account Borrows :','Total Borrows :','Total Supply :','Total Cash :','Transaction :'],
-            ['{str(tx["args"]["borrower"])}','{str(tx["address"])}','{str(tx["args"]["borrowAmount"])}','{str(tx["args"]["accountBorrows"])}','{str(tx["args"]["totalBorrows"])}',
-            '{str(state_results.at[0, "totalSupply()"])}','{str(state_results.at[0, "getCash()"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Borrower :',
+            'Address :',
+            'Borrow Amount :',
+            'Account Borrows :',
+            'Total Borrows :',
+            'Total Supply :',
+            'Total Cash :',
+            'Transaction :'],
+            ['{str(tx["args"]["borrower"])}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["borrowAmount"])}',
+            '{str(tx["args"]["accountBorrows"])}',
+            '{str(tx["args"]["totalBorrows"])}',
+            '{str(state_results.at[0, "totalSupply()"])}',
+            '{str(state_results.at[0, "getCash()"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
             [True,True,False,True,True,True,True,True,False])'''
 
             color = colors.blurple
@@ -206,10 +249,26 @@ def handle_message(alert, tx, function, state_results, webhook):
                                                      str(tx["event"])) + " event detected for " + str(
                 state_results.at[0, "name()"])
 
-            fields = f'''makeFields(['Block Number :','Payer :','Address : ','Repaid Amount :','Account Borrows :','Total Borrows :','Total Supply :','Total Cash :','Transaction :'],
-            ['{str(tx["blockNumber"])}','{str(tx["args"]["payer"])}','{str(tx["address"])}','{str(tx["args"]["repayAmount"])}','{str(tx["args"]["accountBorrows"])}',
-            '{str(tx["args"]["totalBorrows"])}','{str(state_results.at[0, "totalSupply()"])}','{str(state_results.at[0, "getCash()"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-            [True,False,False,True,True,True,True,False])'''
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Payer :',
+            'Address : ',
+            'Repaid Amount :',
+            'Account Borrows :',
+            'Total Borrows :',
+            'Total Supply :',
+            'Total Cash :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["payer"])}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["repayAmount"])}',
+            '{str(tx["args"]["accountBorrows"])}',
+            '{str(tx["args"]["totalBorrows"])}',
+            '{str(state_results.at[0, "totalSupply()"])}',
+            '{str(state_results.at[0, "getCash()"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            [True,False,False,True,True,True,True,True,False])'''
 
             color = colors.blurple
             send = True
@@ -218,9 +277,25 @@ def handle_message(alert, tx, function, state_results, webhook):
                                                      str(tx["event"])) + " event detected for " + str(
                 state_results.at[0, "name()"])
 
-            fields = f'''makeFields(['Block Number :','Liquidator :','Borrower :','Address :','Seized Token Address :','Repay Amount :','Seized Tokens Amount','Total Supply :','Transaction :'],
-            ['{str(tx["blockNumber"])}','{str(tx["args"]["liquidator"])}','{str(tx["args"]["borrower"])}','{str(tx["address"])}','{str(tx["args"]["cTokenCollateral"])}',
-            '{str(tx["args"]["repayAmount"])}','{str(tx["args"]["seizeTokens"])}','{str(state_results.at[0, "totalSupply()"])}','{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+            fields = f'''makeFields(
+            ['Block Number :',
+            'Liquidator :',
+            'Borrower :',
+            'Address :',
+            'Seized Token Address :',
+            'Repay Amount :',
+            'Seized Tokens Amount',
+            'Total Supply :',
+            'Transaction :'],
+            ['{str(tx["blockNumber"])}',
+            '{str(tx["args"]["liquidator"])}',
+            '{str(tx["args"]["borrower"])}',
+            '{str(tx["address"])}',
+            '{str(tx["args"]["cTokenCollateral"])}',
+            '{str(tx["args"]["repayAmount"])}',
+            '{str(tx["args"]["seizeTokens"])}',
+            '{str(state_results.at[0, "totalSupply()"])}',
+            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
             [True,False,True,True,False,True,True,True,False])'''
 
             color = colors.blurple
@@ -260,7 +335,7 @@ def handle_message(alert, tx, function, state_results, webhook):
             ['{str(tx["blockNumber"])}',
             '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-            [False,False,False,False])'''
+            [False,False,False])'''
 
             color = colors.dark_red
             send = True
@@ -275,7 +350,7 @@ def handle_message(alert, tx, function, state_results, webhook):
             ['{str(tx["blockNumber"])}',
             '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-            [False,False,False,False])'''
+            [False,False,False])'''
 
             color = colors.blurple
             send = True
@@ -290,7 +365,7 @@ def handle_message(alert, tx, function, state_results, webhook):
             ['{str(tx["blockNumber"])}',
             '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-            [False,False,False,False])'''
+            [False,False,False])'''
 
             color = colors.dark_green
             send = True
@@ -384,8 +459,6 @@ def handle_message(alert, tx, function, state_results, webhook):
             'amountAMin :',
             'amountBMin :',
             'Token 0 :','Token 1 :',
-            'Token A :','Token B :',
-            'Total Reserves 0 :','Total Reserves 1 :',
             'Total Supply :',
             'Transaction :'],
             ['{str(tx["blockNumber"])}',
@@ -400,13 +473,9 @@ def handle_message(alert, tx, function, state_results, webhook):
             '{str(tx["args"]["amountBMin"] / 1e18)}',
             '{str(state_results.at[0, "token0()"])}',
             '{str(state_results.at[0, "token1()"])}',
-            '{str(tx["args"]["tokenA"])}',
-            '{str(tx["args"]["tokenB"])}',
-            '{str(state_results.at[0, "getReserves()"][0] / 1e18)}',
-            '{str(state_results.at[0, "getReserves()"][1] / 1e18)},
             '{str(state_results.at[0, "totalSupply()"] / 1e18)}',
             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-            [True,True,True,False,True,True,False,True,False,True,False,True,False,True,True,True,True,False])'''
+            [True,True,True,False,True,True,False,True,False,True,True,True,True,False])'''
 
             color = colors.dark_green
             send = True
@@ -449,7 +518,6 @@ def handle_message(alert, tx, function, state_results, webhook):
             'All Markets :',
             'Comptroller :',
             'Transaction :'],
-            
             ['{str(tx["blockNumber"])}',
             '{str(tx["address"])}',
             '{str(state_results.at[0, "getAllMarkets()"])}',

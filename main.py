@@ -26,7 +26,6 @@ n_alert = 0
 
 # First loop to cover all alert tags  (then contract and functions)
 for alert in alerts:
-
     # Define webhook, functions and state functions corresponding to alert name
     webhook = eval(f'webhook_{alert}')
     state_functions = eval(f'state_{alert}')
@@ -56,6 +55,7 @@ for alert in alerts:
             Listener(web3, alert, contract, function, state_functions, webhook).start()
             n_alert += 1
 
+            # Log alert-contract-function
             print(str(datetime.now())+' '+ alert+'-'+contract.address+'-'+function+'-'+ str(n_alert) + ' started listening at function ' + function + ' on contract ' + contract.address)
 
 print(str(datetime.now())+' '+'Total alerts running : ' + str(n_alert))
