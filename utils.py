@@ -28,13 +28,19 @@ class StateChangeListener(Thread):
         while True:
             try:
                 #print(f'''self.contract.functions.{self.function}('{str(self.function_arg)}').call()''')
-                self.value = eval(f'''self.contract.functions.{self.function}('{str(self.function_arg)}').call()''')
+                self.value = eval(f'''self.contract.functions.{self.function}('{self.function_arg}').call()''')
                 change = (self.value  / old_value) - 1
                 old_value = self.value
                 if change != 0:
                     content = formatPercent(change) + ' change detected !'
                     print(str(change) + ' change detected on ' +str(self.function_arg))
-                    sendWebhook(os.getenv('WEBHOOK_TESTING'),"Test State Price Alert","",str(content),"","")
+                    fields = makeFields(['Test','Test2'],['1','2'],[True,True])
+                    webhook = os.getenv('WEBHOOK_TESTING')
+                    title = "Test State Price Alert"
+                    image=""
+                    color=colors.blurple
+
+                    sendWebhook(webhook,title,fields,content,image,color)
                     print('Message Sent !')
             except Exception as e:
                 #logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
@@ -160,7 +166,7 @@ def handle_message(alert, tx, function):
                 '{str(formatCurrency(fetchers.getDola3crvBalances()[0]))}',
                 '{str(formatCurrency(fetchers.getDola3crvBalances()[1]))}',
                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                [True,False,True,False,True,False])'''
+                [True,False,True,False,True,True,False])'''
                 color = colors.red
                 send = True
             elif (function == "AddLiquidity"):
@@ -337,15 +343,9 @@ def handle_message(alert, tx, function):
                 fields = f'''makeFields(
                 ['Block Number :',
                 'Targets :',
-                'Values :',
-                'Signatures :',
-                'Call Data :',
                 'Description :',
                 'Transaction :'],
                 ['{str(tx["blockNumber"])}',
-                '{str(tx["args"]["targets"])}',
-                '{str(tx["args"]["values"])}',
-                '{str(tx["args"]["signatures"])}',
                 '{str(tx["args"]["calldatas"])}',
                 '{str(tx["args"]["description"])[0:30]}',
                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
@@ -445,14 +445,14 @@ def handle_message(alert, tx, function):
                 title = "Sushi New Swap event detected"
                 content = ''
                 if tx["args"]['amount0In'] == 0:
-                    operation = 'Buy '+formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0]))+\
+                    operation = 'Buy '+str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))+\
                                 ' '+ str(fetchers.getSushiTokensSymbol(tx["address"])[0]) +' with '+ \
-                                +formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1])) + \
-                                ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1])
+                                +str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1])) + \
+                                ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1]))
                 else:
-                    operation = 'Sell '+formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0]))+\
+                    operation = 'Sell '+str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))+\
                                 ' '+ str(fetchers.getSushiTokensSymbol(tx["address"])[0]) +' for '+ \
-                                +formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1])) + \
+                                +str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1]))) + \
                                 ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1])
 
                 fields = f'''makeFields(
@@ -466,7 +466,7 @@ def handle_message(alert, tx, function):
                 '{str(fetchers.getName(tx["address"]))}',
                 '{str(fetchers.getSymbol(tx["address"]))}',
                 '{str(tx["address"])}',
-                '{operation}',
+                '{str(operation)}',
                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                 [True,True,True,False,False,False])'''
 
@@ -480,8 +480,6 @@ def handle_message(alert, tx, function):
                         'Name :',
                         'Symbol :',
                         'Address :',
-                        'Sender :',
-                        'To :',
                         'amountADesired :',
                         'amountBDesired :',
                         'amountAMin :',
@@ -494,8 +492,6 @@ def handle_message(alert, tx, function):
                         '{str(fetchers.getName(tx["address"]))}',
                         '{str(fetchers.getSymbol(tx["address"]))}',
                         '{str(tx["address"])}',
-                        '{str(tx["args"]["sender"])}',
-                        '{str(tx["args"]["to"])}',
                         '{str(tx["args"]["amountADesired"] / 1e18)}',
                         '{str(tx["args"]["amountBDesired"] / 1e18)}',
                         '{str(tx["args"]["amountAMin"] / 1e18)}',
@@ -504,7 +500,7 @@ def handle_message(alert, tx, function):
                         '{str(fetchers.getBalance(tx["address"],fetchers.getSushiTokens(tx["address"][1])))}',
                         '{str(fetchers.getSupply(tx["address"]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                        [True,True,True,False,True,True,False,True,False,True,True,True,True,False])'''
+                        [True,True,True,False,False,True,False,True,True,True,True,False])'''
 
                 color = colors.dark_green
                 send = True
@@ -516,8 +512,6 @@ def handle_message(alert, tx, function):
                         'Name :',
                         'Symbol :',
                         'Address :',
-                        'Sender :',
-                        'To :',
                         'Amount 0 :',
                         'Amount 1 :',
                         'Total Reserves 0 :',
@@ -528,15 +522,13 @@ def handle_message(alert, tx, function):
                         '{str(fetchers.getName(tx["address"]))}',
                         '{str(fetchers.getSymbol(tx["address"]))}',
                         '{str(tx["address"])}',
-                        '{str(tx["args"]["sender"])}',
-                        '{str(tx["args"]["to"])}',
                         '{str(tx["args"]["amount0"] / 1e18)}',
                         '{str(tx["args"]["amount1"] / 1e18)}',
                         '{str(fetchers.getBalance(tx["address"],fetchers.getSushiTokens(tx["address"][0])))}',
                         '{str(fetchers.getBalance(tx["address"],fetchers.getSushiTokens(tx["address"][1])))}',
                         '{str(fetchers.getSupply(tx["address"]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                        [True,True,True,True,False,True,True,True,True,False])'''
+                        [True,True,False,True,True,True,True,False])'''
 
                 color = colors.dark_red
                 send = True
@@ -580,9 +572,9 @@ def handle_message(alert, tx, function):
 
 def sendWebhook(webhook, title, fields, content, imageurl, color):
     try:
-        data = f"""{{"content": {content}}}"""
-
-        embed = f'[{{"fields":{fields},"title": "{title}","color": "{color}","image":{{"url": "{imageurl}"}}}}]'
+        data = f"""{{"content": '{content}'}}"""
+        data = eval(data)
+        embed = f"""[{{"fields":{fields},"title": '{title}',"color": '{color}',"image":{{"url": '{imageurl}'}}}}]"""
         data["embeds"] = eval(embed)
         result = requests.post(webhook, json=data)
 

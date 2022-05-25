@@ -10,6 +10,7 @@ from web3 import Web3
 from datetime import datetime
 import logging
 import sys
+import requests
 
 # Logger config
 logging.basicConfig(
