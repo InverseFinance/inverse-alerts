@@ -4,11 +4,24 @@ import os
 import pandas as pd
 import fetchers
 from threading import Thread
-from utils import Listener
+from utils import EventListener
 from dotenv import load_dotenv
 from web3 import Web3
 from datetime import datetime
-immport logger
+import logging
+import sys
+
+# Logger config
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("debug.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+# Mute warning when pool is full
+logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 load_dotenv()
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
@@ -19,14 +32,12 @@ alerts = functions.columns.array
 
 for alert in alerts:
     exec(f"functions_{alert} = functions['{alert}'].dropna()")
-    exec(f"webhook_{alert} = os.getenv(str('webhook_{alert}').upper())")
 
 n_alert = 0
 
 # First loop to cover all alert tags  (then contract and functions)
 for alert in alerts:
-    # Define webhook, functions corresponding to alert name
-    webhook = eval(f'webhook_{alert}')
+    # Define functions corresponding to alert tag
     functions = eval(f'functions_{alert}')
 
     # Get contracts filtering by alert tag and load their ABIs
@@ -50,7 +61,7 @@ for alert in alerts:
             function = j
 
             # Initiate Thread per alert/contract/function listened
-            Listener(web3, alert, contract, function, webhook).start()
+            EventListener(web3, alert, contract, function).start()
             n_alert += 1
 
             # Log alert-contract-function
