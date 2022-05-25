@@ -33,7 +33,7 @@ class StateChangeListener(Thread):
                 self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
                 change = (self.value  / old_value) - 1
                 old_value = self.value
-                if change != 0:
+                if change > 0 and self.value >0:
                     handle_state_variation(self.value,change,self.alert,self.state_function,self.argument)
 
             except Exception as e:
@@ -400,24 +400,13 @@ def handle_event(event, alert, event_name):
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/838610/1466237/8e64e858-5db5-4692-922d-5f9fe6b7a8c6"
                 title = "Sushi New Swap event detected"
                 content = ''
+                color = colors.blurple
                 if tx["args"]['amount0In'] == 0:
-                    operation = 'Buy ' + \
-                                str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(
-                                    fetchers.getSushiTokens(tx["address"])[0]))) + \
-                                ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[0]) + \
-                                ' with ' + \
-                                str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(
-                                    fetchers.getSushiTokens(tx["address"])[1])) + \
-                                    ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1]))
+                    operation = f"""Buy {str(formatCurrency(tx["args"]['amount0Out']/fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))} {str(fetchers.getSushiTokensSymbol(tx["address"])[0])}
+                     with {str(formatCurrency(tx["args"]['amount0In']/fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1])))} {str(fetchers.getSushiTokensSymbol(tx["address"])[1])})"""
                 else:
-                    operation = 'Sell ' + \
-                                str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(
-                                    fetchers.getSushiTokens(tx["address"])[0]))) + \
-                                ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[0]) + \
-                                ' for ' + \
-                                str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(
-                                    fetchers.getSushiTokens(tx["address"])[1]))) + \
-                                ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1])
+                    operation = f"""Sell {str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))} {str(fetchers.getSushiTokensSymbol(tx["address"])[0])}
+                     for {str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1])))} {str(fetchers.getSushiTokensSymbol(tx["address"])[1])})"""
 
                 fields = f'''makeFields(
                 ['Block Number :',
@@ -432,11 +421,10 @@ def handle_event(event, alert, event_name):
                 '{str(fetchers.getSymbol(tx["address"]))}',
                 '{str(tx["address"])}',
                 '{str(operation)}',
-                '{str((formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])) + formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0]))) * fetchers.getUnderlyingPrice(fetchers.getUnderlying(fetchers.getSushiTokens(tx["address"])[0])))}',
+                '{str(formatCurrency(((tx["args"]['amount0Out'] + tx["args"]['amount0In']) / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])) * fetchers.getUnderlyingPrice('0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b')))}',
                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                 [True,True,True,False,False,False])'''
 
-                color = colors.blurple
                 send = True
             elif (event_name in ["Mint"]):
                 title = "Sushi New Liquidity Add event detected"
@@ -542,8 +530,8 @@ def handle_state_variation(value, change, alert, state_function, state_argument)
         if (alert == 'oracle'):
             webhook = os.getenv('WEBHOOK_TESTING')
             if state_function =='getUnderlyingPrice':
-                print(str(formatPercent(change)) + ' change detected on ' + str(fetchers.getSymbol(state_argument)))
-                title = str(formatPercent(change)) + ' change detected on ' + str(fetchers.getSymbol(fetchers.getUnderlying(state_argument))) + ' Price'
+                print(str(change) + '% change detected on ' + str(fetchers.getSymbol(fetchers.getUnderlying(state_argument))))
+                title = str(formatPercent(change)) + ' change detected on ' + str(fetchers.getSymbol(fetchers.getUnderlying(state_argument))) + ' Oracle'
 
                 if abs(change) > 0.2:
                     content = '<@&945071604642222110>'
@@ -572,7 +560,7 @@ def handle_state_variation(value, change, alert, state_function, state_argument)
             sendWebhook(webhook, title, fields, content, image, color)
             print('Message Sent !')
     except Exception as e:
-        logging.warning('Error in state variation handler : '+str(alert)+"-"+str(state_function)+"-"+str(state_argument)+str(value)+'-'+str(change))
+        logging.warning('Error in state variation handler : '+str(alert)+"-"+str(state_function)+"-"+str(state_argument)+'-'+str(value)+'-'+str(change))
         sendError('Error in state variation handler : '+str(alert)+'-'+str(state_function)+'-'+str(state_argument)+'-'+ str(e)+' Value :'+str(value)+' Change :'+str(change) +" Error : "+str(e))
         logging.error(e)
         pass
