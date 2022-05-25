@@ -56,6 +56,8 @@ for alert in events_alerts:
             # Log alert-contract-event
             logging.info(str(datetime.now())+' '+ alert+'-'+contract.address+'-'+i+'-'+ str(n_alert) + ' started listening at event ' + i + ' on contract ' + contract.address)
 
+logging.info(str(datetime.now())+' '+'Total alerts running : ' + str(n_alert))
+
 for alert in state_alerts:
     # Define state functions corresponding to alert tag
     state_functions = eval(f'''sheet_state['{alert}'].dropna()''')
@@ -74,13 +76,14 @@ for alert in state_alerts:
     for contract in filters["id"]:
         # Third loop to cover all events, in contract, in alert tag
         for state_function in state_functions:
+
             state_arguments = fetchers.getAllMarkets('0x4dcf7407ae5c07f8681e1659f626e114a7667339')
             # Initiate Thread per alert/contract/event listened
             for argument in state_arguments:
                 StateChangeListener(web3, alert, contract, state_function,argument).start()
                 n_alert += 1
 
-                # Log alert-contract-state
+                # Log alert-contract-event
                 logging.info(str(datetime.now()) + ' ' + alert+'-'+contract.address+'-'+ state_function + '-' + str(n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
 
 logging.info(str(datetime.now())+' '+'Total alerts running : ' + str(n_alert))

@@ -34,13 +34,13 @@ class StateChangeListener(Thread):
                 change = (self.value  / old_value) - 1
                 old_value = self.value
                 if change != 0:
-                    handle_state_variation(change)
+                    handle_state_variation(self.value,change,self.alert,self.state_function,self.argument)
 
             except Exception as e:
                 #logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
                 #    self.event))
                 logging.error(e)
-                sendError("Error in State Change Listener " + "\n"+str(e))
+                sendError("Error in State Change Listener :" + str(e))
                 pass
 
 # Define a Thread to listen separately on each contract/event in the contract file
@@ -67,13 +67,10 @@ class EventListener(Thread):
                 logging.warning("Error in Event Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
                     self.event_name))
                 logging.error(e)
-                sendError("Error in Event Listener " + "\n"+str(e))
+                sendError("Error in Event Listener " +str(e))
                 pass
 
 # Define event to handle and print to the console/send to discord
-# Need to pass the web3 and contract args to load proper events functions
-# Get an event and decide if it sends a message or not to the appropriate webhook base on the condition 'send'
-# defined in the event
 def handle_event(event, alert, event_name):
     try:
         tx = json.loads(Web3.toJSON(event))
@@ -293,7 +290,7 @@ def handle_event(event, alert, event_name):
                 color = colors.blurple
                 send = True
         elif (alert == "governance"):
-            content = "<@899302193608409178>"
+            content = "<@&899302193608409178>"
             webhook = os.getenv('WEBHOOK_GOVERNANCE')
             if (event_name == "ProposalCreated"):
                 title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",
@@ -527,31 +524,56 @@ def handle_event(event, alert, event_name):
 
     except Exception as e:
         logging.warning('Error in event handler')
-        sendError("Error in event handler " + "\n" + str(e))
+        sendError("Error in event handler " + str(e))
         logging.error(e)
         pass
 
-def handle_state_variation(value,alert,state_function):
+# Define state change to handle and print to the console/send to discord
+def handle_state_variation(value, change, alert, state_function, state_argument):
     try:
         send = False
         image = ''
+        content = ''
+        webhook = ''
+        title = ''
+        fields = []
         color = colors.blurple
-        if alert=='oracle':
-            if state_function =='getUnderlyingPrice':
-                content = formatPercent(value) + ' change detected !'
-                print(str(value) + ' change detected on ' + str(self.argument))
-                fields = makeFields(['Test', 'Test2'], ['1', '2'], [True, True])
-                webhook = os.getenv('WEBHOOK_TESTING')
-                title = "Test State Price Alert"
-                image = ""
-                send = True
 
-        if send == True:
-             sendWebhook(webhook, title, fields, content, image, color)
-        print('Message Sent !')
+        if (alert == 'oracle'):
+            webhook = os.getenv('WEBHOOK_TESTING')
+            if state_function =='getUnderlyingPrice':
+                print(str(formatPercent(change)) + ' change detected on ' + str(fetchers.getSymbol(state_argument)))
+                title = str(formatPercent(change)) + ' change detected on ' + str(fetchers.getSymbol(fetchers.getUnderlying(state_argument))) + ' Price'
+
+                if abs(change) > 0.2:
+                    content = '<@&945071604642222110>'
+                    level = 3
+                    color = colors.red
+                    send = True
+                elif abs(change) > 0.1:
+                    level = 2
+                    color = colors.dark_orange
+                    send = True
+                elif abs(change) > 0.05:
+                    level = 1
+                    color = colors.orange
+                    send = True
+        if send:
+            fields = f'''makeFields(
+                 ['Alert Level :',
+                 'Variation :',
+                 'Last Value :',
+                 'Link to Market :'], 
+                 ['{str(level)}',
+                 '{str(formatPercent(change))}',
+                 '{str(formatCurrency(value / fetchers.getDecimals(fetchers.getUnderlying(state_argument))))}',
+                 '{'https://etherscan.io/address/' + str(state_argument)}'], 
+                 [True, True,True,False])'''
+            sendWebhook(webhook, title, fields, content, image, color)
+            print('Message Sent !')
     except Exception as e:
-        logging.warning('Error in state variation handler')
-        sendError("Error in state variation handler " + "\n" + str(e))
+        logging.warning('Error in state variation handler : '+str(alert)+"-"+str(state_function)+"-"+str(state_argument)+str(value)+'-'+str(change))
+        sendError('Error in state variation handler : '+str(alert)+'-'+str(state_function)+'-'+str(state_argument)+'-'+ str(e)+' Value :'+str(value)+' Change :'+str(change) +" Error : "+str(e))
         logging.error(e)
         pass
 
@@ -570,7 +592,7 @@ def makeFields(names, values, inline):
         return fields
     except Exception as e:
         logging.warning('Error in makeFields ')
-        sendError("Error in sending makeFields " + "\n" + str(e))
+        sendError("Error in sending makeFields " + str(e))
         logging.error(e)
         pass
 
@@ -583,11 +605,10 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
         embed = f"""[{{"fields":{fields},"title": '{title}',"color": '{color}',"image":{{"url": '{imageurl}'}}}}]"""
         data["embeds"] = eval(embed)
         result = requests.post(webhook, json=data)
-
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         logging.error(err)
-        sendError("Error in sending message to webhook " + "\n" + str(err))
+        sendError("Error in sending message to webhook :"+ str(err))
         pass
     else:
         logging.info("Embed delivered successfully to webhook code {}.".format(result.status_code))
@@ -604,7 +625,7 @@ def sendError(content):
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         logging.error(err)
-        sendError("Error in sending error to webhook " + "\n" + str(err))
+        sendError("Error in sending error to webhook :"+ str(err))
         pass
     else:
         logging.info("Error delivered successfully to error channel code {}.".format(result.status_code))

@@ -27,7 +27,6 @@ state_alerts = sheet_state.columns.array
 
 n_alert = 0
 
-
 for alert in state_alerts:
     # Define state functions corresponding to alert tag
     state_functions = eval(f'''sheet_state['{alert}'].dropna()''')
@@ -46,6 +45,7 @@ for alert in state_alerts:
     for contract in filters["id"]:
         # Third loop to cover all events, in contract, in alert tag
         for state_function in state_functions:
+
             state_arguments = fetchers.getAllMarkets('0x4dcf7407ae5c07f8681e1659f626e114a7667339')
             # Initiate Thread per alert/contract/event listened
             for argument in state_arguments:
