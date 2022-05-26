@@ -11,20 +11,21 @@ from datetime import datetime
 import logging
 import sys
 
-# Load Web3 instance and import logger parameters for error display
+# Load locals and web3 provider
 load_dotenv()
 LoggerParams()
-web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST'))) # Or infura key
-# Get contracts metadata from excel
-contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
+web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))
 
-# Get alerts, events, to read from
+# Get contracts metadata from excel
+sheet_contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
 sheet_events = pd.read_excel('contracts.xlsx', sheet_name='alerts_events')
-events_alerts = sheet_events.columns.array
-# Get alerts, state function, to read from
 sheet_state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
+sheet_state_arguments = pd.read_excel('contracts.xlsx', sheet_name='state_arguments')
+
+events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
 
+# Init count of alerts
 n_alert = 0
 
 # First loop to cover all alert tags  (then contract and events)
@@ -33,28 +34,26 @@ for alert in events_alerts:
     events = eval(f'''sheet_events['{alert}'].dropna()''')
 
     # Get contracts filtering by alert tag and load their ABIs
-    contracts_instance = contracts[contracts['tags_events'].str.contains(alert)]
+    alert_contracts = sheet_contracts[sheet_contracts['tags_events'].str.contains(alert)]
 
+    # Construct all contracts objects and put them in filter array
     filters = {"id": []}
-    for i in range(0, len(contracts_instance['contract_address'])):
-        contract_name = web3.toChecksumAddress(contracts_instance.iloc[i]['contract_address'])
-        contract_abi = json.loads(str(contracts_instance.iloc[i]['ABI']))
+    for i in range(0, len(alert_contracts['contract_address'])):
+        contract_name = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
+        contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
         contract = web3.eth.contract(address=contract_name, abi=contract_abi)
         filters["id"].append(contract)
 
-    # Second loop to cover all contracts in the alert tag
-    for i in filters["id"]:
-        contract = i
-
+    # Second loop to cover all contracts in the filter array/alert tag
+    for contract in filters["id"]:
         # Third loop to cover all events, in contract, in alert tag
-        for i in events:
-
+        for event_name in events:
             # Initiate Thread per alert/contract/event listened
-            EventListener(web3, alert, contract, i).start()
+            EventListener(web3, alert, contract, event_name).start()
             n_alert += 1
 
             # Log alert-contract-event
-            logging.info(str(datetime.now())+' '+ alert+'-'+contract.address+'-'+i+'-'+ str(n_alert) + ' started listening at event ' + i + ' on contract ' + contract.address)
+            logging.info(str(datetime.now())+' '+ alert+'-'+contract.address+'-'+event_name+'-'+ str(n_alert) + ' started listening at event ' + event_name + ' on contract ' + contract.address)
 
 logging.info(str(datetime.now())+' '+'Total alerts running : ' + str(n_alert))
 
@@ -63,12 +62,13 @@ for alert in state_alerts:
     state_functions = eval(f'''sheet_state['{alert}'].dropna()''')
 
     # Get contracts filtering by alert tag and load their ABIs
-    contracts_instance = contracts[contracts['tags_state'].str.contains(alert)]
+    alert_contracts = sheet_contracts[sheet_contracts['tags_state'].str.contains(alert)]
 
+    # Define a set of filters containing the contract we are going to call (in oracle case only one)
     filters = {"id": []}
-    for i in range(0, len(contracts_instance['contract_address'])):
-        contract_name = web3.toChecksumAddress(contracts_instance.iloc[i]['contract_address'])
-        contract_abi = json.loads(str(contracts_instance.iloc[i]['ABI']))
+    for i in range(0, len(alert_contracts['contract_address'])):
+        contract_name = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
+        contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
         contract = web3.eth.contract(address=contract_name, abi=contract_abi)
         filters["id"].append(contract)
 
@@ -76,9 +76,9 @@ for alert in state_alerts:
     for contract in filters["id"]:
         # Third loop to cover all events, in contract, in alert tag
         for state_function in state_functions:
-
+            # Get an array of all markets to use in the Oracle calling
             state_arguments = fetchers.getAllMarkets('0x4dcf7407ae5c07f8681e1659f626e114a7667339')
-            # Initiate Thread per alert/contract/event listened
+            # Initiate Thread per alert/contract/state function listened
             for argument in state_arguments:
                 StateChangeListener(web3, alert, contract, state_function,argument).start()
                 n_alert += 1
