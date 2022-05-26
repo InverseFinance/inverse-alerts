@@ -4,7 +4,7 @@ import re
 import pandas as pd
 import requests
 import fetchers
-import os
+import time
 import logging
 import sys
 
@@ -14,35 +14,79 @@ from threading import Thread
 from datetime import datetime
 
 
-# Define a Thread to listen separately on each state change
-class StateChangeListener(Thread):
-    def __init__(self, web3, alert, contract, state_function, argument, **kwargs):
-        super(StateChangeListener, self).__init__(**kwargs)
+# Define a Thread to listen separately on each contract/event in the contract file
+class TxListener(Thread):
+    def __init__(self, web3, alert, contract, **kwargs):
+        super(TxListener, self).__init__(**kwargs)
         self.web3 = web3
         self.alert = alert
         self.contract = contract
-        self.state_function = state_function
-        self.argument = argument
-        self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
+        self.tx_filter = []
 
     def run(self):
-        old_value = self.value
+        self.tx_filter = eval(f'''self.web3.eth.filter({{"address":'{self.contract}'}})''')
         while True:
             try:
-                # print(f'''self.contract.functions.{self.function}('{str(self.argument)}').call()''')
-                self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
-                change = (self.value / old_value) - 1
-                old_value = self.value
-                if change > 0.05  and self.value > 0:
-                    HandleStateVariation(self.value, change, self.alert, self.state_function, self.argument).start()
+                for tx in self.tx_filter.get_new_entries():
+                    logging.info(str(datetime.now()) + " Tx found in " + str(self.alert) + "-" + str(
+                        self.contract))
+
+                    HandleTx(tx, self.alert, self.contract).start()
+
+                time.sleep(5)
 
             except Exception as e:
-                # logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
-                #    self.event))
+                logging.warning("Error in Tx Listener " + str(self.alert) + "-" + str(self.contract))
                 logging.error(e)
-                sendError("Error in State Change Listener :" + str(e))
+                sendError("Error in Tx Listener " + str(e))
                 pass
 
+
+# Define state change to handle and print to the console/send to discord
+class HandleTx(Thread):
+    def __init__(self,  tx, alert, contract, **kwargs):
+        super(HandleTx, self).__init__(**kwargs)
+        self.contract = contract
+        self.alert = alert
+        self.tx = tx
+
+    def run(self):
+        try:
+            tx = json.loads(Web3.toJSON(self.tx))
+            # Print result table and start writing message
+            logging.info(str(datetime.now()) + " " + str(self.tx))
+
+            send = False
+            image = ''
+            content = ''
+            webhook = ''
+            title = ''
+            fields = []
+            color = colors.blurple
+            if (self.alert == 'multisig'):
+                webhook = os.getenv('WEBHOOK_GOVERNANCE')
+
+                print(str('Tx detected on ' + str(self.tx["address"])))
+                title = str('Tx detected on ' + str(self.tx["address"]) + ' Multisig')
+                content = 'No tagging yet'
+                send = True
+                fields = f'''makeFields(
+                     ['Multisig :',
+                     'Link to transaction :'], 
+                     ['{str(self.tx["address"])}',
+                     '{'https://etherscan.io/tx/' + str(self.tx["transactionHash"])}'], 
+                     [False,False])'''
+
+            if send:
+                sendWebhook(webhook, title, fields, content, image, color)
+                print('Message Sent !')
+
+
+        except Exception as e:
+            logging.warning('Error in tx handler : ' + str(self.alert) + "-" + str(self.contract))
+            sendError('Error in state variation handler : ' + str(self.alert) + '-' + str(self.contract) + " Error : " + str(e))
+            logging.error(e)
+            pass
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class EventListener(Thread):
@@ -63,7 +107,9 @@ class EventListener(Thread):
                         self.contract.address) + "-" + str(self.event_name))
 
                     HandleEvent(event, self.alert, self.event_name).start()
-                    # Add triggers here
+
+                time.sleep(5)
+
             except Exception as e:
                 logging.warning(
                     "Error in Event Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
@@ -71,7 +117,6 @@ class EventListener(Thread):
                 logging.error(e)
                 sendError("Error in Event Listener " + str(e))
                 pass
-
 
 # Define event to handle and print to the console/send to discord
 class HandleEvent(Thread):
@@ -320,14 +365,14 @@ class HandleEvent(Thread):
 
                     fields = f'''makeFields(
                     ['Block Number :',
-                    'Targets :',
+                    'Proposal :',
                     'Description :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(tx["args"]["calldatas"])}',
+                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount())}',
                     '{str(tx["args"]["description"])[0:30]}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False,False,False,False,False])'''
+                    [False,False,False])'''
 
                     color = colors.blurple
                     send = True
@@ -421,12 +466,12 @@ class HandleEvent(Thread):
                 if (self.event_name == "Swap"):
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/838610/1466237/8e64e858-5db5-4692-922d-5f9fe6b7a8c6.jpg"
                     if tx["args"]['amount0In'] == 0:
-                        operation = 'Sell ' + str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))+" "+ str(fetchers.getSushiTokensSymbol(tx["address"])[0])+ ' for ' + str(formatCurrency(tx["args"]['amount1In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1]))) + ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1])
+                        operation = 'Buy ' + str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))+" "+ str(fetchers.getSushiTokensSymbol(tx["address"])[0])
                         color = colors.dark_green
                         title = "Sushiswap New Buy event detected"
                         send = True
                     else:
-                        operation = 'Sell ' + str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))+" "+ str(fetchers.getSushiTokensSymbol(tx["address"])[0])+ ' for ' + str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[1]))) + ' ' + str(fetchers.getSushiTokensSymbol(tx["address"])[1])
+                        operation = 'Sell ' + str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])))+" "+ str(fetchers.getSushiTokensSymbol(tx["address"])[0])
                         color = colors.dark_red
                         title = "Sushiswap New Sell event detected"
                         send = True
@@ -446,7 +491,7 @@ class HandleEvent(Thread):
                                 '{str(operation)}',
                                 '{str(formatCurrency(((tx["args"]["amount0Out"] + tx["args"]["amount0In"]) / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])) * fetchers.getUnderlyingPrice('0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b')))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,True,True,False,False,False,False])'''
+                                [True,True,True,False,True,True,False])'''
 
                 elif (self.event_name in ["Mint"]):
                     title = "Sushi New Liquidity Add event detected"
@@ -505,7 +550,6 @@ class HandleEvent(Thread):
                             '{str(fetchers.getSupply(tx["address"]))}',
                             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                             [True,True,False,True,True,True,True,False])'''
-
                     color = colors.dark_red
                     send = True
             elif (self.alert == "unitroller"):
@@ -519,15 +563,11 @@ class HandleEvent(Thread):
                     fields = f'''makeFields(
                     ['Block Number :',
                     'Address :',
-                    'All Markets :',
-                    'Comptroller :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{str(tx["address"])}',
-                    '{str(fetchers.getAllMarkets())}',
-                    '{str(fetchers.getComptroller())}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False,False,False])'''
+                    [False,False,False])'''
 
                     color = colors.dark_orange
                     send = True
@@ -541,12 +581,52 @@ class HandleEvent(Thread):
             logging.error(e)
             pass
 
+# Define a Thread to listen separately on each state change
+class StateChangeListener(Thread):
+    def __init__(self, web3, alert, contract, state_function, argument, **kwargs):
+        super(StateChangeListener, self).__init__(**kwargs)
+        self.web3 = web3
+        self.alert = alert
+        self.contract = contract
+        self.state_function = state_function
+        self.argument = argument
+                # If condition to take into account state function with no input params
+        if self.argument is None:
+            self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
+        else:
+            self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
+
+    def run(self):
+        self.old_value = self.value
+        while True:
+            try:
+                if self.old_value !=0 :
+                    # If condition to take into account state function with no input params
+                    if self.argument is None:
+                        self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
+                    else :
+                        self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
+                    self.change = (self.value / self.old_value) - 1
+                    self.old_value = self.value
+                    time.sleep(5)
+
+                    if self.change > 0.05  and self.value > 0:
+                        HandleStateVariation(self.value, self.change, self.alert,self.contract, self.state_function, self.argument).start()
+
+            except Exception as e:
+                # logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
+                #    self.event))
+                logging.error(e)
+                sendError("Error in State Change Listener :" + str(e))
+                pass
+
 # Define state change to handle and print to the console/send to discord
 class HandleStateVariation(Thread):
-    def __init__(self, value, change, alert, state_function, state_argument, **kwargs):
+    def __init__(self, value, change, alert,contract, state_function, state_argument, **kwargs):
         super(HandleStateVariation, self).__init__(**kwargs)
         self.value = value
         self.change = change
+        self.contract = contract
         self.alert = alert
         self.state_function = state_function
         self.state_argument = state_argument
@@ -581,19 +661,93 @@ class HandleStateVariation(Thread):
                         level = 1
                         color = colors.orange
                         send = True
-            if send:
-                fields = f'''makeFields(
-                     ['Alert Level :',
-                     'Variation :',
-                     'Last Value :',
-                     'Link to Market :'], 
-                     ['{str(level)}',
-                     '{str(formatPercent(self.change))}',
-                     '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
-                     '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
-                     [True, True,True,False])'''
-                sendWebhook(webhook, title, fields, content, image, color)
-                print('Message Sent !')
+
+                    fields = f'''makeFields(
+                         ['Alert Level :',
+                         'Variation :',
+                         'Last Value :',
+                         'Link to Market :'], 
+                         ['{str(level)}',
+                         '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
+                         '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
+                         [True, True,True,False])'''
+
+            if (self.alert == 'cash'):
+                webhook = os.getenv('WEBHOOK_MARKETS')
+                if self.state_function == 'cash':
+                    print(str(self.change) + '% change detected on ' + str(fetchers.getName(self.contract.address)))+ ' balance'
+                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
+                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Cash balance'
+
+                    if abs(self.change) > 0.2:
+                        content = '<@&945071604642222110>'
+                        level = 3
+                        color = colors.red
+                        send = True
+                    elif abs(self.change) > 0.1:
+                        level = 2
+                        color = colors.dark_orange
+                        send = True
+                    elif abs(self.change) > 0.05:
+                        level = 1
+                        color = colors.orange
+                        send = True
+
+                    fields = f'''makeFields(
+                         ['Alert Level :',
+                         'Variation :',
+                         'Last Value :',
+                         'Link to Market :'], 
+                         ['{str(level)}',
+                         '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                         '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
+                         [True, True,True,False])'''
+
+
+                if send:
+                    sendWebhook(webhook, title, fields, content, image, color)
+                    print('Message Sent !')
+
+            if (self.alert == 'supply'):
+                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                if self.state_function == 'totalSupply':
+                    print(str(self.change) + '% change detected on ' + str(fetchers.getName(self.contract.address)))+ ' total supply'
+                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
+                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Supply'
+
+                    if abs(self.change) > 0.015:
+                        content = '<@&945071604642222110>'
+                        level = 3
+                        color = colors.red
+                        send = True
+                    elif abs(self.change) > 0.01:
+                        level = 2
+                        color = colors.dark_orange
+                        send = True
+                    elif abs(self.change) > 0.005:
+                        level = 1
+                        color = colors.orange
+                        send = True
+
+                    fields = f'''makeFields(
+                         ['Alert Level :',
+                         'Variation :',
+                         'Last Value :',
+                         'Link to Pool :'], 
+                         ['{str(level)}',
+                         '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                         '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
+                         [True, True,True,False])'''
+
+
+                if send:
+                    sendWebhook(webhook, title, fields, content, image, color)
+                    print('Message Sent !')
+
+
         except Exception as e:
             logging.warning(
                 'Error in state variation handler : ' + str(self.alert) + "-" + str(self.state_function) + "-" + str(
