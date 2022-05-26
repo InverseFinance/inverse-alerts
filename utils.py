@@ -211,7 +211,7 @@ class HandleEvent(Thread):
 
                     color = colors.dark_green
                     send = True
-            elif (self.alert in ("lending1","lending2")):
+            elif (self.alert in ["lending1","lending2"]):
                 webhook = os.getenv('WEBHOOK_LENDING')
                 if (self.event_name == "Mint"):
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(tx["address"]))
