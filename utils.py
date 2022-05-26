@@ -211,7 +211,7 @@ class HandleEvent(Thread):
 
                     color = colors.dark_green
                     send = True
-            elif (self.alert == "lending"):
+            elif (self.alert in ("lending1","lending2")):
                 webhook = os.getenv('WEBHOOK_LENDING')
                 if (self.event_name == "Mint"):
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(tx["address"]))
@@ -577,7 +577,7 @@ class HandleEvent(Thread):
 
         except Exception as e:
             logging.warning('Error in event handler')
-            sendError("Error in event handler " + str(e))
+            sendError("Error in event handler :" + str(e))
             logging.error(e)
             pass
 
