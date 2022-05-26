@@ -52,7 +52,7 @@ class HandleTx(Thread):
 
     def run(self):
         try:
-            tx = json.loads(Web3.toJSON(self.tx))
+            self.tx = json.loads(Web3.toJSON(self.tx))
             # Print result table and start writing message
             logging.info(str(datetime.now()) + " " + str(self.tx))
 
@@ -68,13 +68,13 @@ class HandleTx(Thread):
 
                 print(str('Tx detected on ' + str(self.tx["address"])))
                 title = str('Tx detected on ' + str(self.tx["address"]) + ' Multisig')
-                content = 'No tagging yet'
+                content = ''
                 send = True
                 fields = f'''makeFields(
                      ['Multisig :',
                      'Link to transaction :'], 
                      ['{str(self.tx["address"])}',
-                     '{'https://etherscan.io/tx/' + str(self.tx["transactionHash"])}'], 
+                     '{"https://etherscan.io/tx/" + str(self.tx["transactionHash"])}'], 
                      [False,False])'''
 
             if send:
