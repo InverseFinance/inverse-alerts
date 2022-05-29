@@ -91,7 +91,6 @@ def getENS(address):
     return address_ens
 
 # Governor Mills and multisig related function
-# TODO : Find multisig API
 def getProposal(proposal_id):
 
     address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
