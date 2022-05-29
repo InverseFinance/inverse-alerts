@@ -26,7 +26,7 @@ class TxListener(Thread):
                     logging.info(str(datetime.now()) + " Tx found in " + str(self.alert) + "-" + str(self.contract))
                     with PriorityThreadPoolExecutor() as executor:
                         executor.submit(HandleTx, (tx, self.alert, self.contract),priority=0)
-                time.sleep(5)
+                time.sleep(1)
 
             except Exception as e:
                 logging.warning("Error in Tx Listener " + str(self.alert) + "-" + str(self.contract))
@@ -53,7 +53,7 @@ class EventListener(Thread):
                         self.contract.address) + "-" + str(self.event_name))
                     with PriorityThreadPoolExecutor() as executor:
                         executor.submit(HandleEvent, (event, self.alert, self.event_name),priority=0)
-                time.sleep(5)
+                time.sleep(1)
 
             except Exception as e:
                 logging.warning(
@@ -97,7 +97,7 @@ class StateChangeListener(Thread):
                         with PriorityThreadPoolExecutor() as executor:
                             executor.submit(HandleStateVariation, (self.value, self.change, self.alert, self.contract, self.state_function,
                                              self.argument),priority=0)
-                    time.sleep(5)
+                    time.sleep(1)
 
             except Exception as e:
                 # logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
