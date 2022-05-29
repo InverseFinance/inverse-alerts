@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from web3 import Web3
 from datetime import datetime
 import logging
-from prioritythreadpoolexecutor import PriorityThreadPoolExecutor
+from priority_thread_pool_executor import PriorityThreadPoolExecutor
 import sys
 
 # Load locals and web3 provider
