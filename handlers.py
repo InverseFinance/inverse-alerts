@@ -8,7 +8,6 @@ from web3 import Web3
 from datetime import datetime
 import logging
 from helpers import colors, makeFields, sendError, sendWebhook, formatPercent, formatCurrency
-
 from dotenv import load_dotenv
 import requests
 import pandas as pd

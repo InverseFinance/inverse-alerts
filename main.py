@@ -4,13 +4,12 @@ import json
 import os
 import pandas as pd
 import fetchers
-from threading import Thread
-from listeners import EventListener, StateChangeListener, TxListener
-from helpers import LoggerParams
+import logging
+from helpers import LoggerParams, sendError
 from dotenv import load_dotenv
 from web3 import Web3
 from datetime import datetime
-import logging
+from listeners import EventListener, StateChangeListener, TxListener
 from priority_thread_pool_executor import PriorityThreadPoolExecutor
 import sys
 
@@ -31,6 +30,7 @@ tx_alerts = sheet_tx.columns.array
 
 
 def main():
+
     # Init count of alerts
     n_alert = 0
 
@@ -134,4 +134,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logging.warning("Error alert " + str(alert))
+        logging.error(e)
+        sendError("Error alert :" + str(e))
+        pass

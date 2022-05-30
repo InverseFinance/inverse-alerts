@@ -3,6 +3,8 @@ import requests
 import logging
 import sys
 from dotenv import load_dotenv
+from web3 import Web3
+import json
 
 # Create fields for the embed content
 def makeFields(names, values, inline):

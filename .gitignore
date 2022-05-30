@@ -7,6 +7,7 @@ test.py
 test2.py
 __pycache__/
 test.py
-test.py
 test_listeners.py
-test.py
+build/
+dist/
+

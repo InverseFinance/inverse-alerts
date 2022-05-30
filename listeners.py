@@ -5,9 +5,10 @@ from threading import Thread
 from datetime import datetime
 from priority_thread_pool_executor import PriorityThreadPoolExecutor
 from handlers import HandleTx,HandleEvent,HandleStateVariation
+from web3 import Web3
+import json
 import sys
 from dotenv import load_dotenv
-from web3 import Web3
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
