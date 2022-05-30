@@ -4,25 +4,78 @@ This repository is a Python Smart contract alerting system, allowing to send to 
 based on Ethereum Transactions or state variables. 
 This was originally implemented for Inverse Finance Market monitoring and Risk Management purposes.
 
-The version in prod is running on a Remote Server running a light node.
+The version in prod is running on a Remote Server running an Ethereum light node.
 
 ### Ethereum Endpoint
-This script is continuous. Hence we recommend listening to events by running a private node with geth. 
+This script is heavily requesting the RPC endpoint. Hence we recommend listening to events by running a private node with geth in order to avoid paying  high API query fees.
 Filters being now supported on light nodes, you don't have to index a full archive node before being able to start. 
 Just install Geth and start a light node using :
 
 `geth --syncmode light --http --http.addr 0.0.0.0`
 
+This might take a while to synchronize the first time, once your node is up to date you can start running the alerts.
 
-### Getting Rid of Async functions and using thread
+### Install requirements
+
+Make sure you're running the latest release of Python (3.10) and that Python is allowed through your Firewall (necessary to be able to send requests to webhook) :
+
+`pip install -r requirements.txt`
+
+### Configure your *.env
+
+Fill in your node RPC, and webhooks for alerts and error deliveries. Make sure they are included in `handler.py` 
+
+```LOCALHOST = "http://localhost:8545"
+LOCALHOST = "http://localhost:8545"
+
+WEBHOOK_TESTING = [enter a Discord webhook for testing]
+WEBHOOK_ERRORS = [enter a Discord webhook for errors]
+
+WEBHOOK_DOLA3CRV = [enter a Discord webhook dola3crv alerts] 
+WEBHOOK_FED = [enter a Discord webhook fed alerts]
+WEBHOOK_GOVERNANCE = [enter a Discord webhook governance alerts]
+WEBHOOK_LENDING = [enter a Discord webhook lending alerts]
+WEBHOOK_LIQUIDATIONS = [enter a Discord webhook liquidations alerts]
+WEBHOOK_MARKETS = [enter a Discord webhook markets alerts]
+WEBHOOK_SWAP = [enter a Discord webhook swap alerts]
+WEBHOOK_UNITROLLER = [enter a Discord webhook unitroller alerts]
+
+```
+
+### Run with Python
+
+Execute main.py in your Python env or venv :
+
+`[Path to your project]/venv/Scripts/python.exe main.py`
+
+### Listeners
+
+This script is using 3 types of listeners (`listeners.py`) and can listen to three types of events happening on Ethereum mainnet :
+- Smart contract events
+- View State function variations 
+- Transactions emitted from an address
+
+Those listeners are using events handlers (`handlers.py`) to dispatch the messages to the appropriate webhook.
+
+
+### Custom ThreadPoolExecutor with priority
 The use of async functions is generally recommended for Nodes were the user have to pay to access the data or were 
 the query rate is strongly limited.
 However it generates challenges in term of parrallel processing and CPU optimisation in the case you are running a high number of Listeners.
 
-This python script is instead continuously monitoring the events, inside separate threads, allowing the CPU to 
-jump from one thread to the other and maintaining a sustainable CPU load over all processes.
+This python script is instead continuously monitoring the events, inside separate threads, all managed by the threadpool executor (cf:`priority_thread_pool_executor.py`)  maintaining a sustainable and stable CPU load.
+
+In addition and to avoid a long delay time before delivering the payload to the webhook, Webhook threads are initialized with a higher priority than Listeners.
 
 
-### Contract.xlsx
-This file is used to update the contract, events and return result triggered by the alert. 
+### Adding an alert
+To add an alert head to `contract.xlsx`. This file is used to update the contract, events and return result triggered by the different alerts. 
 It is to be amended carefully since the smallest typo will generate errors.
+
+1. Enter the contract you want to listen to on sheet 'contracts', and paste its unformatted ABI, or the one you are going to use (might be different from the contract ABI in the case of proxies).
+2. Enter an alert name in the appropriate column depending on the alert type.
+3. Define the alert type you are going to use :
+   - for Smart contract events go to `alerts_events` sheet and add the alert name and the events you want to listen to (case sensitive).
+   - for State functions variation go to `alerts_state`, add the alert name and the state functions you want to monitor
+   - for Transactions go to `alerts_tx`, add the alert name (it is not necessary to add the addresses again since they should be filled on the sheet `contracts`)
+4. If you are using State function alerts with arguments, carefully amend `main.py` to allow the script to loop correctly throught the function argument. In the case of this script
