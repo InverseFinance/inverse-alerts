@@ -1,4 +1,3 @@
-
 # import the following dependencies
 import json
 import os
@@ -30,8 +29,7 @@ state_alerts = sheet_state.columns.array
 tx_alerts = sheet_tx.columns.array
 
 
-def main():
-
+try:
     # Init count of alerts
     n_alert = 0
 
@@ -131,10 +129,7 @@ def main():
     logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
 
 
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        logging.error(e)
-        sendError("Error alert :" + str(e))
-        pass
+except Exception as e:
+    logging.error(e)
+    sendError("Error alert :" + str(e))
+    pass
