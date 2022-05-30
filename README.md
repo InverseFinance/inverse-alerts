@@ -61,19 +61,6 @@ mainnet :
 
 Those listeners are using events handlers (`handlers.py`) to dispatch the messages to the appropriate webhook.
 
-### Custom ThreadPoolExecutor with priority
-
-The use of async functions is generally recommended for Nodes were the user have to pay to access the data or were
-the query rate is strongly limited.
-However, it generates challenges in terms of parallel processing and CPU optimisation in the case you are running a high
-number of Listeners.
-
-This python script is instead continuously monitoring the events, inside separate threads, all managed by the threadpool
-executor (cf:`priority_thread_pool_executor.py`)  maintaining a sustainable and stable CPU load.
-
-In addition and to avoid a long delay time before delivering the payload to the webhook, Webhook threads are initialized
-with a higher priority than Listeners.
-
 ### Adding an alert
 
 To add an alert head to `contract.xlsx`. This file is used to update the contract, events and return result triggered by
