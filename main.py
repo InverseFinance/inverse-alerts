@@ -6,13 +6,12 @@ import sys
 import requests
 from datetime import datetime
 import pandas as pd
-from helpers import LoggerParams, sendError
+from helpers import LoggerParams, sendError,patch_http_connection_pool
 from dotenv import load_dotenv
 import fetchers
 from web3 import Web3
 from listeners import EventListener, StateChangeListener, TxListener
-from concurrent.futures import ThreadPoolExecutor
-
+patch_http_connection_pool(maxsize=150)
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()

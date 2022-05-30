@@ -7,7 +7,6 @@ import sys
 import requests
 from dotenv import load_dotenv
 from web3 import Web3
-from concurrent.futures import ThreadPoolExecutor
 from handlers import HandleTx,HandleEvent,HandleStateVariation
 from helpers import sendError
 
