@@ -10,7 +10,7 @@ The version in prod is running on a Remote Server running an Ethereum light node
 ### Ethereum Endpoint
 
 This script is heavily requesting the RPC endpoint. Hence we recommend listening to events by running a private node
-with geth in order to avoid paying high API query fees.
+with Geth in order to avoid paying high API query fees.
 Filters being now supported on light nodes, you don't have to index a full archive node before being able to start.
 Just install Geth and start a light node using :
 
@@ -87,12 +87,12 @@ It is to be amended carefully since the smallest typo will generate errors.
 2. Enter an alert name in the appropriate column depending on the alert type.
 3. Define the alert type you are going to use :
     - for Smart contract events go to `alerts_events` sheet and add the alert name and the events you want to listen
-      to (case sensitive).
+      to (case-sensitive).
     - for State functions variation go to `alerts_state`, add the alert name and the state functions you want to monitor
     - for Transactions go to `alerts_tx`, add the alert name (it is not necessary to add the addresses again since they
       should be filled on the sheet `contracts`)
 4. If you are using State function alerts with arguments, carefully amend `main.py` to allow the script to loop
-   correctly throught the function argument.
+   correctly through the function arguments.
    In the case of this script we have two State functions alerts, one with parameters, the other not, so we switch the
    arguments with :
 
@@ -101,7 +101,7 @@ if alert == 'oracle':
    # Get an array of all markets to use in the Oracle calling
    state_arguments = fetchers.getAllMarkets('0x4dcf7407ae5c07f8681e1659f626e114a7667339')
 elif alert == 'cash':
-state_arguments = None
+   state_arguments = None
 ```
 
 5. Finally, we need to amend the file `handler.py` to send formatted messages with the corresponding information to our
