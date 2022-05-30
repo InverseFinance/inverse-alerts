@@ -1,14 +1,15 @@
 import time
 import logging
-from helpers import sendError
 from threading import Thread
 from datetime import datetime
-from priority_thread_pool_executor import PriorityThreadPoolExecutor
-from handlers import HandleTx,HandleEvent,HandleStateVariation
-from web3 import Web3
 import json
 import sys
+import requests
 from dotenv import load_dotenv
+from web3 import Web3
+from concurrent.futures import ThreadPoolExecutor
+from handlers import HandleTx,HandleEvent,HandleStateVariation
+from helpers import sendError
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
@@ -25,8 +26,7 @@ class TxListener(Thread):
             try:
                 for tx in self.tx_filter.get_new_entries():
                     logging.info(str(datetime.now()) + " Tx found in " + str(self.alert) + "-" + str(self.contract))
-                    with PriorityThreadPoolExecutor() as executor:
-                        executor.submit(HandleTx, (tx, self.alert, self.contract),priority=0)
+                    HandleTx(tx, self.alert, self.contract).start()
                 time.sleep(1)
 
             except Exception as e:
@@ -52,8 +52,7 @@ class EventListener(Thread):
                 for event in self.event_filter.get_new_entries():
                     logging.info(str(datetime.now()) + " Event found in " + str(self.alert) + "-" + str(
                         self.contract.address) + "-" + str(self.event_name))
-                    with PriorityThreadPoolExecutor() as executor:
-                        executor.submit(HandleEvent, (event, self.alert, self.event_name),priority=0)
+                    HandleEvent(event, self.alert, self.event_name).start()
                 time.sleep(1)
 
             except Exception as e:
@@ -95,9 +94,8 @@ class StateChangeListener(Thread):
                     self.old_value = self.value
 
                     if self.change > 0.05 and self.value > 0:
-                        with PriorityThreadPoolExecutor() as executor:
-                            executor.submit(HandleStateVariation, (self.value, self.change, self.alert, self.contract, self.state_function,
-                                             self.argument),priority=0)
+                        HandleStateVariation(self.value, self.change, self.alert, self.contract, self.state_function,
+                                             self.argument).start()
                     time.sleep(1)
 
             except Exception as e:

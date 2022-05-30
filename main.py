@@ -1,17 +1,18 @@
-import concurrent.futures
+
 # import the following dependencies
 import json
 import os
-import pandas as pd
-import fetchers
 import logging
+import sys
+import requests
+from datetime import datetime
+import pandas as pd
 from helpers import LoggerParams, sendError
 from dotenv import load_dotenv
+import fetchers
 from web3 import Web3
-from datetime import datetime
 from listeners import EventListener, StateChangeListener, TxListener
-from priority_thread_pool_executor import PriorityThreadPoolExecutor
-import sys
+from concurrent.futures import ThreadPoolExecutor
 
 # Load locals and web3 provider
 load_dotenv()
@@ -55,8 +56,7 @@ def main():
             # Third loop to cover all events, in contract, in alert tag
             for event_name in events:
                 # Initiate Thread per alert/contract/event listened
-                with PriorityThreadPoolExecutor() as executor:
-                    executor.submit(EventListener, (web3, alert, contract, event_name),priority =1)
+                EventListener(web3, alert, contract, event_name).start()
                 n_alert += 1
 
                 # Log alert-contract-event
@@ -92,11 +92,10 @@ def main():
                 elif alert == 'cash':
                     state_arguments = None
 
-                if state_arguments != None:
+                if state_arguments is not None:
                     # Initiate Thread per alert/contract/state function listened
                     for argument in state_arguments:
-                        with PriorityThreadPoolExecutor() as executor:
-                            executor.submit(StateChangeListener, (web3, alert, contract, state_function, argument),priority=1)
+                        StateChangeListener(web3, alert, contract, state_function, argument).start()
                         n_alert += 1
 
                         # Log alert-contract-event
@@ -122,8 +121,7 @@ def main():
         # Construct all address array
         for i in range(0, len(addresses['contract_address'])):
             contract_name = web3.toChecksumAddress(addresses.iloc[i]['contract_address'])
-            with PriorityThreadPoolExecutor() as executor:
-                executor.submit(TxListener, (web3, alert, contract_name),priority=1)
+            TxListener(web3, alert, contract_name).start()
             n_alert += 1
 
             # Log alerts-contract
@@ -137,7 +135,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logging.warning("Error alert " + str(alert))
         logging.error(e)
         sendError("Error alert :" + str(e))
         pass
