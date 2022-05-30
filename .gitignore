@@ -1,13 +1,9 @@
-*.env
 /.idea
 /venv
+/build
+/dist
+/__pycache__
+*.env
 *.cmd
 debug.log
-test.py
-test2.py
-__pycache__/
-test.py
-test_listeners.py
-build/
-dist/
 
