@@ -124,7 +124,7 @@ class PriorityThreadPoolExecutor(ThreadPoolExecutor):
         """
         def weak_ref_cb(_, q=self._work_queue):
             q.put(NULL_ENTRY)
-        if len(self._threads) < self._max_workers:
+        if len(self._threads) <= self._max_workers:
             t = threading.Thread(target=_worker,
                                  args=(weakref.ref(self, weak_ref_cb),
                                        self._work_queue))
