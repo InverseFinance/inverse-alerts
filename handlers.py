@@ -396,7 +396,6 @@ class HandleEvent(Thread):
                     fields = f'''makeFields(
                     ['Block Number :',
                     'Proposal :',
-                    'Description :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount())}',
