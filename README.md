@@ -1,8 +1,7 @@
 # Inverse Python Alerts
 
 This repository is a Python Smart contract alerting system, allowing to send to discord events depending on certain
-conditions
-based on Ethereum Transactions or state variables.
+conditions based on Ethereum Transactions or state variables.
 This was originally implemented for Inverse Finance Market monitoring and Risk Management purposes.
 
 The version in prod is running on a Remote Server running an Ethereum light node.
@@ -10,13 +9,13 @@ The version in prod is running on a Remote Server running an Ethereum light node
 ### Ethereum Endpoint
 
 This script is heavily requesting the RPC endpoint. Hence we recommend listening to events by running a private node
-with Geth in order to avoid paying high API query fees.
+with Geth in order to avoid paying high API query fees or to increase sleeping time in `listeners.py`.
 Filters being now supported on light nodes, you don't have to index a full archive node before being able to start.
 Just install Geth and start a light node using :
 
 `geth --syncmode light --http --http.addr 0.0.0.0`
 
-This might take a while to synchronize the first time, once your node is up to date you can start running the alerts.
+This might take a while to synchronize the first time, once your node is up-to-date you can start running the alerts.
 
 ### Install requirements
 
@@ -29,21 +28,20 @@ to be able to send requests to webhook) :
 
 Fill in your node RPC, and webhooks for alerts and error deliveries. Make sure they are included in `handler.py`
 
-```LOCALHOST = "http://localhost:8545"
+```
 LOCALHOST = "http://localhost:8545"
 
-WEBHOOK_TESTING = [enter a Discord webhook for testing]
-WEBHOOK_ERRORS = [enter a Discord webhook for errors]
+WEBHOOK_TESTING = "[enter a Discord webhook for testing]"
+WEBHOOK_ERRORS = "[enter a Discord webhook for errors]"
 
-WEBHOOK_DOLA3CRV = [enter a Discord webhook dola3crv alerts] 
-WEBHOOK_FED = [enter a Discord webhook fed alerts]
-WEBHOOK_GOVERNANCE = [enter a Discord webhook governance alerts]
-WEBHOOK_LENDING = [enter a Discord webhook lending alerts]
-WEBHOOK_LIQUIDATIONS = [enter a Discord webhook liquidations alerts]
-WEBHOOK_MARKETS = [enter a Discord webhook markets alerts]
-WEBHOOK_SWAP = [enter a Discord webhook swap alerts]
-WEBHOOK_UNITROLLER = [enter a Discord webhook unitroller alerts]
-
+WEBHOOK_DOLA3CRV = "[enter a Discord webhook dola3crv alerts] "
+WEBHOOK_FED = "[enter a Discord webhook fed alerts]"
+WEBHOOK_GOVERNANCE = "[enter a Discord webhook governance alerts]"
+WEBHOOK_LENDING = "[enter a Discord webhook lending alerts]"
+WEBHOOK_LIQUIDATIONS = "[enter a Discord webhook liquidations alerts]"
+WEBHOOK_MARKETS = "[enter a Discord webhook markets alerts]"
+WEBHOOK_SWAP = "[enter a Discord webhook swap alerts]"
+WEBHOOK_UNITROLLER = "[enter a Discord webhook unitroller alerts]"
 ```
 
 ### Run with Python
@@ -67,7 +65,7 @@ Those listeners are using events handlers (`handlers.py`) to dispatch the messag
 
 The use of async functions is generally recommended for Nodes were the user have to pay to access the data or were
 the query rate is strongly limited.
-However it generates challenges in term of parrallel processing and CPU optimisation in the case you are running a high
+However, it generates challenges in terms of parallel processing and CPU optimisation in the case you are running a high
 number of Listeners.
 
 This python script is instead continuously monitoring the events, inside separate threads, all managed by the threadpool
@@ -106,8 +104,8 @@ elif alert == 'cash':
 
 5. Finally, we need to amend the file `handler.py` to send formatted messages with the corresponding information to our
    webhooks.
-   This is using `fetchers.py` a small home made library allowing to fetch directly view & state functions on Ethereum.
-   Discord handlers are very sensitive to formatting so make sure you are passing the results of your calculation into
+   This is using `fetchers.py` a small homemade library allowing to fetch directly view & state functions on Ethereum.
+   Discord handlers are very sensitive to formatting so make sure you are passing the results of your calculations into
    your  message as strings and that you are defining a handler condition for every case you need to (Address and function) :
 
 ```
@@ -116,3 +114,27 @@ if (self.alert == 'cash'):
     if self.state_function == 'cash':
     ...and so on
 ```
+   Additionally, this script is heavily relying on discord embed functionality allowing to format messages in a 
+   user-friendly manner. Using the function `makeFields`, always make sure you are returning as many fields as titles,
+   that the inline parameter and color code of your alert are defined :
+
+```
+elif (self.alert == "governance"):
+    content = ""
+    webhook = os.getenv('WEBHOOK_GOVERNANCE')
+    if (self.event_name == "ProposalCreated"):
+        title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event "]))
+
+        fields = f'''makeFields(
+        ['Block Number :',
+        'Proposal :',
+        'Transaction :'],
+        ['{str(tx["blockNumber"])}',
+        '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount())}',
+        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+        [False,False,False])'''
+
+        color = colors.blurple
+        send = True
+```
+   
