@@ -50,16 +50,20 @@ Execute main.py in your Python env or venv :
 
 `[Path to your project]/venv/Scripts/python.exe main.py`
 
+Alternatively you can use the CMD batch files available. You can use `run`, `run-geth-light`, or `run-with-geth` to correspondingly
+run the script alone, run a Geth light node or both at the same time. Make sure you have installed Geth and that you are 
+running Python in the proper environment.
+
 ### Listeners
 
-This script is using 3 types of listeners (`listeners.py`) and can listen to three types of events happening on Ethereum
-mainnet :
+This script is using 3 types of listeners `listeners.py` and can listening to 3 types of Ethereum mainnet occurences :
 
-- Smart contract events
-- View State function variations
-- Transactions emitted from an address
+- Smart contract events : `EventListener`
+- Smart contract View State functions variations : `StateChangeListener`
+- Transactions emitted from an address : `TxListener`
 
-Those listeners are using events handlers (`handlers.py`) to dispatch the messages to the appropriate webhook.
+Those listeners are using events handlers `handlers.py` to define the conditions for  sending a message format and 
+dispatch this latter to the appropriate webhook.
 
 ### Adding an alert
 
