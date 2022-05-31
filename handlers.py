@@ -138,7 +138,7 @@ class HandleStateVariation(Thread):
 
                 if send:
                     sendWebhook(webhook, title, fields, content, image, color)
-                    print('Message Sent !')
+                    print(f'Message Sent to {webhook}')
 
 
         except Exception as e:
@@ -640,7 +640,7 @@ class HandleTx(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-                print('Message Sent !')
+                print(f'Message Sent to {webhook}')
 
 
         except Exception as e:

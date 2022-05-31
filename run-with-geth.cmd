@@ -6,7 +6,7 @@ TIMEOUT /T 60
 setlocal
 :: Set local folder
 cd /d %~dp0
-python main.py
+venv\Scripts\python.exe main.py
 :: Wait 5 seconds before restarting in case of timeout
 TIMEOUT /T 5
 GOTO:Start
