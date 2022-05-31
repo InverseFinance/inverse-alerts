@@ -8,7 +8,7 @@ import requests
 from dotenv import load_dotenv
 from web3 import Web3
 from handlers import HandleTx,HandleEvent,HandleStateVariation
-from helpers import sendError
+from helpers import sendError,formatPercent
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
@@ -24,14 +24,15 @@ class TxListener(Thread):
         while True:
             try:
                 for tx in self.tx_filter.get_new_entries():
-                    logging.info("Tx found in " + str(self.alert) + "-" + str(self.contract))
+                    logging.info(f'Tx found in {str(self.alert)}-{str(self.contract)}')
+                    logging.info(str(tx))
                     HandleTx(tx, self.alert, self.contract).start()
                 time.sleep(2)
 
             except Exception as e:
-                logging.warning("Error in Tx Listener " + str(self.alert) + "-" + str(self.contract))
+                logging.warning(f'Error in listener {str(self.alert)}-{str(self.contract)}')
+                sendError(f'Error in Tx Listener : {str(e)}')
                 logging.error(e)
-                sendError("Error in Tx Listener " + str(e))
                 pass
 
 # Define a Thread to listen separately on each contract/event in the contract file
@@ -49,16 +50,14 @@ class EventListener(Thread):
         while True:
             try:
                 for event in self.event_filter.get_new_entries():
-                    logging.info("Event found in " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(self.event_name))
+                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                     HandleEvent(event, self.alert, self.event_name).start()
                 time.sleep(2)
 
             except Exception as e:
-                logging.warning(
-                    "Error in Event Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
-                        self.event_name))
+                logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 logging.error(e)
-                sendError("Error in Event Listener " + str(e))
+                sendError(f'Error in Event Listener : {str(e)}')
                 pass
 
 # Define a Thread to listen separately on each state change
@@ -85,20 +84,21 @@ class StateChangeListener(Thread):
                     if self.argument is None:
                         self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
                     else:
-                        self.value = eval(
-                            f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
+                        self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
 
                     self.change = (self.value / self.old_value) - 1
                     self.old_value = self.value
 
                     if self.change > 0.05 and self.value > 0:
-                        HandleStateVariation(self.value, self.change, self.alert, self.contract, self.state_function,
-                                             self.argument).start()
+                        logging.info(f'Change matching criteria found in {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
+                        logging.info(formatPercent(self.change))
+                        HandleStateVariation(self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
                 time.sleep(2)
 
             except Exception as e:
-                logging.error(e)
-                sendError("Error in State Change Listener :" + str(e))
+                logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}')
+                logging.error(str(e))
+                sendError(f'Error in State Change Listener : {str(e)}')
                 pass
 
 

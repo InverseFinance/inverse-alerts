@@ -3,7 +3,6 @@ import json
 import os
 import logging
 import sys
-from datetime import datetime
 import requests
 import pandas as pd
 from dotenv import load_dotenv
@@ -33,7 +32,7 @@ tx_alerts = sheet_tx.columns.array
 
 try:
     # Init count of alerts
-    n_alert = 0
+    n_alert = 1
 
     # First loop to cover all alert tags  (then contract and events)
     for alert in events_alerts:
@@ -57,13 +56,9 @@ try:
             for event_name in events:
                 # Initiate Thread per alert/contract/event listened
                 EventListener(web3, alert, contract, event_name).start()
-                n_alert += 1
-
                 # Log alert-contract-event
-                logging.info(alert + '-' + contract.address + '-' + event_name + '-' + str(
-                    n_alert) + ' started listening at event ' + event_name + ' on contract ' + contract.address)
-
-    logging.info('Total alerts running : ' + str(n_alert))
+                logging.info(f'{alert}-{contract.address}-{contract.address}-{str(n_alert)} started listening...')
+                n_alert += 1
 
     for alert in state_alerts:
         # Define state functions corresponding to alert tag
@@ -84,8 +79,8 @@ try:
         for contract in filters["id"]:
             # Third loop to cover all events, in contract, in alert tag
             for state_function in state_functions:
-                # Organise state args for reading function
 
+                # Organise state args for reading function
                 if alert == 'oracle':
                     # Get an array of all markets to use in the Oracle calling
                     state_arguments = fetchers.getAllMarkets('0x4dcf7407ae5c07f8681e1659f626e114a7667339')
@@ -96,18 +91,14 @@ try:
                     # Initiate Thread per alert/contract/state function listened
                     for argument in state_arguments:
                         StateChangeListener(web3, alert, contract, state_function, argument).start()
-                        n_alert += 1
-
                         # Log alert-contract-event
-                        logging.info(alert + '-' + contract.address + '-' + state_function + '-' + str(n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
+                        logging.info(f'{alert}-{contract.address}-{state_function}-{str(n_alert)} started listening...')
+                        n_alert += 1
                 else:
                     StateChangeListener(web3, alert, contract, state_function, None).start()
-                    n_alert += 1
-
                     # Log alert-contract-event
-                    logging.info(alert + '-' + contract.address + '-' + state_function + '-' + str(n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
-
-    logging.info('Total alerts running : ' + str(n_alert))
+                    logging.info(f'{alert}-{contract.address}-{state_function}-{str(n_alert)} started listening...')
+                    n_alert += 1
 
     # First loop to cover all alert tags
     for alert in tx_alerts:
@@ -118,16 +109,13 @@ try:
         for i in range(0, len(addresses['contract_address'])):
             contract_name = web3.toChecksumAddress(addresses.iloc[i]['contract_address'])
             TxListener(web3, alert, contract_name).start()
+            # Log alerts-contract
+            logging.info(f'{alert}-{contract_name}-{str(n_alert)} started listening...')
             n_alert += 1
 
-            # Log alerts-contract
-            logging.info(alert + '-' + str(contract_name) + '-' + str(
-                n_alert) + ' started listening at transactions on Multisig ' + str(contract_name))
-
-    logging.info('Total alerts running : ' + str(n_alert))
+    logging.info(f'Total alerts running : {n_alert-1}')
 
 
 except Exception as e:
-    logging.error(e)
-    sendError("Error alert :" + str(e))
-    pass
+    sendError(f'Error alert : {str(e)}')
+    logging.error(str(e))

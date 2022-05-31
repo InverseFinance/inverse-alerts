@@ -101,7 +101,7 @@ class HandleStateVariation(Thread):
 
                 if send:
                     sendWebhook(webhook, title, fields, content, image, color)
-                    print('Message Sent !')
+                    print(f'Message sent to {webhook}')
 
             if (self.alert == 'supply'):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
@@ -142,14 +142,9 @@ class HandleStateVariation(Thread):
 
 
         except Exception as e:
-            logging.warning(
-                'Error in state variation handler : ' + str(self.alert) + "-" + str(self.state_function) + "-" + str(
-                    self.state_argument) + '-' + str(self.value) + '-' + str(self.change))
-            sendError(
-                'Error in state variation handler : ' + str(self.alert) + '-' + str(self.state_function) + '-' + str(
-                    self.state_argument) + '-' + str(e) + ' Value :' + str(self.value) + ' Change :' + str(
-                    self.change) + " Error : " + str(e))
+            logging.warning(f'Error in state variation handler')
             logging.error(e)
+            sendError(f'Error in state variation handler : {str(e)}')
             pass
 
 # Define event to handle and print to the console/send to discord
@@ -604,8 +599,8 @@ class HandleEvent(Thread):
 
         except Exception as e:
             logging.warning('Error in event handler')
-            sendError("Error in event handler :" + str(e))
             logging.error(e)
+            sendError(f'Error in event handler : {str(e)}')
             pass
 
 # Define state change to handle and print to the console/send to discord
@@ -649,7 +644,7 @@ class HandleTx(Thread):
 
 
         except Exception as e:
-            logging.warning('Error in tx handler : ' + str(self.alert) + "-" + str(self.contract))
-            sendError('Error in state variation handler : ' + str(self.alert) + '-' + str(self.contract) + " Error : " + str(e))
+            logging.warning('Error in tx handler')
             logging.error(e)
+            sendError(f'Error in tx handler : {str(e)}')
             pass
