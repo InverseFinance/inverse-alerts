@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 import fetchers
 from web3 import Web3
 from listeners import EventListener, StateChangeListener, TxListener
-patch_http_connection_pool(maxsize=150)
+patch_http_connection_pool(maxsize=1000)
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
