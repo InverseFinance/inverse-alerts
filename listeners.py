@@ -95,11 +95,9 @@ class StateChangeListener(Thread):
                     if self.change > 0.05 and self.value > 0:
                         HandleStateVariation(self.value, self.change, self.alert, self.contract, self.state_function,
                                              self.argument).start()
-                    time.sleep(2)
+                time.sleep(2)
 
             except Exception as e:
-                # logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
-                #    self.event))
                 logging.error(e)
                 sendError("Error in State Change Listener :" + str(e))
                 pass
