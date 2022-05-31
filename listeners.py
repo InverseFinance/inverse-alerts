@@ -26,7 +26,7 @@ class TxListener(Thread):
                 for tx in self.tx_filter.get_new_entries():
                     logging.info(str(datetime.now()) + " Tx found in " + str(self.alert) + "-" + str(self.contract))
                     HandleTx(tx, self.alert, self.contract).start()
-                time.sleep(1)
+                time.sleep(2)
 
             except Exception as e:
                 logging.warning("Error in Tx Listener " + str(self.alert) + "-" + str(self.contract))
@@ -52,7 +52,7 @@ class EventListener(Thread):
                     logging.info(str(datetime.now()) + " Event found in " + str(self.alert) + "-" + str(
                         self.contract.address) + "-" + str(self.event_name))
                     HandleEvent(event, self.alert, self.event_name).start()
-                time.sleep(1)
+                time.sleep(2)
 
             except Exception as e:
                 logging.warning(
@@ -95,7 +95,7 @@ class StateChangeListener(Thread):
                     if self.change > 0.05 and self.value > 0:
                         HandleStateVariation(self.value, self.change, self.alert, self.contract, self.state_function,
                                              self.argument).start()
-                    time.sleep(1)
+                    time.sleep(2)
 
             except Exception as e:
                 # logging.warning("Error in State Change Listener " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(
