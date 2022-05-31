@@ -75,6 +75,27 @@ def sendError(content):
     else:
         logging.info("Error delivered successfully to error channel code {}.".format(result.status_code))
 
+def sendTest(content):
+    """
+    Seend a message to a discord channel exclusively used for reporting errors
+    :param content: string
+    :return:
+    """
+    load_dotenv()
+    webhook = os.getenv('WEBHOOK_TESTING')
+    try:
+        data = f"""{{"content": '{content}'}}"""
+        data = eval(data)
+        result = requests.post(webhook, json=data)
+
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        logging.error(err)
+        sendError("Error in sending error to webhook :" + str(err))
+        pass
+    else:
+        logging.info("Error delivered successfully to test channel code {}.".format(result.status_code))
+
 
 # Format to 0,000.00
 def formatCurrency(value):
