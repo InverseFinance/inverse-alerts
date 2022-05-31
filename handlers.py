@@ -13,7 +13,7 @@ import requests
 import pandas as pd
 import sys
 
-# Define state change to handle and print to the console/send to discord
+# Define state change to handle and logs to the console/send to discord
 class HandleStateVariation(Thread):
     def __init__(self, value, change, alert, contract, state_function, state_argument, **kwargs):
         super(HandleStateVariation, self).__init__(**kwargs)
@@ -36,7 +36,7 @@ class HandleStateVariation(Thread):
             if (self.alert == 'oracle'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
                 if self.state_function == 'getUnderlyingPrice':
-                    print(str(self.change) + '% change detected on ' + str(
+                    logging.info(str(self.change) + '% change detected on ' + str(
                         fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))))
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
                         fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Oracle'
@@ -69,7 +69,7 @@ class HandleStateVariation(Thread):
             if (self.alert == 'cash'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
                 if self.state_function == 'cash':
-                    print(str(self.change) + '% change detected on ' + str(
+                    logging.info(str(self.change) + '% change detected on ' + str(
                         fetchers.getName(self.contract.address))) + ' balance'
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
                         fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Cash balance'
@@ -101,12 +101,12 @@ class HandleStateVariation(Thread):
 
                 if send:
                     sendWebhook(webhook, title, fields, content, image, color)
-                    print(f'Message sent to {webhook}')
+                    logging.info(f'Message sent to {webhook}')
 
             if (self.alert == 'supply'):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 if self.state_function == 'totalSupply':
-                    print(str(self.change) + '% change detected on ' + str(
+                    logging.info(str(self.change) + '% change detected on ' + str(
                         fetchers.getName(self.contract.address))) + ' total supply'
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
                         fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Supply'
@@ -138,7 +138,7 @@ class HandleStateVariation(Thread):
 
                 if send:
                     sendWebhook(webhook, title, fields, content, image, color)
-                    print(f'Message Sent to {webhook}')
+                    logging.info(f'Message Sent to {webhook}')
 
 
         except Exception as e:
@@ -147,7 +147,7 @@ class HandleStateVariation(Thread):
             sendError(f'Error in state variation handler : {str(e)}')
             pass
 
-# Define event to handle and print to the console/send to discord
+# Define event to handle and logs to the console/send to discord
 class HandleEvent(Thread):
     def __init__(self, event, alert, event_name, **kwargs):
         super(HandleEvent, self).__init__(**kwargs)
@@ -159,7 +159,7 @@ class HandleEvent(Thread):
         try:
             tx = json.loads(Web3.toJSON(self.event))
 
-            # Print result table and start writing message
+            # logs result table and start writing message
             logging.info(str(datetime.now()) + " " + str(tx))
             send = False
             title = ''
@@ -603,7 +603,7 @@ class HandleEvent(Thread):
             sendError(f'Error in event handler : {str(e)}')
             pass
 
-# Define state change to handle and print to the console/send to discord
+# Define state change to handle and logs to the console/send to discord
 class HandleTx(Thread):
     def __init__(self, tx, alert, contract, **kwargs):
         super(HandleTx, self).__init__(**kwargs)
@@ -614,7 +614,7 @@ class HandleTx(Thread):
     def run(self):
         try:
             self.tx = json.loads(Web3.toJSON(self.tx))
-            # Print result table and start writing message
+            # logs result table and start writing message
             logging.info(str(datetime.now()) + " " + str(self.tx))
 
             send = False
@@ -627,7 +627,7 @@ class HandleTx(Thread):
             if (self.alert == 'multisig'):
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
-                print(str('Tx detected on ' + str(self.tx["address"])))
+                logging.info(str('Tx detected on ' + str(self.tx["address"])))
                 title = str('Tx detected on ' + str(self.tx["address"]) + ' Multisig')
                 content = ''
                 send = True
@@ -640,7 +640,7 @@ class HandleTx(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-                print(f'Message Sent to {webhook}')
+                logging.log(f'Message Sent to {webhook}')
 
 
         except Exception as e:

@@ -21,7 +21,6 @@ def makeFields(names, values, inline):
         for i in range(0, len(a)):
             fields.append({"name": a[i], "value": b[i], "inline": c[i]})
 
-        # print(fields = json.dumps(fields, indent=1))
         return fields
     except Exception as e:
         logging.warning('Error in makeFields ')
