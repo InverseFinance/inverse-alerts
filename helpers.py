@@ -6,8 +6,12 @@ from dotenv import load_dotenv
 from web3 import Web3
 import json
 
-# Create fields for the embed content
 def makeFields(names, values, inline):
+    """
+    :param names: array of names of the embed field
+    :param values: array of values of the embed field
+    :param inline: array of Boolean values if the fields is in line with the previous fields
+    """
     try:
         fields = []
         a = names
@@ -25,10 +29,18 @@ def makeFields(names, values, inline):
         logging.error(e)
         pass
 
-
-# Send a webhook with embed (title,fields,image,url,color)
-# content is used for the body of the message and tagging roles
 def sendWebhook(webhook, title, fields, content, imageurl, color):
+    """
+    Send a webhook with embed (title,fields,image,url,color)
+    content is used for the body of the message and tagging roles
+    :param webhook: string webhook link to send the message to
+    :param title: self explanatory, string
+    :param fields: a json string of fields with names, values, and inLine paramter filled (use the function makefields)
+    :param content: the text body of the message, can be used for tagging roles
+    :param imageurl: string link to an embedded image url
+    :param color: color of the embed message in discord
+    :return:
+    """
     try:
         data = f"""{{"content": '{content}'}}"""
         data = eval(data)
@@ -43,9 +55,12 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
     else:
         logging.info("Embed delivered successfully to webhook code {}.".format(result.status_code))
 
-
-# Send an error to the appropriate discord webhook (modify in .env file)
 def sendError(content):
+    """
+    Seend a message to a discord channel exclusively used for reporting errors
+    :param content: string
+    :return:
+    """
     load_dotenv()
     webhook = os.getenv('WEBHOOK_ERRORS')
     try:
@@ -75,6 +90,9 @@ def formatPercent(value):
 
 
 def LoggerParams():
+    """
+    Configure our logger to write in debug.log
+    """
     # Logger config
     logging.basicConfig(
         level=logging.INFO,
@@ -84,7 +102,7 @@ def LoggerParams():
             logging.StreamHandler(sys.stdout)
         ]
     )
-    # Mute warning when pool is full
+    # Mute warning when pool is full :: overriden by poolsize paramater
     logging.getLogger("urllib3").setLevel(logging.INFO)
 
 
@@ -105,8 +123,11 @@ def patch_http_connection_pool(**constructor_kwargs):
             super(MyHTTPConnectionPool, self).__init__(*args,**kwargs)
     poolmanager.pool_classes_by_scheme['http'] = MyHTTPConnectionPool
 
-# Color shortcut-class for discord embed notification
+
 class colors:
+    """
+    This color class allows to pass readable arguments to theDiscord Embed
+    """
     default = 0
     teal = 0x1abc9c
     dark_teal = 0x11806a
