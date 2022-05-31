@@ -5,10 +5,8 @@ from web3 import Web3
 
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))  # Or infura key
 
-# Fetchers is a handpicked list of utils that you can use to fetch the function of a particular argument
-# directly into your python code
-# TODO : Transform into class
 
+# TODO : Transform into class
 # Common used functions
 def getBalance(address, token_address):
 
@@ -89,6 +87,7 @@ def getENS(address):
         address_ens = address
 
     return address_ens
+
 
 # Governor Mills and multisig related function
 def getProposal(proposal_id):
