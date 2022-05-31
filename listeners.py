@@ -24,7 +24,7 @@ class TxListener(Thread):
         while True:
             try:
                 for tx in self.tx_filter.get_new_entries():
-                    logging.info(str(datetime.now()) + " Tx found in " + str(self.alert) + "-" + str(self.contract))
+                    logging.info("Tx found in " + str(self.alert) + "-" + str(self.contract))
                     HandleTx(tx, self.alert, self.contract).start()
                 time.sleep(2)
 
@@ -49,8 +49,7 @@ class EventListener(Thread):
         while True:
             try:
                 for event in self.event_filter.get_new_entries():
-                    logging.info(str(datetime.now()) + " Event found in " + str(self.alert) + "-" + str(
-                        self.contract.address) + "-" + str(self.event_name))
+                    logging.info("Event found in " + str(self.alert) + "-" + str(self.contract.address) + "-" + str(self.event_name))
                     HandleEvent(event, self.alert, self.event_name).start()
                 time.sleep(2)
 

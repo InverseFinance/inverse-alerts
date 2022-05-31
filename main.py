@@ -3,26 +3,29 @@ import json
 import os
 import logging
 import sys
-import requests
 from datetime import datetime
+import requests
 import pandas as pd
-from helpers import LoggerParams, sendError,patch_http_connection_pool
 from dotenv import load_dotenv
-import fetchers
 from web3 import Web3
+import fetchers
+from helpers import LoggerParams, sendError,patch_http_connection_pool
 from listeners import EventListener, StateChangeListener, TxListener
+
+
+# Increase http connection pool size, load locals and set web3 provider
 patch_http_connection_pool(maxsize=1000)
-# Load locals and web3 provider
 load_dotenv()
 LoggerParams()
 web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))
 
-# Get contracts metadata from excel
+# Get contracts metadata from excel and alerts by type
 sheet_contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
 sheet_events = pd.read_excel('contracts.xlsx', sheet_name='alerts_events')
 sheet_state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
 sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
 
+# Gets alert name by reading headers on each sheet
 events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
 tx_alerts = sheet_tx.columns.array
@@ -35,7 +38,7 @@ try:
     # First loop to cover all alert tags  (then contract and events)
     for alert in events_alerts:
         # Define events corresponding to alert tag
-        events = eval(f'''sheet_events['{alert}'].dropna()''')
+        events = sheet_events[alert].dropna()
 
         # Get contracts filtering by alert tag and load their ABIs
         alert_contracts = sheet_contracts[sheet_contracts['tags_events'].str.contains(alert)]
@@ -57,14 +60,14 @@ try:
                 n_alert += 1
 
                 # Log alert-contract-event
-                logging.info(str(datetime.now()) + ' ' + alert + '-' + contract.address + '-' + event_name + '-' + str(
+                logging.info(alert + '-' + contract.address + '-' + event_name + '-' + str(
                     n_alert) + ' started listening at event ' + event_name + ' on contract ' + contract.address)
 
-    logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
+    logging.info('Total alerts running : ' + str(n_alert))
 
     for alert in state_alerts:
         # Define state functions corresponding to alert tag
-        state_functions = eval(f'''sheet_state['{alert}'].dropna()''')
+        state_functions = sheet_state[alert].dropna()
 
         # Get contracts filtering by alert tag and load their ABIs
         alert_contracts = sheet_contracts[sheet_contracts['tags_state'].str.contains(alert)]
@@ -96,19 +99,15 @@ try:
                         n_alert += 1
 
                         # Log alert-contract-event
-                        logging.info(
-                            str(datetime.now()) + ' ' + alert + '-' + contract.address + '-' + state_function + '-' + str(
-                                n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
+                        logging.info(alert + '-' + contract.address + '-' + state_function + '-' + str(n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
                 else:
                     StateChangeListener(web3, alert, contract, state_function, None).start()
                     n_alert += 1
 
                     # Log alert-contract-event
-                    logging.info(
-                        str(datetime.now()) + ' ' + alert + '-' + contract.address + '-' + state_function + '-' + str(
-                            n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
+                    logging.info(alert + '-' + contract.address + '-' + state_function + '-' + str(n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
 
-    logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
+    logging.info('Total alerts running : ' + str(n_alert))
 
     # First loop to cover all alert tags
     for alert in tx_alerts:
@@ -122,10 +121,10 @@ try:
             n_alert += 1
 
             # Log alerts-contract
-            logging.info(str(datetime.now()) + ' ' + alert + '-' + str(contract_name) + '-' + str(
+            logging.info(alert + '-' + str(contract_name) + '-' + str(
                 n_alert) + ' started listening at transactions on Multisig ' + str(contract_name))
 
-    logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
+    logging.info('Total alerts running : ' + str(n_alert))
 
 
 except Exception as e:
