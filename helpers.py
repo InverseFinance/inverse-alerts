@@ -21,6 +21,7 @@ def makeFields(names, values, inline):
         for i in range(0, len(a)):
             fields.append({"name": a[i], "value": b[i], "inline": c[i]})
 
+        # print(fields = json.dumps(fields, indent=1))
         return fields
     except Exception as e:
         logging.warning('Error in makeFields ')
@@ -75,27 +76,6 @@ def sendError(content):
     else:
         logging.info("Error delivered successfully to error channel code {}.".format(result.status_code))
 
-def sendTest(content):
-    """
-    Seend a message to a discord channel exclusively used for reporting errors
-    :param content: string
-    :return:
-    """
-    load_dotenv()
-    webhook = os.getenv('WEBHOOK_TESTING')
-    try:
-        data = f"""{{"content": '{content}'}}"""
-        data = eval(data)
-        result = requests.post(webhook, json=data)
-
-        result.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        logging.error(err)
-        sendError("Error in sending error to webhook :" + str(err))
-        pass
-    else:
-        logging.info("Error delivered successfully to test channel code {}.".format(result.status_code))
-
 
 # Format to 0,000.00
 def formatCurrency(value):
@@ -123,7 +103,7 @@ def LoggerParams():
         ]
     )
     # Mute warning when pool is full :: overriden by poolsize paramater
-    logging.getLogger("urllib3").setLevel(logging.INFO)
+    logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 
 def patch_http_connection_pool(**constructor_kwargs):

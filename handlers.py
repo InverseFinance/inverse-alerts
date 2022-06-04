@@ -68,7 +68,7 @@ class HandleStateVariation(Thread):
 
             if (self.alert == 'cash'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
-                if self.state_function == 'cash':
+                if self.state_function == 'getCash':
                     logging.info(str(self.change) + '% change detected on ' + str(
                         fetchers.getName(self.contract.address))) + ' balance'
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
@@ -140,11 +140,14 @@ class HandleStateVariation(Thread):
                     sendWebhook(webhook, title, fields, content, image, color)
                     logging.info(f'Message Sent to {webhook}')
 
+            if send:
+                sendWebhook(webhook, title, fields, content, image, color)
+
 
         except Exception as e:
             logging.warning(f'Error in state variation handler')
             logging.error(e)
-            sendError(f'Error in state variation handler : {str(e)}')
+            #sendError(f'Error in state variation handler : {str(e)}')
             pass
 
 # Define event to handle and logs to the console/send to discord
@@ -356,8 +359,7 @@ class HandleEvent(Thread):
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "LiquidateBorrow"):
-                    title = "Lending Market New Liquidation event detected for " + + str(
-                        fetchers.getSymbol(tx["address"]))
+                    title = "Lending Market New Liquidation event detected for " + str(fetchers.getSymbol(tx["address"]))
                     webhook = os.getenv('WEBHOOK_LIQUIDATIONS')
                     fields = f'''makeFields(
                                 ['Block Number :',
@@ -367,7 +369,6 @@ class HandleEvent(Thread):
                                 'Seized Token Address :',
                                 'Repay Amount :',
                                 'Seized Tokens Amount',
-                                'Total Supply :',
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
                                 '{str(tx["args"]["liquidator"])}',
@@ -377,7 +378,7 @@ class HandleEvent(Thread):
                                 '{str(tx["args"]["repayAmount"])}',
                                 '{str(tx["args"]["seizeTokens"])}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,False,True,True,False,True,True,True,False])'''
+                                [True,False,True,True,False,True,True,False])'''
 
                     color = colors.blurple
                     send = True
@@ -442,7 +443,7 @@ class HandleEvent(Thread):
             elif (self.alert == "fed"):
                 webhook = os.getenv('WEBHOOK_FED')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/22517/1128427/3084f915-b906-4fdf-ac8c-ad5c0ce57e2b.jpg"
-                content = '<@945071604642222110>'
+                content = '<@&945071604642222110>'
                 if (self.event_name in ["Expansion"]):
                     title = "Fed " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
 
@@ -581,7 +582,23 @@ class HandleEvent(Thread):
                                         "MarketUnlisted"]):
                     title = "Comptroller Markets " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                             str(tx["event"])) + " event detected"
-                    content = '<@945071604642222110>'
+                    content = '<@&945071604642222110>'
+                    fields = f'''makeFields(
+                        ['Block Number :',
+                        'Address :',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(tx["address"])}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                        [False,False,False])'''
+
+                color = colors.dark_orange
+                send = True
+            elif (self.alert == "test"):
+                webhook = os.getenv('WEBHOOK_TESTING')
+                if (self.event_name in ["Transfer"]):
+                    title = "Test Transfer event detected"
+                    content = '<@578956365205209098>'
                     fields = f'''makeFields(
                     ['Block Number :',
                     'Address :',
@@ -596,11 +613,12 @@ class HandleEvent(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
+                logging.info(f'Message Sent to {webhook}')
 
         except Exception as e:
             logging.warning('Error in event handler')
             logging.error(e)
-            sendError(f'Error in event handler : {str(e)}')
+            #sendError(f'Error in event handler : {str(e)}')
             pass
 
 # Define state change to handle and logs to the console/send to discord
@@ -640,11 +658,11 @@ class HandleTx(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-                logging.log(f'Message Sent to {webhook}')
+                logging.info(f'Message Sent to {str(webhook)}')
 
 
         except Exception as e:
             logging.warning('Error in tx handler')
             logging.error(e)
-            sendError(f'Error in tx handler : {str(e)}')
+            #sendError(str(f'Error in tx handler : {str(e)}'))
             pass
