@@ -72,7 +72,7 @@ class HandleStateVariation(Thread):
                     logging.info(str(self.change) + '% change detected on ' + str(
                         fetchers.getName(self.contract.address))) + ' balance'
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Cash balance'
+                        fetchers.getSymbol(fetchers.getUnderlying(self.contract.address))) + ' Cash balance'
 
                     if abs(self.change) > 0.2:
                         content = '<@&945071604642222110>'
@@ -386,7 +386,7 @@ class HandleEvent(Thread):
                 content = "<@&899302193608409178>"
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
                 if (self.event_name == "ProposalCreated"):
-                    title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event "]))
+                    title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"]))
 
                     fields = f'''makeFields(
                     ['Block Number :',

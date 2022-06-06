@@ -130,5 +130,5 @@ try:
 
 except Exception as e:
     logging.error(e)
-    sendError("Error alert :" + str(e))
+    #sendError("Error alert :" + str(e))
     pass
