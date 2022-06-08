@@ -15,7 +15,7 @@ import sys
 
 # Define state change to handle and logs to the console/send to discord
 class HandleStateVariation(Thread):
-    def __init__(self, value, change, alert, contract, state_function, state_argument, **kwargs):
+    def __init__(self, old_value,value, change, alert, contract, state_function, state_argument, **kwargs):
         super(HandleStateVariation, self).__init__(**kwargs)
         self.value = value
         self.change = change
@@ -58,13 +58,15 @@ class HandleStateVariation(Thread):
                     fields = f'''makeFields(
                          ['Alert Level :',
                          'Variation :',
-                         'Last Value :',
+                         'Old Value :',
+                         'New Value :',
                          'Link to Market :'], 
                          ['{str(level)}',
                          '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
                          '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
                          '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
-                         [True, True,True,False])'''
+                         [True, True,True,True,False])'''
 
             if (self.alert == 'cash'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
@@ -91,13 +93,15 @@ class HandleStateVariation(Thread):
                     fields = f'''makeFields(
                          ['Alert Level :',
                          'Variation :',
-                         'Last Value :',
+                         'Old Value :',
+                         'New Value :',
                          'Link to Market :'], 
                          ['{str(level)}',
                          '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
                          '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
                          '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                         [True, True,True,False])'''
+                         [True, True,True,True,False])'''
 
                 if send:
                     sendWebhook(webhook, title, fields, content, image, color)
@@ -128,13 +132,15 @@ class HandleStateVariation(Thread):
                     fields = f'''makeFields(
                          ['Alert Level :',
                          'Variation :',
-                         'Last Value :',
+                         'Old Value :',
+                         'New Value :',
                          'Link to Pool :'], 
                          ['{str(level)}',
                          '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
                          '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
                          '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                         [True, True,True,False])'''
+                         [True, True,True,True,False])'''
 
                 if send:
                     sendWebhook(webhook, title, fields, content, image, color)

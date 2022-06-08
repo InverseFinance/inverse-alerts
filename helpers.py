@@ -5,6 +5,7 @@ import sys
 from dotenv import load_dotenv
 from web3 import Web3
 import json
+import time
 
 def makeFields(names, values, inline):
     """
@@ -41,19 +42,23 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
     :param color: color of the embed message in discord
     :return:
     """
-    try:
-        data = f"""{{"content": '{content}'}}"""
-        data = eval(data)
-        embed = f"""[{{"fields":{fields},"title": '{title}',"color": '{color}',"image":{{"url": '{imageurl}'}}}}]"""
-        data["embeds"] = eval(embed)
-        result = requests.post(webhook, json=data)
-        result.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        logging.error(err)
-        sendError("Error in sending message to webhook :" + str(err))
-        pass
-    else:
-        logging.info("Embed delivered successfully to webhook code {}.".format(result.status_code))
+    error = True
+    while error:
+        try:
+            data = f"""{{"content": '{content}'}}"""
+            data = eval(data)
+            embed = f"""[{{"fields":{fields},"title": '{title}',"color": '{color}',"image":{{"url": '{imageurl}'}}}}]"""
+            data["embeds"] = eval(embed)
+            result = requests.post(webhook, json=data)
+            result.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            logging.error(err)
+            sendError("Error in sending message to webhook. Waiting 5 seconds to retry...")
+            time.sleep(5)
+            error = True
+        else:
+            logging.info("Embed delivered successfully to webhook code {}.".format(result.status_code))
+            error = False
 
 def sendError(content):
     """
@@ -63,18 +68,21 @@ def sendError(content):
     """
     load_dotenv()
     webhook = os.getenv('WEBHOOK_ERRORS')
-    try:
-        data = f"""{{"content": '{content}'}}"""
-        data = eval(data)
-        result = requests.post(webhook, json=data)
-
-        result.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        logging.error(err)
-        sendError("Error in sending error to webhook :" + str(err))
-        pass
-    else:
-        logging.info("Error delivered successfully to error channel code {}.".format(result.status_code))
+    error = True
+    while error:
+        try:
+            data = f"""{{"content": '{content}'}}"""
+            data = eval(data)
+            result = requests.post(webhook, json=data)
+            result.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            logging.error(err)
+            sendError("Error in sending message to webhook. Waiting 5 seconds to retry...")
+            time.sleep(5)
+            error = True
+        else:
+            logging.info("Error delivered successfully to error channel code {}.".format(result.status_code))
+            error = False
 
 
 # Format to 0,000.00

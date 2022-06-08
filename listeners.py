@@ -87,12 +87,12 @@ class StateChangeListener(Thread):
                         self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
 
                     self.change = (self.value / self.old_value) - 1
-                    self.old_value = self.value
 
                     if abs(self.change) > 0.05 and self.value > 0:
                         logging.info(f'State Change matching criteria found in {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
                         logging.info(formatPercent(self.change))
-                        HandleStateVariation(self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
+                        HandleStateVariation(self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
+                    self.old_value = self.value
                 time.sleep(60)
 
             except Exception as e:
