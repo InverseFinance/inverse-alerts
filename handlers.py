@@ -250,8 +250,8 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             elif (self.alert in ["lending1", "lending2"]):
-                webhook = os.getenv('WEBHOOK_LENDING')
                 if (self.event_name == "Mint"):
+                    webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(tx["address"]))
                     fields = f'''makeFields(
                                 ['Block Number :',
@@ -279,6 +279,7 @@ class HandleEvent(Thread):
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "Redeem"):
+                    webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Withdrawal event detected for " + str(fetchers.getSymbol(tx["address"]))
                     fields = f'''makeFields(
                                 ['Block Number :',
@@ -306,6 +307,7 @@ class HandleEvent(Thread):
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "Borrow"):
+                    webhook = os.getenv('WEBHOOK_BORROW')
                     title = "Lending Market : New Borrow event detected for " + str(fetchers.getSymbol(tx["address"]))
                     fields = f'''makeFields(
                                 ['Block Number :',
@@ -335,6 +337,7 @@ class HandleEvent(Thread):
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "RepayBorrow"):
+                    webhook = os.getenv('WEBHOOK_BORROW')
                     title = "Lending Market : New Repayment event detected for " + str(fetchers.getSymbol(tx["address"]))
 
                     fields = f'''makeFields(
@@ -371,20 +374,24 @@ class HandleEvent(Thread):
                                 ['Block Number :',
                                 'Liquidator :',
                                 'Borrower :',
-                                'Address :',
-                                'Seized Token Address :',
+                                'Market Address :',
+                                'Seized Amount :'
+                                'Seized Token  :',
                                 'Repay Amount :',
-                                'Seized Tokens Amount',
+                                'Repay Amount USD:',
+                                'Repay Token  :',
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
                                 '{str(tx["args"]["liquidator"])}',
                                 '{str(tx["args"]["borrower"])}',
                                 '{str(tx["address"])}',
-                                '{str(tx["args"]["cTokenCollateral"])}',
-                                '{str(tx["args"]["repayAmount"])}',
-                                '{str(tx["args"]["seizeTokens"])}',
+                                '{str(formatCurrency(tx["args"]["seizeTokens"])/ fetchers.getDecimals(tx["address"]))}',
+                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(formatCurrency(tx["args"]["repayAmount"]/ fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["repayAmount"]* fetchers.getUnderlyingPrice(tx["args"]["cTokenCollateral"])/ fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
+                                '{str(fetchers.getSymbol(tx["args"]["cTokenCollateral"]))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,False,True,True,False,True,True,False])'''
+                                [True,False,False,False,True,True,True,True,True,False])'''
 
                     color = colors.blurple
                     send = True
