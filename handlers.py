@@ -717,8 +717,8 @@ class HandleCoingecko(Thread):
                 fields = []
                 color = colors.blurple
                 webhook = os.getenv('WEBHOOK_MARKETS')
-                logging.info(str(formatPercent(self.change)) + ' change detected on Coingecko INV Price')
-                title = str(formatPercent(self.change)) + ' change detected on Coingecko INV Price'
+                logging.info(str(formatPercent(self.change)) + ' change detected on Coingecko '+str(self.id)+' Price')
+                title = str(formatPercent(self.change)) + ' change detected on Coingecko '+str(self.id)+' Price'
 
                 if abs(self.change) > 0.2:
                     content = '<@&945071604642222110>'

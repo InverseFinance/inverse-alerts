@@ -78,6 +78,7 @@ def sendError(content):
         except requests.exceptions.HTTPError as err:
             logging.error(err)
             sendError("Error in sending message to webhook. Waiting 5 seconds to retry...")
+            # time sleep is used to avoid throttling the error webhook w/ too many attempts
             time.sleep(5)
             error = True
         else:
