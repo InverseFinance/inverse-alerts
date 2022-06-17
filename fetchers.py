@@ -24,7 +24,7 @@ def getBalance(address, token_address):
 
 
 def getDecimals(address):
-    if (address == '0x0000000000000000000000000000000000000000'):
+    if (address == web3.toChecksumAddress('0x0000000000000000000000000000000000000000')):
         decimals = 1e18
     else:
         address = web3.toChecksumAddress(address)
@@ -52,7 +52,7 @@ def getSupply(address):
 
 
 def getName(address):
-    if (address == '0x0000000000000000000000000000000000000000'):
+    if (address == web3.toChecksumAddress('0x0000000000000000000000000000000000000000')):
         name = 'Ether'
     else:
         address = web3.toChecksumAddress(address)
@@ -64,7 +64,7 @@ def getName(address):
 
 
 def getSymbol(address):
-    if (address == '0x0000000000000000000000000000000000000000'):
+    if (address == web3.toChecksumAddress('0x0000000000000000000000000000000000000000')):
         symbol = 'ETH'
     else:
         address = web3.toChecksumAddress(address)
@@ -243,7 +243,7 @@ def getUnderlyingPrice(address):
 
 
 def getUnderlying(address):
-    if (address == '0x697b4acAa24430F254224eB794d2a85ba1Fa1FB8'):
+    if (address == web3.toChecksumAddress('0x697b4acAa24430F254224eB794d2a85ba1Fa1FB8')):
         underlying = '0x0000000000000000000000000000000000000000'
     else:
         address = web3.toChecksumAddress(address)

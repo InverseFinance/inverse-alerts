@@ -5,12 +5,13 @@ import logging
 import sys
 import requests
 from datetime import datetime
+from pycoingecko import CoinGeckoAPI
 import pandas as pd
 from helpers import LoggerParams, sendError,patch_http_connection_pool
 from dotenv import load_dotenv
 import fetchers
 from web3 import Web3
-from listeners import EventListener, StateChangeListener, TxListener
+from listeners import EventListener, StateChangeListener, TxListener,CoinGeckoListener
 #patch_http_connection_pool(maxsize=1000)
 # Load locals and web3 provider
 load_dotenv()
@@ -22,6 +23,8 @@ sheet_contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
 sheet_events = pd.read_excel('contracts.xlsx', sheet_name='alerts_events')
 sheet_state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
 sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
+# Coingecko ids to monitor for changes
+ids = ['inverse-finance', 'dola-usd']
 
 events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
@@ -126,6 +129,10 @@ try:
                 n_alert) + ' started listening at transactions on Multisig ' + str(contract_name))
 
     logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
+
+    for id in ids:
+        CoinGeckoListener(id).start()
+        logging.info("Started Coingecko Listener " + str(id))
 
 
 except Exception as e:

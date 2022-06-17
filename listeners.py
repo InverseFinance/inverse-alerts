@@ -1,13 +1,14 @@
 import time
 import logging
 from threading import Thread
+from pycoingecko import CoinGeckoAPI
 from datetime import datetime
 import json
 import sys
 import requests
 from dotenv import load_dotenv
 from web3 import Web3
-from handlers import HandleTx,HandleEvent,HandleStateVariation
+from handlers import HandleTx,HandleEvent,HandleStateVariation,HandleCoingecko
 from helpers import sendError,formatPercent
 
 # Define a Thread to listen separately on each contract/event in the contract file
@@ -100,5 +101,30 @@ class StateChangeListener(Thread):
                 logging.error(str(e))
                 #sendError(f'Error in State Change Listener : {str(e)}')
                 pass
+
+# Define a Thread to listen separately on each state change
+class CoinGeckoListener(Thread):
+    def __init__(self, id, **kwargs):
+        super(CoinGeckoListener, self).__init__(**kwargs)
+        self.id = id
+        self.cg = CoinGeckoAPI()
+
+    def run(self):
+        try:
+            old_value = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
+            while True:
+                price = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
+                change = (old_value / price) - 1
+                logging.info('change : ' + str(formatPercent(change))+ ' / price : ' + str(price) + ' / old price : ' + str(old_value))
+                HandleCoingecko(old_value, price, change).start()
+                old_value = price
+                time.sleep(60)
+
+        except Exception as e:
+            logging.error(f'Error in CoinGecko Listener : {self.id}')
+            logging.error(str(e))
+            #sendError(f'Error in State Change Listener : {str(e)}')
+            pass
+
 
 
