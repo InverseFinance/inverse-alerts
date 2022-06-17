@@ -700,9 +700,10 @@ class HandleTx(Thread):
             pass
 
 class HandleCoingecko(Thread):
-    def __init__(self, old_value,value, change,  **kwargs):
+    def __init__(self, id, old_value,value, change,  **kwargs):
         super(HandleCoingecko, self).__init__(**kwargs)
         self.value = value
+        self.id = id
         self.old_value = old_value
         self.change = change
 

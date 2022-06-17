@@ -111,12 +111,12 @@ class CoinGeckoListener(Thread):
 
     def run(self):
         try:
-            old_value = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
+            self.old_value = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
             while True:
-                price = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
-                change = (old_value / price) - 1
-                logging.info('change : ' + str(formatPercent(change))+ ' / price : ' + str(price) + ' / old price : ' + str(old_value))
-                HandleCoingecko(old_value, price, change).start()
+                self.price = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
+                self.change = (self.old_value / self.price) - 1
+                logging.info('change : ' + str(formatPercent(self.change))+ ' / price : ' + str(self.price) + ' / old price : ' + str(self.old_value))
+                HandleCoingecko(self.id, self.old_value, self.price, self.change).start()
                 old_value = price
                 time.sleep(60)
 
