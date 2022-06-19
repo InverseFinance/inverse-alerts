@@ -8,8 +8,8 @@ import sys
 import requests
 from dotenv import load_dotenv
 from web3 import Web3
-from handlers import HandleTx,HandleEvent,HandleStateVariation,HandleCoingecko
-from helpers import sendError,formatPercent
+from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
+from helpers import sendError, formatPercent
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
@@ -102,7 +102,7 @@ class StateChangeListener(Thread):
                 #sendError(f'Error in State Change Listener : {str(e)}')
                 pass
 
-# Define a Thread to listen separately on each state change
+# Define a Thread to listen separately to price variation
 class CoinGeckoListener(Thread):
     def __init__(self, id, **kwargs):
         super(CoinGeckoListener, self).__init__(**kwargs)
@@ -122,6 +122,37 @@ class CoinGeckoListener(Thread):
 
         except Exception as e:
             logging.error(f'Error in CoinGecko Listener : {self.id}')
+            logging.error(str(e))
+            #sendError(f'Error in State Change Listener : {str(e)}')
+            pass
+
+# Define a Thread to listen separately to price variation
+class CoinGeckoVolumeListener(Thread):
+    def __init__(self, id, **kwargs):
+        super(CoinGeckoVolumeListener, self).__init__(**kwargs)
+        self.id = id
+        self.cg = CoinGeckoAPI()
+    def run(self):
+        try:
+            self.tickers = self.cg.get_coin_by_id(id=self.id, vs_currency='usd', days=1)['tickers']
+            self.old_value = 0
+            for i in range(0, len(self.tickers)):
+                self.old_value += self.tickers[i]['converted_volume']['usd']
+
+            while True:
+                self.tickers = self.cg.get_coin_by_id(id=self.id, vs_currency='usd', days=1)['tickers']
+                self.volume = 0
+                for i in range(0, len(self.tickers)):
+                    self.volume += self.tickers[i]['converted_volume']['usd']
+
+                self.change = (self.volume / self.old_value) - 1
+                logging.info('change : ' + str(formatPercent(self.change))+ ' / volume : ' + str(self.volume) + ' / old volume : ' + str(self.old_value))
+                HandleCoingeckoVolume(self.id, self.old_value, self.volume, self.change).start()
+                self.old_value = self.volume
+                time.sleep(60)
+
+        except Exception as e:
+            logging.error(f'Error in CoinGecko Volume Listener : {self.id}')
             logging.error(str(e))
             #sendError(f'Error in State Change Listener : {str(e)}')
             pass

@@ -11,7 +11,7 @@ from helpers import LoggerParams, sendError,patch_http_connection_pool
 from dotenv import load_dotenv
 import fetchers
 from web3 import Web3
-from listeners import EventListener, StateChangeListener, TxListener,CoinGeckoListener
+from listeners import EventListener, StateChangeListener, TxListener,CoinGeckoListener,CoinGeckoVolumeListener
 #patch_http_connection_pool(maxsize=1000)
 # Load locals and web3 provider
 load_dotenv()
@@ -132,8 +132,13 @@ try:
 
     for id in ids:
         CoinGeckoListener(id).start()
+        n_alert +=1
+        logging.info("Started Coingecko Listener " + str(id))
+        CoinGeckoVolumeListener(id).start()
+        n_alert +=1
         logging.info("Started Coingecko Listener " + str(id))
 
+    logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
 
 except Exception as e:
     logging.error(e)

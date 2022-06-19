@@ -281,7 +281,8 @@ class HandleEvent(Thread):
                                 '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,True,False,True,True,True,True,True,False])'''
-
+                    if ((tx["args"]["mintAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                        content = '<@&945071604642222110>'
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "Redeem"):
@@ -309,6 +310,8 @@ class HandleEvent(Thread):
                                 '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,True,False,True,True,True,True,True,False])'''
+                    if ((tx["args"]["redeemAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                        content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
@@ -339,6 +342,8 @@ class HandleEvent(Thread):
                                 '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,False,True,True,True,True,True,True,True,False])'''
+                    if ((tx["args"]["borrowAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                        content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
@@ -370,6 +375,8 @@ class HandleEvent(Thread):
                                 '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,False,True,True,True,True,True,True,True,False])'''
+                    if ((tx["args"]["repayAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                        content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
@@ -398,6 +405,8 @@ class HandleEvent(Thread):
                                 '{str(fetchers.getSymbol(tx["address"]))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [False,False,False,False,True,True,False,True,True,False])'''
+                    if ((tx["args"]["repayAmount"]/ fetchers.getDecimals(fetchers.getUnderlying(tx["address"])))>100000):
+                        content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
@@ -477,7 +486,7 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(tx["args"]["amount"] / 1e18))}',
                     '{str(formatCurrency(fetchers.getSupply('0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False,False,False])'''
+                    [False,False,True,True,False])'''
 
                     color = colors.dark_red
                     send = True
@@ -487,15 +496,15 @@ class HandleEvent(Thread):
                     fields = f'''makeFields([
                     'Block Number :',
                     'Fed Address :',
-                    'Sender :',
+                    'Amount :',
                     'Total Supply :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{str(tx["address"])}',
-                    '{str(tx["args"]["amount"] / 1e18)}',
-                    '{str(fetchers.getSupply('0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18)}',
+                    '{str(formatCurrency(tx["args"]["amount"] / 1e18))}',
+                    '{str(formatCurrency(fetchers.getSupply('0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False,False,False])'''
+                    [False,False,True,True,False])'''
 
                     color = colors.dark_green
                     send = True
@@ -699,6 +708,7 @@ class HandleTx(Thread):
             #sendError(str(f'Error in tx handler : {str(e)}'))
             pass
 
+# Listen to coingecko  price changes every 60 seconds
 class HandleCoingecko(Thread):
     def __init__(self, id, old_value,value, change,  **kwargs):
         super(HandleCoingecko, self).__init__(**kwargs)
@@ -731,6 +741,65 @@ class HandleCoingecko(Thread):
                     color = colors.dark_orange
                     send = True
                 elif abs(self.change) > 0.05:
+                    level = 1
+                    color = colors.orange
+                    send = True
+
+                if send:
+                    fields = f'''makeFields(
+                                 ['Alert Level :',
+                                 'Variation :',
+                                 'Old Value :',
+                                 'New Value :',
+                                 'Link to Market :'], 
+                                 ['{str(level)}',
+                                 '{str(formatPercent(self.change))}',
+                                 '{str(formatCurrency(self.old_value))}',
+                                 '{str(formatCurrency(self.value))}',
+                                 '{'https://www.coingecko.com/en/coins/inverse-finance'}'], 
+                                 [True, True,True,True,False])'''
+
+                    sendWebhook(webhook, title, fields, content, image, color)
+
+        except Exception as e:
+            logging.warning(f'Error in coingecko variation handler')
+            logging.error(e)
+            #sendError(f'Error in state variation handler : {str(e)}')
+            pass
+
+# Listen to coingecko  price changes every 60 seconds
+class HandleCoingeckoVolume(Thread):
+    def __init__(self, id, old_value,value, change,  **kwargs):
+        super(HandleCoingeckoVolume, self).__init__(**kwargs)
+        self.value = value
+        self.id = id
+        self.old_value = old_value
+        self.change = change
+
+
+    def run(self):
+        try:
+            if abs(self.change) > 0:
+                send = False
+                image = ''
+                content = ''
+                title = ''
+                fields = []
+                color = colors.blurple
+                webhook = os.getenv('WEBHOOK_MARKETS')
+                logging.info(str(formatPercent(self.change)) + ' change detected on Coingecko '+str(self.id)+' 24H volume')
+                title = str(formatPercent(self.change)) + ' change detected on Coingecko '+str(self.id)+'  24H volume'
+
+                if abs(self.change) > 0.9:
+                    content = '<@&945071604642222110>'
+                    level = 3
+                    color = colors.red
+                    send = True
+                elif abs(self.change) > 0.8:
+                    level = 2
+                    color = colors.dark_orange
+                    send = True
+                elif abs(self.change) > 0.7:
                     level = 1
                     color = colors.orange
                     send = True
