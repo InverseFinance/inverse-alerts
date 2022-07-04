@@ -235,7 +235,10 @@ def getUnderlyingPrice(address):
     contract = web3.eth.contract(address=oracle_name, abi=oracle_ABI)
     underlying_decimals = getDecimals(getUnderlying(address))
     price = contract.functions.getUnderlyingPrice(address).call()
-    price = price / underlying_decimals
+    if address == web3.toChecksumAddress('0x17786f3813E6bA35343211bd8Fe18EC4de14F28b'):
+        price = price / 1e28
+    else:
+        price = price / underlying_decimals
 
     if (price == 0): price = 1
 
