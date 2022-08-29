@@ -211,7 +211,7 @@ class HandleEvent(Thread):
                     'DOLA+3CRV in Pool',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amount"] / 1e18))}',
+                    '{str(formatCurrency(0))}',
                     '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
                     '{str(formatCurrency(tx["args"]["token_supply"] / 1e18))}',
                     '{str(formatCurrency(fetchers.getDola3crvBalances()[0]))}',
@@ -617,7 +617,8 @@ class HandleEvent(Thread):
                 send = True
             elif (self.alert == "transfer"):
                 webhook = os.getenv('WEBHOOK_CONCAVE')
-                if (self.event_name in ["Transfer"] and (str(tx["args"]["from"])=="0x226e7AF139a0F34c6771DeB252F9988876ac1Ced" or str(tx["args"]["to"])=="0x226e7AF139a0F34c6771DeB252F9988876ac1Ced")):
+                watch_addresses =["0x6ff51547f69d05d83a7732429cfe4ea1e3299e10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
+                if (self.event_name in ["Transfer"] and (str(tx["args"]["from"]) in watch_addresses or str(tx["args"]["to"]) in watch_addresses)):
                     title = "Concave DOLA/3CRV activity detected"
                     content = '<@&945071604642222110>'
                     fields = f'''makeFields(
