@@ -203,23 +203,19 @@ class HandleEvent(Thread):
                     title = "DOLA3CRV Pool Liquidity Removal event detected"
                     fields = f'''makeFields(
                     ['Block :',
-                    'DOLA Amount :',
-                    '3CRV Amount :',
-                    'Token Supply :',
+                    'Token Amount :',
                     'DOLA in Pool :',
                     '3CRV in Pool :',
                     'DOLA+3CRV in Pool',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(0))}',
                     '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_supply"] / 1e18))}',
                     '{str(formatCurrency(fetchers.getDola3crvBalances()[0]))}',
                     '{str(formatCurrency(fetchers.getDola3crvBalances()[1]))}',
                     '{str(formatCurrency(fetchers.getDola3crvBalances()[0] + fetchers.getDola3crvBalances()[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,False,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amount"] + tx["args"]["coin_amount"])/1e18 > 300000:
+                    [True,False,True,False,True,False,False])'''
+                    if tx["args"]["coin_amount"]/1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
