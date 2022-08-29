@@ -104,10 +104,6 @@ class HandleStateVariation(Thread):
                          '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
                          [True, True,True,True,False])'''
 
-                if send:
-                    sendWebhook(webhook, title, fields, content, image, color)
-                    logging.info(f'Message sent to {webhook}')
-
             if (self.alert == 'supply'):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 if self.state_function == 'totalSupply':
@@ -143,12 +139,9 @@ class HandleStateVariation(Thread):
                          '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
                          [True, True,True,True,False])'''
 
-                if send:
-                    sendWebhook(webhook, title, fields, content, image, color)
-                    logging.info(f'Message Sent to {webhook}')
-
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
+                logging.info(f'Message sent to {webhook}')
 
 
         except Exception as e:
@@ -622,21 +615,26 @@ class HandleEvent(Thread):
 
                 color = colors.dark_orange
                 send = True
-            elif (self.alert == "test"):
-                webhook = os.getenv('WEBHOOK_TESTING')
-                if (self.event_name in ["Transfer"]):
-                    title = "Test Transfer event detected"
-                    content = '<@578956365205209098>'
+            elif (self.alert == "transfer"):
+                webhook = os.getenv('WEBHOOK_CONCAVE')
+                if (self.event_name in ["Transfer"] and (str(tx["args"]["from"])=="0x226e7AF139a0F34c6771DeB252F9988876ac1Ced" or str(tx["args"]["to"])=="0x226e7AF139a0F34c6771DeB252F9988876ac1Ced")):
+                    title = "Concave DOLA/3CRV activity detected"
+                    content = '<@&945071604642222110>'
                     fields = f'''makeFields(
                     ['Block Number :',
-                    'Address :',
+                    'Transfer :',
+                    'From :',
+                    'To :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(tx["address"])}',
+                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(tx["address"])))+' '+str(fetchers.getSymbol(tx["address"]))}',
+                    '{str(tx["args"]["from"])}',
+                    '{str(tx["args"]["to"])}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False])'''
+                    [False,False,False,False,False])'''
 
                     color = colors.dark_orange
+
                     send = True
 
             if send:
