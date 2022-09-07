@@ -13,11 +13,12 @@ from helpers import sendError, formatPercent
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
-    def __init__(self, web3, alert, contract, **kwargs):
+    def __init__(self, web3, alert, contract,name, **kwargs):
         super(TxListener, self).__init__(**kwargs)
         self.web3 = web3
         self.alert = alert
         self.contract = contract
+        self.name = name
         self.tx_filter = []
 
     def run(self):
@@ -25,9 +26,9 @@ class TxListener(Thread):
         while True:
             try:
                 for tx in self.tx_filter.get_new_entries():
-                    logging.info(f'Tx found in {str(self.alert)}-{str(self.contract)}')
+                    logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
                     logging.info(str(tx))
-                    HandleTx(tx, self.alert, self.contract).start()
+                    HandleTx(tx, self.alert, self.contract,self.name).start()
                 time.sleep(2)
 
             except Exception as e:

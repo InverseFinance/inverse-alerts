@@ -46,9 +46,9 @@ try:
         # Construct all contracts objects and put them in filter array
         filters = {"id": []}
         for i in range(0, len(alert_contracts['contract_address'])):
-            contract_name = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
+            contract_address = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
             contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
-            contract = web3.eth.contract(address=contract_name, abi=contract_abi)
+            contract = web3.eth.contract(address=contract_address, abi=contract_abi)
             filters["id"].append(contract)
 
         # Second loop to cover all contracts in the filter array/alert tag
@@ -75,9 +75,9 @@ try:
         # Define a set of filters containing the contract we are going to call (in oracle case only one)
         filters = {"id": []}
         for i in range(0, len(alert_contracts['contract_address'])):
-            contract_name = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
+            contract_address = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
             contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
-            contract = web3.eth.contract(address=contract_name, abi=contract_abi)
+            contract = web3.eth.contract(address=contract_address, abi=contract_abi)
             filters["id"].append(contract)
 
         # Second loop to cover all contracts in the alert tag
@@ -119,9 +119,10 @@ try:
         addresses = sheet_contracts[sheet_contracts['tags_tx'].str.contains(alert)]
 
         # Construct all address array
-        for i in range(0, len(addresses['contract_address'])):
-            contract_name = web3.toChecksumAddress(addresses.iloc[i]['contract_address'])
-            TxListener(web3, alert, contract_name).start()
+        for i in range(0, len(addresses['name'])):
+            contract_name = addresses.iloc[i]['name']
+            contract_address = web3.toChecksumAddress(addresses.iloc[i]['contract_address'])
+            TxListener(web3, alert, contract_address,contract_name).start()
             n_alert += 1
 
             # Log alerts-contract

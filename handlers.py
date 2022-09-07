@@ -646,10 +646,11 @@ class HandleEvent(Thread):
 
 # Define state change to handle and logs to the console/send to discord
 class HandleTx(Thread):
-    def __init__(self, tx, alert, contract, **kwargs):
+    def __init__(self, tx, alert, contract, name, **kwargs):
         super(HandleTx, self).__init__(**kwargs)
         self.contract = contract
         self.alert = alert
+        self.name = name
         self.tx = tx
 
     def run(self):
@@ -669,7 +670,7 @@ class HandleTx(Thread):
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
                 logging.info(str('Tx detected on ' + str(self.tx["address"])))
-                title = str('Tx detected on ' + str(self.tx["address"]) + ' Multisig')
+                title = str('Tx detected on ' + str(self.name) + ' Multisig')
                 content = ''
                 send = True
                 fields = f'''makeFields(
