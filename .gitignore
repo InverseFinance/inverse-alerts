@@ -10,3 +10,4 @@ debug.log
 .~lock.contracts.xlsx\#
 test.py
 .~lock.contracts.xlsx\#
+*.xlsx#
