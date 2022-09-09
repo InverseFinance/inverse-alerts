@@ -27,7 +27,7 @@ class TxListener(Thread):
             try:
                 for tx in self.tx_filter.get_new_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
-                    logging.info(str(tx))
+                    logging.info(json.dumps(tx))
                     HandleTx(tx, self.alert, self.contract,self.name).start()
                 time.sleep(2)
 
