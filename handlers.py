@@ -670,7 +670,7 @@ class HandleTx(Thread):
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
                 logging.info(str('Tx detected on ' + str(self.tx["address"])))
-                title = str('Tx detected on ' + str(self.name) + ' Multisig')
+                title = str('Tx detected on ' + str(self.name))
                 content = ''
                 send = True
                 fields = f'''makeFields(
