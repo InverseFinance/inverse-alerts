@@ -633,6 +633,39 @@ class HandleEvent(Thread):
                     color = colors.dark_orange
 
                     send = True
+            elif (self.alert == "debt_repayment"):
+                webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
+                if (self.event_name in ["debtRepayment"]):
+                    title = "Debt Repayment detected"
+                    content = ''
+                    fields = f'''makeFields(
+                    ['Block Number :',
+                    'Token Repaid :',
+                    'Amount Received :',
+                    'Amount Paid :',
+                    'Received/Paid ratio :',
+                    'Transaction :',
+                    'Debt Repayment Contract :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(formatCurrency(fetchers.getSymbol(tx["args"]["address"])))}',
+                    '{str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(tx["args"]["address"])))}',
+                    '{str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(tx["args"]["address"])))}',
+                    '{str(formatPercent(tx["args"]["receiveAmount"]/tx["args"]["paidAmount"]))}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
+                    '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
+                    [False,True,True,True,True,False,False])'''
+
+                    color = colors.dark_orange
+
+                    send = True
+            elif (self.alert == "debt_conversion"):
+                webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
+                if (self.event_name in ["Conversion"]):
+                    title = "Debt Conversion  detected"
+                    content = json.dumps(tx)
+                    fields = []
+                    color = colors.dark_orange
+                    send = True
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
