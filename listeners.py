@@ -90,7 +90,7 @@ class StateChangeListener(Thread):
 
                     self.change = (self.value / self.old_value) - 1
 
-                    if abs(self.change) > 0.05 and self.value > 0:
+                    if abs(self.change) > 0 and self.value > 0:
                         logging.info(f'State Change matching criteria found in {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
                         logging.info(formatPercent(self.change))
                         HandleStateVariation(self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()

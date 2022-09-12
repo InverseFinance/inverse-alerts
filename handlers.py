@@ -34,6 +34,7 @@ class HandleStateVariation(Thread):
             title = ''
             fields = []
             color = colors.blurple
+            level = 0
             if (self.alert == 'oracle'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
                 if self.state_function == 'getUnderlyingPrice':
@@ -136,6 +137,32 @@ class HandleStateVariation(Thread):
                          '{str(formatPercent(self.change))}',
                          '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
                          '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                         '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
+                         [True, True,True,True,False])'''
+
+            if (self.alert == 'liquidation_incentive'):
+                webhook = os.getenv('WEBHOOK_MARKETS')
+                if self.state_function == 'liquidationIncentiveMantissa':
+                    logging.info(str(self.change) + '% change detected on ' + str(
+                        fetchers.getName(self.contract.address))+ ' Liquidation incentive')
+                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
+                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Liquidation incentive'
+
+                    content = '<@&945071604642222110>'
+                    level = 3
+                    color = colors.red
+                    send = True
+
+                    fields = f'''makeFields(
+                         ['Alert Level :',
+                         'Variation :',
+                         'Old Value :',
+                         'New Value :',
+                         'Link to Pool :'], 
+                         ['{str(level)}',
+                         '{str(formatPercent(self.change))}',
+                         '{str(formatCurrency(self.old_value / 1e18))}',
+                         '{str(formatCurrency(self.value / 1e18))}',
                          '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
                          [True, True,True,True,False])'''
 
@@ -647,9 +674,9 @@ class HandleEvent(Thread):
                     'Transaction :',
                     'Debt Repayment Contract :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(fetchers.getSymbol(tx["args"]["address"])))}',
-                    '{str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(tx["args"]["address"])))}',
-                    '{str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(tx["args"]["address"])))}',
+                    '{str(fetchers.getSymbol(tx["args"]["underlying"]))}',
+                    '{str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(tx["args"]["underlying"])))}',
+                    '{str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(tx["args"]["underlying"])))}',
                     '{str(formatPercent(tx["args"]["receiveAmount"]/tx["args"]["paidAmount"]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
                     '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
@@ -663,7 +690,22 @@ class HandleEvent(Thread):
                 if (self.event_name in ["Conversion"]):
                     title = "Debt Conversion  detected"
                     content = json.dumps(tx)
-                    fields = []
+                    fields = f'''makeFields(
+                                        ['Block Number :',
+                                        'User :',
+                                        'Token Repaid :',
+                                        'DOLA Amount :',
+                                        'Underlying Amount :',
+                                        'Transaction :',
+                                        'Debt Conversion Contract :'],
+                                        ['{str(tx["blockNumber"])}',
+                                        '{str(tx["args"]["user"])}',
+                                        '{str(fetchers.getSymbol(tx["args"]["anToken"]))}',
+                                        '{str(formatCurrency(tx["args"]["'dolaAmount': "] / 1e18))}',
+                                        '{str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(tx["args"]["anToken"])))}',
+                                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
+                                        '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
+                                        [False,True,True,True,True,False,False])'''
                     color = colors.dark_orange
                     send = True
 
