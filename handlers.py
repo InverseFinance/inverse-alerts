@@ -239,7 +239,7 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
                     '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
                     '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,False,True,False,True,False,False])'''
                     if tx["args"]["coin_amount"]/1e18 > 300000:
@@ -291,10 +291,10 @@ class HandleEvent(Thread):
                     '{str(tx["address"])}',
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,True,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
@@ -314,7 +314,7 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,False,True,False,True,False,False])'''
-                    if tx["args"]["coin_amount"]/1e18 > 300000:
+                    if tx["args"]["coin_amount"] / 1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
@@ -338,10 +338,108 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,True,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 300000:
                         content = '<@&945071604642222110>'
 
                     color = colors.dark_green
+                    send = True
+            elif (self.alert == "dolafraxbp_gauge"):
+                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                image = ""
+                if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
+                    title = "DOLAFRAX New Gauge Weight detected"
+                    fields = f'''makeFields(
+                    ['Block :',
+                    'Gauge Address :',
+                    'Weight :',
+                    'Total Weight :',
+                    'DOLA in Pool :',
+                    'crvFRAX in Pool :',
+                    'DOLA+crvFRAX in Pool',
+                    'Transaction :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(tx["args"]["gauge_addr"])}',
+                    '{str(tx["args"]["weight"])}',
+                    '{str(tx["args"]["total_weight"])}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                    [True,False,False,False,True,True,False,False])'''
+                    content = '<@&945071604642222110>'
+                    color = colors.red
+                    send = True
+                elif (self.event_name == "VoteForGauge" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
+                    title = "DOLAFRAX Pool Vote For Gauge detected"
+                    fields = f'''makeFields(
+                                        ['Block :',
+                                        'User :',
+                                        'Gauge Address :',
+                                        'Weight :',
+                                        'DOLA in Pool :',
+                                        'crvFRAX in Pool :',
+                                        'DOLA+crvFRAX in Pool',
+                                        'Transaction :'],
+                                        ['{str(tx["blockNumber"])}',
+                                        '{str(tx["args"]["user"])}',
+                                        '{str(tx["args"]["gauge_addr"])}',
+                                        '{str(tx["args"]["weight"])}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                                        [True,False,False,False,True,True,False,False])'''
+                    content = '<@&945071604642222110>'
+                    color = colors.red
+                    send = True
+            elif (self.alert == "dola3crv_gauge"):
+                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                image = ""
+                if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a'):
+                    title = "DOLA3CRV New Gauge Weight detected"
+                    fields = f'''makeFields(
+                    ['Block :',
+                    'Gauge Address :',
+                    'Weight :',
+                    'Total Weight :',
+                    'DOLA in Pool :',
+                    'DOLA3CRV in Pool :',
+                    'DOLA+DOLA3CRV in Pool',
+                    'Transaction :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(tx["args"]["gauge_addr"])}',
+                    '{str(tx["args"]["weight"])}',
+                    '{str(tx["args"]["total_weight"])}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                    [True,False,False,False,True,True,False,False])'''
+                    content = '<@&945071604642222110>'
+                    color = colors.dark_orange
+                    send = True
+                elif (self.event_name == "VoteForGauge" and tx["args"]["gauge_addr"]=='0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a'):
+                    title = "DOLA3CRV Pool Vote For Gauge detected"
+                    fields = f'''makeFields(
+                                        ['Block :',
+                                        'User :',
+                                        'Gauge Address :',
+                                        'Weight :',
+                                        'DOLA in Pool :',
+                                        '3CRV in Pool :',
+                                        'DOLA+3CRV in Pool',
+                                        'Transaction :'],
+                                        ['{str(tx["blockNumber"])}',
+                                        '{str(tx["args"]["user"])}',
+                                        '{str(tx["args"]["gauge_addr"])}',
+                                        '{str(tx["args"]["weight"])}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                                        [True,False,False,False,True,True,False,False])'''
+                    content = '<@&945071604642222110>'
+                    color = colors.dark_orange
                     send = True
             elif (self.alert in ["lending1", "lending2"]):
                 if (self.event_name == "Mint"):
