@@ -272,9 +272,9 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             if (self.alert == "dolafraxbp_pool"):
-                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                 image = ""
-                if (self.event_name == "RemoveLiquidity"):
+                if (self.event_name == "RemoveLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
                     title = "DOLAFRAX Pool Liquidity Removal event detected"
                     fields = f'''makeFields(
                     ['Block :',
@@ -294,11 +294,11 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,True,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 300000:
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
-                elif (self.event_name == "RemoveLiquidityOne"):
+                elif (self.event_name == "RemoveLiquidityOne" and tx["args"]["coin_amount"] / 1e18 > 50000):
                     title = "DOLAFRAX Pool Liquidity Removal event detected"
                     fields = f'''makeFields(
                     ['Block :',
@@ -314,11 +314,11 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,False,True,False,True,False,False])'''
-                    if tx["args"]["coin_amount"] / 1e18 > 300000:
+                    if tx["args"]["coin_amount"] / 1e18 > 500000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
-                elif (self.event_name == "AddLiquidity"):
+                elif (self.event_name == "AddLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
                     title = "DOLAFRAX Pool Liquidity Add event detected"
                     fields = f'''makeFields(
                     ['Block :',
@@ -338,13 +338,13 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,True,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 300000:
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
                         content = '<@&945071604642222110>'
 
                     color = colors.dark_green
                     send = True
             elif (self.alert == "dolafraxbp_gauge"):
-                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                 image = ""
                 if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
                     title = "DOLAFRAX New Gauge Weight detected"
@@ -810,7 +810,7 @@ class HandleEvent(Thread):
                 send = True
             elif (self.alert == "transfer"):
                 webhook = os.getenv('WEBHOOK_CONCAVE')
-                watch_addresses =["0x6ff51547f69d05d83a7732429cfe4ea1e3299e10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
+                watch_addresses =["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
                 if (self.event_name in ["Transfer"] and (str(tx["args"]["from"]) in watch_addresses or str(tx["args"]["to"]) in watch_addresses)):
                     title = "Concave DOLA/3CRV activity detected"
                     content = '<@&945071604642222110>'
@@ -825,6 +825,31 @@ class HandleEvent(Thread):
                     '{str(tx["args"]["from"])}',
                     '{str(tx["args"]["to"])}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                    [False,False,False,False,False])'''
+
+                    color = colors.dark_orange
+
+                    send = True
+            elif (self.alert == "profits"):
+                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                feds =["0xcc180262347F84544c3a4854b87C34117ACADf94"]
+
+                if (self.event_name in ["Transfer"] and (str(tx["args"]["from"]) in feds and str(tx["args"]["to"])=='0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
+                    title = "Fed Profit Taking detected"
+                    content = '<@&945071604642222110>'
+                    fields = f'''makeFields(
+                    ['Block Number :',
+                    'Transfer :',
+                    'From :',
+                    'To :',
+                    'Transaction :'
+                    'Fed Address :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(tx["address"])))+' '+str(fetchers.getSymbol(tx["address"]))}',
+                    '{str(tx["args"]["from"])}',
+                    '{str(tx["args"]["to"])}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
+                    '{"https://etherscan.io/address/" + str(tx["args"]["from"])}'],
                     [False,False,False,False,False])'''
 
                     color = colors.dark_orange
