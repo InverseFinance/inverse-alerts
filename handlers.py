@@ -217,9 +217,9 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                     '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                     '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[0]))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[1]))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[0] + fetchers.getDola3crvBalances()[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,True,True,False,True,True,False,False])'''
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
@@ -237,9 +237,9 @@ class HandleEvent(Thread):
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[0]))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[1]))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[0] + fetchers.getDola3crvBalances()[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,False,True,False,True,False,False])'''
                     if tx["args"]["coin_amount"]/1e18 > 300000:
@@ -261,9 +261,81 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                     '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                     '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[0]))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[1]))}',
-                    '{str(formatCurrency(fetchers.getDola3crvBalances()[0] + fetchers.getDola3crvBalances()[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+                    [True,True,True,False,True,True,False,False])'''
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
+                        content = '<@&945071604642222110>'
+
+                    color = colors.dark_green
+                    send = True
+            if (self.alert == "dolafraxbp_pool"):
+                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                image = ""
+                if (self.event_name == "RemoveLiquidity"):
+                    title = "DOLAFRAX Pool Liquidity Removal event detected"
+                    fields = f'''makeFields(
+                    ['Block :',
+                    'DOLA Amount :',
+                    'FRAX Amount :',
+                    'Address :',
+                    'DOLA in Pool :',
+                    'FRAX in Pool :',
+                    'DOLA+FRAX in Pool',
+                    'Transaction :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
+                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
+                    '{str(tx["address"])}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                    [True,True,True,False,True,True,False,False])'''
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
+                        content = '<@&945071604642222110>'
+                    color = colors.red
+                    send = True
+                elif (self.event_name == "RemoveLiquidityOne"):
+                    title = "DOLA3CRV Pool Liquidity Removal event detected"
+                    fields = f'''makeFields(
+                    ['Block :',
+                    'Token Amount :',
+                    'DOLA in Pool :',
+                    '3CRV in Pool :',
+                    'DOLA+3CRV in Pool',
+                    'Transaction :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+                    [True,False,True,False,True,False,False])'''
+                    if tx["args"]["coin_amount"]/1e18 > 300000:
+                        content = '<@&945071604642222110>'
+                    color = colors.red
+                    send = True
+                elif (self.event_name == "AddLiquidity"):
+                    title = "DOLA3CRV Pool Liquidity Add event detected"
+                    fields = f'''makeFields(
+                    ['Block :',
+                    'DOLA Amount :',
+                    '3CRV Amount :',
+                    'Address :',
+                    'DOLA in Pool :',
+                    '3CRV in Pool :',
+                    'DOLA+3CRV in Pool',
+                    'Transaction :'],
+                    ['{str(tx["blockNumber"])}',
+                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
+                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
+                    '{str(tx["address"])}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,True,True,False,True,True,False,False])'''
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
@@ -701,7 +773,7 @@ class HandleEvent(Thread):
                                         ['{str(tx["blockNumber"])}',
                                         '{str(tx["args"]["user"])}',
                                         '{str(fetchers.getSymbol(tx["args"]["anToken"]))}',
-                                        '{str(formatCurrency(tx["args"]["'dolaAmount': "] / 1e18))}',
+                                        '{str(formatCurrency(tx["args"]["dolaAmount"] / 1e18))}',
                                         '{str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(tx["args"]["anToken"])))}',
                                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
                                         '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
