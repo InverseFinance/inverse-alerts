@@ -299,13 +299,13 @@ class HandleEvent(Thread):
                     color = colors.red
                     send = True
                 elif (self.event_name == "RemoveLiquidityOne"):
-                    title = "DOLA3CRV Pool Liquidity Removal event detected"
+                    title = "DOLAFRAX Pool Liquidity Removal event detected"
                     fields = f'''makeFields(
                     ['Block :',
                     'Token Amount :',
                     'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
+                    'FRAX in Pool :',
+                    'DOLA+FRAX in Pool',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
@@ -319,15 +319,15 @@ class HandleEvent(Thread):
                     color = colors.red
                     send = True
                 elif (self.event_name == "AddLiquidity"):
-                    title = "DOLA3CRV Pool Liquidity Add event detected"
+                    title = "DOLAFRAX Pool Liquidity Add event detected"
                     fields = f'''makeFields(
                     ['Block :',
                     'DOLA Amount :',
-                    '3CRV Amount :',
+                    'FRAX Amount :',
                     'Address :',
                     'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
+                    'FRAX in Pool :',
+                    'DOLA+FRAX in Pool',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
