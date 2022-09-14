@@ -884,7 +884,7 @@ class HandleEvent(Thread):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 if (self.event_name in ["Conversion"]):
                     title = "Debt Conversion  detected"
-                    content = json.dumps(tx)
+                    content = ''
                     fields = f'''makeFields(
                                         ['Block Number :',
                                         'User :',
@@ -899,7 +899,7 @@ class HandleEvent(Thread):
                                         '{str(formatCurrency(tx["args"]["dolaAmount"] / 1e18))}',
                                         '{str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(tx["args"]["anToken"])))}',
                                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
-                                        '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
+                                        '{"https://etherscan.io/address/0x1ff9c712B011cBf05B67A6850281b13cA27eCb2A"}'],
                                         [False,True,True,True,True,False,False])'''
                     color = colors.dark_orange
                     send = True
