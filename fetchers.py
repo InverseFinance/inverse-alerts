@@ -160,9 +160,9 @@ def getSushiBalance(address):
 
 
 ## DOLA3CRV related functions
-def getDola3crvBalances():
+def getCurveBalances(address):
     balances = []
-    address = web3.toChecksumAddress('0xaa5a67c256e27a5d80712c51971408db3370927d')
+    address = web3.toChecksumAddress(address)
 
     balances.append(getBalance(address, getDola3crvTokens()[0]))
     balances.append(getBalance(address, getDola3crvTokens()[1]))
