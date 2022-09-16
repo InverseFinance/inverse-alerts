@@ -8,7 +8,7 @@ import sys
 import requests
 from dotenv import load_dotenv
 from web3 import Web3
-from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
+from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume,HandleContract
 from helpers import sendError, formatPercent
 
 # Define a Thread to listen separately on each contract/event in the contract file
@@ -29,7 +29,7 @@ class TxListener(Thread):
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
                     logging.info(json.dumps(tx))
                     HandleTx(tx, self.alert, self.contract,self.name).start()
-                time.sleep(2)
+                time.sleep(5)
 
             except Exception as e:
                 logging.warning(f'Error in listener {str(self.alert)}-{str(self.contract)}')
@@ -54,10 +54,36 @@ class EventListener(Thread):
                 for event in self.event_filter.get_new_entries():
                     logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                     HandleEvent(event, self.alert, self.event_name).start()
-                time.sleep(2)
+                time.sleep(5)
 
             except Exception as e:
                 logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
+                logging.error(e)
+                #sendError(f'Error in Event Listener : {str(e)}')
+                pass
+
+
+# Define a Thread to listen separately on each contract/event in the contract file
+class ContractListener(Thread):
+    def __init__(self, web3, alert, contract, **kwargs):
+        super(ContractListener, self).__init__(**kwargs)
+        self.web3 = web3
+        self.alert = alert
+        self.contract = contract
+        self.function_filter = []
+
+    def run(self):
+        logging.info(f'self.web3.eth.filter({{"address": {str(self.contract.address)}}})')
+        self.function_filter = eval(f'self.web3.eth.filter({{"address": {str(self.contract.address)}}})')
+        while True:
+            try:
+                for contract in self.function_filter.get_new_entries():
+                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}')
+                    HandleContract(contract, self.alert).start()
+                time.sleep(5)
+
+            except Exception as e:
+                logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}')
                 logging.error(e)
                 #sendError(f'Error in Event Listener : {str(e)}')
                 pass
