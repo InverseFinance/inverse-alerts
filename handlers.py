@@ -56,19 +56,19 @@ class HandleStateVariation(Thread):
                         level = 1
                         color = colors.orange
                         send = True
-
-                    fields = f'''makeFields(
-                         ['Alert Level :',
-                         'Variation :',
-                         'Old Value :',
-                         'New Value :',
-                         'Link to Market :'], 
-                         ['{str(level)}',
-                         '{str(formatPercent(self.change))}',
-                         '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
-                         '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
-                         '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
-                         [True, True,True,True,False])'''
+                    if send:
+                        fields = f'''makeFields(
+                             ['Alert Level :',
+                             'Variation :',
+                             'Old Value :',
+                             'New Value :',
+                             'Link to Market :'], 
+                             ['{str(level)}',
+                             '{str(formatPercent(self.change))}',
+                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
+                             '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
+                             '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
+                             [True, True,True,True,False])'''
 
             if (self.alert == 'cash'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
@@ -92,18 +92,19 @@ class HandleStateVariation(Thread):
                         color = colors.orange
                         send = True
 
-                    fields = f'''makeFields(
-                         ['Alert Level :',
-                         'Variation :',
-                         'Old Value :',
-                         'New Value :',
-                         'Link to Market :'], 
-                         ['{str(level)}',
-                         '{str(formatPercent(self.change))}',
-                         '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
-                         '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
-                         '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                         [True, True,True,True,False])'''
+                    if send:
+                        fields = f'''makeFields(
+                             ['Alert Level :',
+                             'Variation :',
+                             'Old Value :',
+                             'New Value :',
+                             'Link to Market :'], 
+                             ['{str(level)}',
+                             '{str(formatPercent(self.change))}',
+                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                             '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                             '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
+                             [True, True,True,True,False])'''
 
             if (self.alert == 'supply'):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
@@ -126,19 +127,19 @@ class HandleStateVariation(Thread):
                         level = 1
                         color = colors.orange
                         send = True
-
-                    fields = f'''makeFields(
-                         ['Alert Level :',
-                         'Variation :',
-                         'Old Value :',
-                         'New Value :',
-                         'Link to Pool :'], 
-                         ['{str(level)}',
-                         '{str(formatPercent(self.change))}',
-                         '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
-                         '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
-                         '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                         [True, True,True,True,False])'''
+                    if send:
+                        fields = f'''makeFields(
+                             ['Alert Level :',
+                             'Variation :',
+                             'Old Value :',
+                             'New Value :',
+                             'Link to Pool :'], 
+                             ['{str(level)}',
+                             '{str(formatPercent(self.change))}',
+                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                             '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                             '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
+                             [True, True,True,True,False])'''
 
             if (self.alert == 'liquidation_incentive'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
@@ -168,7 +169,6 @@ class HandleStateVariation(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-                logging.info(f'Message sent to {webhook}')
 
 
         except Exception as e:
@@ -203,150 +203,162 @@ class HandleEvent(Thread):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/833844/1457892/bccc1e5b-4b60-4b28-85da-fbd558a2fd69.jpg"
                 if (self.event_name == "RemoveLiquidity"):
-                    title = "DOLA3CRV Pool Liquidity Removal event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'DOLA Amount :',
-                    '3CRV Amount :',
-                    'Address :',
-                    'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [True,True,True,False,True,True,False,False])'''
+
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
+                    if send:
+                        title = "DOLA3CRV Pool Liquidity Removal event detected"
+                        fields = f'''makeFields(
+                        ['Block :',
+                        'DOLA Amount :',
+                        '3CRV Amount :',
+                        'Address :',
+                        'DOLA in Pool :',
+                        '3CRV in Pool :',
+                        'DOLA+3CRV in Pool',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
+                        '{str(tx["address"])}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                        [True,True,True,False,True,True,False,False])'''
                 elif (self.event_name == "RemoveLiquidityOne"):
-                    title = "DOLA3CRV Pool Liquidity Removal event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'Token Amount :',
-                    'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,False,True,False,True,False,False])'''
                     if tx["args"]["coin_amount"]/1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
+                    if send:
+                        title = "DOLA3CRV Pool Liquidity Removal event detected"
+                        fields = f'''makeFields(
+                        ['Block :',
+                        'Token Amount :',
+                        'DOLA in Pool :',
+                        '3CRV in Pool :',
+                        'DOLA+3CRV in Pool',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+                        [True,False,True,False,True,False,False])'''
                 elif (self.event_name == "AddLiquidity"):
-                    title = "DOLA3CRV Pool Liquidity Add event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'DOLA Amount :',
-                    '3CRV Amount :',
-                    'Address :',
-                    'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,True,True,False,True,True,False,False])'''
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
                         content = '<@&945071604642222110>'
 
                     color = colors.dark_green
                     send = True
+                    if send:
+                        title = "DOLA3CRV Pool Liquidity Add event detected"
+                        fields = f'''makeFields(
+                        ['Block :',
+                        'DOLA Amount :',
+                        '3CRV Amount :',
+                        'Address :',
+                        'DOLA in Pool :',
+                        '3CRV in Pool :',
+                        'DOLA+3CRV in Pool',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
+                        '{str(tx["address"])}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+                        [True,True,True,False,True,True,False,False])'''
             elif (self.alert == "dola3crv_zap"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/833844/1457892/bccc1e5b-4b60-4b28-85da-fbd558a2fd69.jpg"
                 if (self.event_name == "RemoveLiquidity"):
-                    title = "DOLA3CRV Pool Liquidity Removal event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'DOLA Amount :',
-                    '3CRV Amount :',
-                    'Address :',
-                    'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [True,True,True,False,True,True,False,False])'''
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
+                    if send:
+                        title = "DOLA3CRV Pool Liquidity Removal event detected"
+                        fields = f'''makeFields(
+                        ['Block :',
+                        'DOLA Amount :',
+                        '3CRV Amount :',
+                        'Address :',
+                        'DOLA in Pool :',
+                        '3CRV in Pool :',
+                        'DOLA+3CRV in Pool',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
+                        '{str(tx["address"])}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
+                        [True,True,True,False,True,True,False,False])'''
                 elif (self.event_name == "RemoveLiquidityOne"):
-                    title = "DOLA3CRV Pool Liquidity Removal event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'Token Amount :',
-                    'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,False,True,False,True,False,False])'''
                     if tx["args"]["coin_amount"]/1e18 > 300000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
+                    if send:
+                        title = "DOLA3CRV Pool Liquidity Removal event detected"
+                        fields = f'''makeFields(
+                        ['Block :',
+                        'Token Amount :',
+                        'DOLA in Pool :',
+                        '3CRV in Pool :',
+                        'DOLA+3CRV in Pool',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+                        [True,False,True,False,True,False,False])'''
                 elif (self.event_name == "AddLiquidity"):
-                    title = "DOLA3CRV Pool Liquidity Add event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'DOLA Amount :',
-                    '3CRV Amount :',
-                    'Address :',
-                    'DOLA in Pool :',
-                    '3CRV in Pool :',
-                    'DOLA+3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,True,True,False,True,True,False,False])'''
+
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
                         content = '<@&945071604642222110>'
 
                     color = colors.dark_green
                     send = True
+                    if send:
+                        title = "DOLA3CRV Pool Liquidity Add event detected"
+                        fields = f'''makeFields(
+                        ['Block :',
+                        'DOLA Amount :',
+                        '3CRV Amount :',
+                        'Address :',
+                        'DOLA in Pool :',
+                        '3CRV in Pool :',
+                        'DOLA+3CRV in Pool',
+                        'Transaction :'],
+                        ['{str(tx["blockNumber"])}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
+                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
+                        '{str(tx["address"])}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
+                        [True,True,True,False,True,True,False,False])'''
             elif (self.alert == "dolafraxbp_pool"):
                 webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                 image = ""
                 if (self.event_name == "RemoveLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
+                        content = '<@&945071604642222110>'
+                    color = colors.red
+                    send = True
                     title = "DOLAFRAX Pool Liquidity Removal event detected"
                     fields = f'''makeFields(
                     ['Block :',
@@ -366,11 +378,11 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,True,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
+                elif (self.event_name == "RemoveLiquidityOne" and tx["args"]["coin_amount"] / 1e18 > 50000):
+                    if tx["args"]["coin_amount"] / 1e18 > 500000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
-                elif (self.event_name == "RemoveLiquidityOne" and tx["args"]["coin_amount"] / 1e18 > 50000):
                     title = "DOLAFRAX Pool Liquidity Removal event detected"
                     fields = f'''makeFields(
                     ['Block :',
@@ -386,10 +398,6 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,False,True,False,True,False,False])'''
-                    if tx["args"]["coin_amount"] / 1e18 > 500000:
-                        content = '<@&945071604642222110>'
-                    color = colors.red
-                    send = True
                 elif (self.event_name == "AddLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
                     title = "DOLAFRAX Pool Liquidity Add event detected"
                     fields = f'''makeFields(
@@ -410,11 +418,6 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,True,True,False,True,True,False,False])'''
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
-                        content = '<@&945071604642222110>'
-
-                    color = colors.dark_green
-                    send = True
             elif (self.alert == "dolafraxbp_gauge"):
                 webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                 image = ""
@@ -883,9 +886,9 @@ class HandleEvent(Thread):
             elif (self.alert == "transfer"):
                 webhook = os.getenv('WEBHOOK_CONCAVE')
                 watch_addresses =["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
-                if (self.event_name in ["Transfer"] and (str(tx["args"]["from"]) or str(tx["args"]["sender"]) in watch_addresses or str(tx["args"]["to"] or str(tx["args"]["receiver"])) in watch_addresses)):
+                if (self.event_name in ["Transfer"] and (((str(tx["args"]["from"]) or str(tx["args"]["sender"])) in watch_addresses) or ((str(tx["args"]["to"] or str(tx["args"]["receiver"]))) in watch_addresses))):
                     title = "Concave DOLA/3CRV activity detected"
-                    content = '<@&945071604642222110>'
+                    content = '' # '<@&945071604642222110>'
                     fields = f'''makeFields(
                     ['Block Number :',
                     'Transfer :',
@@ -905,9 +908,9 @@ class HandleEvent(Thread):
             elif (self.alert == "transfer_temp"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 watch_addresses =["0xA79828DF1850E8a3A3064576f380D90aECDD3359"]
-                if (self.event_name in ["Transfer"] and (str(tx["args"]["from"]) or str(tx["args"]["sender"]) in watch_addresses or str(tx["args"]["to"] or str(tx["args"]["receiver"])) in watch_addresses)):
-                    title = "Concave DOLA/3CRV activity detected"
-                    content = '<@&945071604642222110>'
+                if (self.event_name in ["Transfer"] and (((str(tx["args"]["from"]) or str(tx["args"]["sender"])) in watch_addresses) or ((str(tx["args"]["to"] or str(tx["args"]["receiver"]))) in watch_addresses))):
+                    title = "Zap Activity detected"
+                    content = ''#'<@&945071604642222110>'
                     fields = f'''makeFields(
                     ['Block Number :',
                     'Transfer :',
@@ -1000,38 +1003,6 @@ class HandleEvent(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-                logging.info(f'Message Sent to {webhook}')
-
-        except Exception as e:
-            logging.warning('Error in event handler')
-            logging.error(e)
-            #sendError(f'Error in event handler : {str(e)}')
-            pass
-
-
-# Define event to handle and logs to the console/send to discord
-class HandleContract(Thread):
-    def __init__(self,contract, alert, **kwargs):
-        super(HandleContract, self).__init__(**kwargs)
-        self.alert = alert
-        self.contract = contract
-
-    def run(self):
-        try:
-            tx = json.loads(Web3.toJSON(self.contract))
-
-            # logs result table and start writing message
-            logging.info(str(datetime.now()) + " " + str(tx))
-            send = True
-            title = 'Testing call handlers'
-            fields = []
-            image = ''
-            color = colors.blurple
-            content = json.dumps(tx)
-            webhook = os.getenv('WEBHOOK_TESTING')
-
-            if send:
-                sendWebhook(webhook, title, fields, content, image, color)
 
         except Exception as e:
             logging.warning('Error in event handler')
@@ -1090,7 +1061,6 @@ class HandleTx(Thread):
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-                logging.info(f'Message Sent to {str(webhook)}')
 
 
         except Exception as e:

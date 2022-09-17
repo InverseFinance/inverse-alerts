@@ -71,18 +71,18 @@ def sendError(content):
     error = True
     while error:
         try:
-            data = f"""{{"content": '{content}'}}"""
+            data = f"""{{"content": '{json.dumps(content)}'}}"""
             data = eval(data)
             result = requests.post(webhook, json=data)
             result.raise_for_status()
         except requests.exceptions.HTTPError as err:
             logging.error(err)
-            sendError("Error in sending message to webhook. Waiting 5 seconds to retry...")
+            logging.info("Error in sending message to webhook. Waiting 5 seconds to retry... code {}.".format(result.status_code))
             # time sleep is used to avoid throttling the error webhook w/ too many attempts
             time.sleep(5)
             error = True
         else:
-            logging.info("Error delivered successfully to error channel code {}.".format(result.status_code))
+
             error = False
 
 

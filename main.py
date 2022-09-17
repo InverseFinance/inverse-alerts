@@ -16,19 +16,21 @@ from listeners import EventListener, StateChangeListener, TxListener,CoinGeckoLi
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
-web3 = Web3(Web3.HTTPProvider(os.getenv('LOCALHOST')))
+web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE')))
 
 # Get contracts metadata from excel
 sheet_contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
 sheet_events = pd.read_excel('contracts.xlsx', sheet_name='alerts_events')
 sheet_state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
 sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
+sheet_calls = pd.read_excel('contracts.xlsx', sheet_name='alerts_calls')
 # Coingecko ids to monitor for changes
 ids = ['inverse-finance', 'dola-usd']
 
 events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
 tx_alerts = sheet_tx.columns.array
+calls_alerts = sheet_calls.columns.array
 
 
 try:
