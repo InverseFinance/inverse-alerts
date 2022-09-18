@@ -69,9 +69,11 @@ def sendError(content):
     load_dotenv()
     webhook = os.getenv('WEBHOOK_ERRORS')
     error = True
+    replacers = {'{': '(', '}': ')', ':': '='}  # etc....
+
     while error:
         try:
-            data = f"""{{"content": '{json.dumps(content)}'}}"""
+            data = f"""{{"content": '{json.dumps(content).replace(replacers)}'}}"""
             data = eval(data)
             result = requests.post(webhook, json=data)
             result.raise_for_status()
@@ -82,7 +84,6 @@ def sendError(content):
             time.sleep(5)
             error = True
         else:
-
             error = False
 
 
@@ -111,7 +112,7 @@ def LoggerParams():
             logging.StreamHandler(sys.stdout)
         ]
     )
-    # Mute warning when pool is full :: overriden by poolsize paramater
+    # Mute warning when pool is full :: overriden by poolsize parameter
     logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 

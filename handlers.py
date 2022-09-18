@@ -15,8 +15,9 @@ import sys
 
 # Define state change to handle and logs to the console/send to discord
 class HandleStateVariation(Thread):
-    def __init__(self, old_value,value, change, alert, contract, state_function, state_argument, **kwargs):
+    def __init__(self, web3,old_value,value, change, alert, contract, state_function, state_argument, **kwargs):
         super(HandleStateVariation, self).__init__(**kwargs)
+        self.web3 = web3
         self.value = value
         self.change = change
         self.contract = contract
@@ -39,9 +40,9 @@ class HandleStateVariation(Thread):
                 webhook = os.getenv('WEBHOOK_MARKETS')
                 if self.state_function == 'getUnderlyingPrice':
                     logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))))
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Oracle'
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Oracle'
 
                     if abs(self.change) > 0.2:
                         content = '<@&945071604642222110>'
@@ -65,8 +66,8 @@ class HandleStateVariation(Thread):
                              'Link to Market :'], 
                              ['{str(level)}',
                              '{str(formatPercent(self.change))}',
-                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
-                             '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.state_argument))))}',
+                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))}',
+                             '{str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))}',
                              '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
                              [True, True,True,True,False])'''
 
@@ -74,9 +75,9 @@ class HandleStateVariation(Thread):
                 webhook = os.getenv('WEBHOOK_MARKETS')
                 if self.state_function == 'getCash':
                     logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getName(self.contract.address)) + ' balance')
+                        fetchers.getName(self.web3,self.contract.address)) + ' balance')
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(fetchers.getUnderlying(self.contract.address))) + ' Cash balance'
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))) + ' Cash balance'
 
                     if abs(self.change) > 0.2:
                         content = '<@&945071604642222110>'
@@ -101,8 +102,8 @@ class HandleStateVariation(Thread):
                              'Link to Market :'], 
                              ['{str(level)}',
                              '{str(formatPercent(self.change))}',
-                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
-                             '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
+                             '{str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
                              '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
                              [True, True,True,True,False])'''
 
@@ -110,9 +111,9 @@ class HandleStateVariation(Thread):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 if self.state_function == 'totalSupply':
                     logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getName(self.contract.address))+ ' total supply')
+                        fetchers.getName(self.web3,self.contract.address))+ ' total supply')
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Supply'
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Supply'
 
                     if abs(self.change) > 0.015:
                         content = '<@&945071604642222110>'
@@ -136,8 +137,8 @@ class HandleStateVariation(Thread):
                              'Link to Pool :'], 
                              ['{str(level)}',
                              '{str(formatPercent(self.change))}',
-                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
-                             '{str(formatCurrency(self.value / fetchers.getDecimals(fetchers.getUnderlying(self.contract.address))))}',
+                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
+                             '{str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
                              '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
                              [True, True,True,True,False])'''
 
@@ -145,9 +146,9 @@ class HandleStateVariation(Thread):
                 webhook = os.getenv('WEBHOOK_MARKETS')
                 if self.state_function == 'liquidationIncentiveMantissa':
                     logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getName(self.contract.address))+ ' Liquidation incentive')
+                        fetchers.getName(self.web3,self.contract.address))+ ' Liquidation incentive')
                     title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(fetchers.getUnderlying(self.state_argument))) + ' Liquidation incentive'
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Liquidation incentive'
 
                     content = '<@&945071604642222110>'
                     level = 3
@@ -179,8 +180,9 @@ class HandleStateVariation(Thread):
 
 # Define event to handle and logs to the console/send to discord
 class HandleEvent(Thread):
-    def __init__(self, event, alert, event_name, **kwargs):
+    def __init__(self, web3,event, alert, event_name, **kwargs):
         super(HandleEvent, self).__init__(**kwargs)
+        self.web3 = web3
         self.event = event
         self.alert = alert
         self.event_name = event_name
@@ -223,9 +225,9 @@ class HandleEvent(Thread):
                         '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                         '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                         '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                         [True,True,True,False,True,True,False,False])'''
                 elif (self.event_name == "RemoveLiquidityOne"):
@@ -244,9 +246,9 @@ class HandleEvent(Thread):
                         'Transaction :'],
                         ['{str(tx["blockNumber"])}',
                         '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                         [True,False,True,False,True,False,False])'''
                 elif (self.event_name == "AddLiquidity"):
@@ -270,9 +272,9 @@ class HandleEvent(Thread):
                         '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                         '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                         '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                         [True,True,True,False,True,True,False,False])'''
             elif (self.alert == "dola3crv_zap"):
@@ -298,9 +300,9 @@ class HandleEvent(Thread):
                         '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                         '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                         '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                         [True,True,True,False,True,True,False,False])'''
                 elif (self.event_name == "RemoveLiquidityOne"):
@@ -319,9 +321,9 @@ class HandleEvent(Thread):
                         'Transaction :'],
                         ['{str(tx["blockNumber"])}',
                         '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                         [True,False,True,False,True,False,False])'''
                 elif (self.event_name == "AddLiquidity"):
@@ -346,9 +348,9 @@ class HandleEvent(Thread):
                         '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                         '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                         '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                         [True,True,True,False,True,True,False,False])'''
             elif (self.alert == "dolafraxbp_pool"):
@@ -373,9 +375,9 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                     '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                     '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,True,True,False,True,True,False,False])'''
                 elif (self.event_name == "RemoveLiquidityOne" and tx["args"]["coin_amount"] / 1e18 > 50000):
@@ -393,9 +395,9 @@ class HandleEvent(Thread):
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
                     '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,False,True,False,True,False,False])'''
                 elif (self.event_name == "AddLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
@@ -413,9 +415,9 @@ class HandleEvent(Thread):
                     '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
                     '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
                     '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
                     [True,True,True,False,True,True,False,False])'''
             elif (self.alert == "dolafraxbp_gauge"):
@@ -436,9 +438,9 @@ class HandleEvent(Thread):
                     '{str(tx["args"]["gauge_addr"])}',
                     '{str(tx["args"]["weight"])}',
                     '{str(tx["args"]["total_weight"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,False,False,False,True,True,False,False])'''
                     content = '<@&945071604642222110>'
@@ -459,9 +461,9 @@ class HandleEvent(Thread):
                                         '{str(tx["args"]["user"])}',
                                         '{str(tx["args"]["gauge_addr"])}',
                                         '{str(tx["args"]["weight"])}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances('0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
                                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                         [True,False,False,False,True,True,False,False])'''
                     content = '<@&945071604642222110>'
@@ -485,9 +487,9 @@ class HandleEvent(Thread):
                     '{str(tx["args"]["gauge_addr"])}',
                     '{str(tx["args"]["weight"])}',
                     '{str(tx["args"]["total_weight"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [True,False,False,False,True,True,False,False])'''
                     content = '<@&945071604642222110>'
@@ -508,9 +510,9 @@ class HandleEvent(Thread):
                                         '{str(tx["args"]["user"])}',
                                         '{str(tx["args"]["gauge_addr"])}',
                                         '{str(tx["args"]["weight"])}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances('0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
+                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
                                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                         [True,False,False,False,True,True,False,False])'''
                     content = '<@&945071604642222110>'
@@ -519,7 +521,7 @@ class HandleEvent(Thread):
             elif (self.alert in ["lending1", "lending2"]):
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
-                    title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(tx["address"]))
+                    title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
                     fields = f'''makeFields(
                                 ['Block Number :',
                                 'Minter :',
@@ -533,22 +535,22 @@ class HandleEvent(Thread):
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
                                 '{str(tx["args"]["minter"])}',
-                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                                 '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["mintTokens"] / fetchers.getDecimals(tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getSupply(tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["mintTokens"] / fetchers.getDecimals(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,True,False,True,True,True,True,True,False])'''
-                    if ((tx["args"]["mintAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                    if ((tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "Redeem"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
-                    title = "Lending Market : New Withdrawal event detected for " + str(fetchers.getSymbol(tx["address"]))
+                    title = "Lending Market : New Withdrawal event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
                     fields = f'''makeFields(
                                 ['Block Number :',
                                 'Redeemer :',
@@ -562,23 +564,23 @@ class HandleEvent(Thread):
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
                                 '{str(tx["args"]["redeemer"])}',
-                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                                 '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["redeemTokens"] / fetchers.getDecimals(tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getSupply(tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["redeemTokens"] / fetchers.getDecimals(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,True,False,True,True,True,True,True,False])'''
-                    if ((tx["args"]["redeemAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                    if ((tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "Borrow"):
                     webhook = os.getenv('WEBHOOK_BORROW')
-                    title = "Lending Market : New Borrow event detected for " + str(fetchers.getSymbol(tx["address"]))
+                    title = "Lending Market : New Borrow event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
                     fields = f'''makeFields(
                                 ['Block Number :',
                                 'Borrower :',
@@ -593,24 +595,24 @@ class HandleEvent(Thread):
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
                                 '{str(tx["args"]["borrower"])}',
-                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                                 '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(fetchers.getSupply(tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,False,True,True,True,True,True,True,True,False])'''
-                    if ((tx["args"]["borrowAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                    if ((tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "RepayBorrow"):
                     webhook = os.getenv('WEBHOOK_BORROW')
-                    title = "Lending Market : New Repayment event detected for " + str(fetchers.getSymbol(tx["address"]))
+                    title = "Lending Market : New Repayment event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
 
                     fields = f'''makeFields(
                                 ['Block Number :',
@@ -626,23 +628,23 @@ class HandleEvent(Thread):
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
                                 '{str(tx["args"]["borrower"])}',
-                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                                 '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(fetchers.getSupply(tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
+                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,False,True,True,True,True,True,True,True,False])'''
-                    if ((tx["args"]["repayAmount"] / fetchers.getDecimals(fetchers.getUnderlying(tx["address"])) * fetchers.getUnderlyingPrice(tx["address"]))>100000):
+                    if ((tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
 
                     color = colors.blurple
                     send = True
                 elif (self.event_name == "LiquidateBorrow"):
-                    title = "Lending Market New Liquidation event detected for " + str(fetchers.getSymbol(tx["address"]))
+                    title = "Lending Market New Liquidation event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
                     webhook = os.getenv('WEBHOOK_LIQUIDATIONS')
                     fields = f'''makeFields(
                                 ['Block Number :',
@@ -659,14 +661,14 @@ class HandleEvent(Thread):
                                 '{str(tx["args"]["liquidator"])}',
                                 '{str(tx["args"]["borrower"])}',
                                 '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["seizeTokens"]/ fetchers.getDecimals(tx["args"]["cTokenCollateral"])))}',
-                                '{str(fetchers.getSymbol(tx["args"]["cTokenCollateral"]))}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"]/ fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"]* fetchers.getUnderlyingPrice(tx["address"])/ fetchers.getDecimals(fetchers.getUnderlying(tx["address"]))))}',
-                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(formatCurrency(tx["args"]["seizeTokens"]/ fetchers.getDecimals(self.web3,tx["args"]["cTokenCollateral"])))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["args"]["cTokenCollateral"]))}',
+                                '{str(formatCurrency(tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(formatCurrency(tx["args"]["repayAmount"]* fetchers.getUnderlyingPrice(self.web3,tx["address"])/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [False,False,False,False,True,True,False,True,True,False])'''
-                    if ((tx["args"]["repayAmount"]/ fetchers.getDecimals(fetchers.getUnderlying(tx["address"])))>100000):
+                    if ((tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))>100000):
                         content = '<@&945071604642222110>'
 
                     color = colors.blurple
@@ -682,7 +684,7 @@ class HandleEvent(Thread):
                     'Proposal :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount())}',
+                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount(self.web3))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [False,False,False])'''
 
@@ -745,7 +747,7 @@ class HandleEvent(Thread):
                     ['{str(tx["blockNumber"])}',
                     '{str(tx["address"])}',
                     '{str(formatCurrency(tx["args"]["amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getSupply('0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
+                    '{str(formatCurrency(fetchers.getSupply(self.web3,'0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [False,False,True,True,False])'''
 
@@ -763,7 +765,7 @@ class HandleEvent(Thread):
                     ['{str(tx["blockNumber"])}',
                     '{str(tx["address"])}',
                     '{str(formatCurrency(tx["args"]["amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getSupply('0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
+                    '{str(formatCurrency(fetchers.getSupply(self.web3,'0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                     [False,False,True,True,False])'''
 
@@ -774,16 +776,16 @@ class HandleEvent(Thread):
                 if (self.event_name == "Swap"):
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/838610/1466237/8e64e858-5db5-4692-922d-5f9fe6b7a8c6.jpg"
                     if tx["args"]['amount0In'] == 0:
-                        operation = 'Buy ' + str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(
-                            fetchers.getSushiTokens(tx["address"])[0]))) + " " + str(
-                            fetchers.getSushiTokensSymbol(tx["address"])[0])
+                        operation = 'Buy ' + str(formatCurrency(tx["args"]['amount0Out'] / fetchers.getDecimals(self.web3,
+                            fetchers.getSushiTokens(self.web3,tx["address"])[0]))) + " " + str(
+                            fetchers.getSushiTokensSymbol(self.web3,tx["address"])[0])
                         color = colors.dark_green
                         title = "Sushiswap New Buy event detected"
                         send = True
                     else:
                         operation = 'Sell ' + str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(
-                            fetchers.getSushiTokens(tx["address"])[0]))) + " " + str(
-                            fetchers.getSushiTokensSymbol(tx["address"])[0])
+                            fetchers.getSushiTokens(self.web3,tx["address"])[0]))) + " " + str(
+                            fetchers.getSushiTokensSymbol(self.web3,tx["address"])[0])
                         color = colors.dark_red
                         title = "Sushiswap New Sell event detected"
                         send = True
@@ -797,11 +799,11 @@ class HandleEvent(Thread):
                                 'USD value :',
                                 'Transaction :'],
                                 ['{str(tx["blockNumber"])}',
-                                '{str(fetchers.getName(tx["address"]))}',
-                                '{str(fetchers.getSymbol(tx["address"]))}',
+                                '{str(fetchers.getName(self.web3,tx["address"]))}',
+                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                                 '{str(tx["address"])}',
                                 '{str(operation)}',
-                                '{str(formatCurrency(((tx["args"]["amount0Out"] + tx["args"]["amount0In"]) / fetchers.getDecimals(fetchers.getSushiTokens(tx["address"])[0])) * fetchers.getUnderlyingPrice('0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b')))}',
+                                '{str(formatCurrency(((tx["args"]["amount0Out"] + tx["args"]["amount0In"]) / fetchers.getDecimals(self.web3,fetchers.getSushiTokens(self.web3,tx["address"])[0])) * fetchers.getUnderlyingPrice(self.web3,'0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b')))}',
                                 '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                                 [True,True,True,False,True,True,False])'''
 
@@ -822,16 +824,16 @@ class HandleEvent(Thread):
                             'Total Supply :',
                             'Transaction :'],
                             ['{str(tx["blockNumber"])}',
-                            '{str(fetchers.getName(tx["address"]))}',
-                            '{str(fetchers.getSymbol(tx["address"]))}',
+                            '{str(fetchers.getName(self.web3,tx["address"]))}',
+                            '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                             '{str(tx["address"])}',
                             '{str(tx["args"]["amountADesired"] / 1e18)}',
                             '{str(tx["args"]["amountBDesired"] / 1e18)}',
                             '{str(tx["args"]["amountAMin"] / 1e18)}',
                             '{str(tx["args"]["amountBMin"] / 1e18)}',
-                            '{str(fetchers.getBalance(tx["address"], fetchers.getSushiTokens(tx["address"][0])))}',
-                            '{str(fetchers.getBalance(tx["address"], fetchers.getSushiTokens(tx["address"][1])))}',
-                            '{str(fetchers.getSupply(tx["address"]))}',
+                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0])))}',
+                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1])))}',
+                            '{str(fetchers.getSupply(self.web3,tx["address"]))}',
                             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                             [True,True,True,False,False,True,False,True,True,True,True,False])'''
 
@@ -852,14 +854,14 @@ class HandleEvent(Thread):
                             'Total Supply :',
                             'Transaction :'],
                             ['{str(tx["blockNumber"])}',
-                            '{str(fetchers.getName(tx["address"]))}',
-                            '{str(fetchers.getSymbol(tx["address"]))}',
+                            '{str(fetchers.getName(self.web3,tx["address"]))}',
+                            '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
                             '{str(tx["address"])}',
                             '{str(tx["args"]["amount0"] / 1e18)}',
                             '{str(tx["args"]["amount1"] / 1e18)}',
-                            '{str(fetchers.getBalance(tx["address"], fetchers.getSushiTokens(tx["address"][0])))}',
-                            '{str(fetchers.getBalance(tx["address"], fetchers.getSushiTokens(tx["address"][1])))}',
-                            '{str(fetchers.getSupply(tx["address"]))}',
+                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0])))}',
+                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1])))}',
+                            '{str(fetchers.getSupply(self.web3,tx["address"]))}',
                             '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
                             [True,True,False,True,True,True,True,False])'''
                     color = colors.dark_red
@@ -896,7 +898,7 @@ class HandleEvent(Thread):
                     'To :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(tx["address"])))+' '+str(fetchers.getSymbol(tx["address"]))}',
+                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"]))}',
                     '{str(tx["args"]["from"]) or str(tx["args"]["sender"])}',
                     '{str(tx["args"]["to"]) or str(tx["args"]["receiver"])}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
@@ -918,7 +920,7 @@ class HandleEvent(Thread):
                     'To :',
                     'Transaction :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(tx["address"])))+' '+str(fetchers.getSymbol(tx["address"]))}',
+                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(self.web3,fetchers.getSymbol(tx["address"]))}',
                     '{str(tx["args"]["from"]) or str(tx["args"]["sender"])}',
                     '{str(tx["args"]["to"]) or str(tx["args"]["receiver"])}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
@@ -942,7 +944,7 @@ class HandleEvent(Thread):
                     'Transaction :'
                     'Fed Address :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(tx["address"])))+' '+str(fetchers.getSymbol(tx["address"]))}',
+                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"]))}',
                     '{str(tx["args"]["from"])}',
                     '{str(tx["args"]["to"])}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
@@ -966,9 +968,9 @@ class HandleEvent(Thread):
                     'Transaction :',
                     'Debt Repayment Contract :'],
                     ['{str(tx["blockNumber"])}',
-                    '{str(fetchers.getSymbol(tx["args"]["underlying"]))}',
-                    '{str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(tx["args"]["underlying"])))}',
-                    '{str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(tx["args"]["underlying"])))}',
+                    '{str(fetchers.getSymbol(self.web3,tx["args"]["underlying"]))}',
+                    '{str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"])))}',
+                    '{str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"])))}',
                     '{str(formatPercent(tx["args"]["receiveAmount"]/tx["args"]["paidAmount"]))}',
                     '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
                     '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
@@ -992,9 +994,9 @@ class HandleEvent(Thread):
                                         'Debt Conversion Contract :'],
                                         ['{str(tx["blockNumber"])}',
                                         '{str(tx["args"]["user"])}',
-                                        '{str(fetchers.getSymbol(tx["args"]["anToken"]))}',
+                                        '{str(fetchers.getSymbol(self.web3,tx["args"]["anToken"]))}',
                                         '{str(formatCurrency(tx["args"]["dolaAmount"] / 1e18))}',
-                                        '{str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(tx["args"]["anToken"])))}',
+                                        '{str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(self.web3,tx["args"]["anToken"])))}',
                                         '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
                                         '{"https://etherscan.io/address/0x1ff9c712B011cBf05B67A6850281b13cA27eCb2A"}'],
                                         [False,True,True,True,True,False,False])'''
@@ -1012,8 +1014,9 @@ class HandleEvent(Thread):
 
 # Define state change to handle and logs to the console/send to discord
 class HandleTx(Thread):
-    def __init__(self, tx, alert, contract, name, **kwargs):
+    def __init__(self,web3, tx, alert, contract, name, **kwargs):
         super(HandleTx, self).__init__(**kwargs)
+        self.web3 = web3
         self.contract = contract
         self.alert = alert
         self.name = name

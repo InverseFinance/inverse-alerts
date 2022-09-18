@@ -1,5 +1,6 @@
 import time
 import logging
+import random
 from threading import Thread
 from pycoingecko import CoinGeckoAPI
 from datetime import datetime
@@ -9,7 +10,7 @@ import requests
 from dotenv import load_dotenv
 from web3 import Web3
 from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
-from helpers import sendError, formatPercent
+from helpers import sendError, formatPercent, patch_http_connection_pool
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
@@ -20,24 +21,28 @@ class TxListener(Thread):
         self.contract = contract
         self.name = name
         self.tx_filter = []
+        patch_http_connection_pool(maxsize=1000)
 
     def run(self):
-        self.tx_filter = eval(f'''self.web3.eth.filter({{"address":'{self.contract}'}})''')
-        try:
-            while True:
-                for tx in self.tx_filter.get_new_entries():
+        while True:
+            block0 = self.web3.eth.get_block_number()
+            try:
+                self.tx_filter = eval(f'''self.web3.eth.filter({{"fromBlock":{block0},"address":'{self.contract}'}})''')
+                block0 = self.web3.eth.get_block_number()
+                for tx in self.tx_filter.get_all_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
                     logging.info(json.dumps(tx))
-                    HandleTx(tx, self.alert, self.contract,self.name).start()
-                    time.sleep(5)
+                    HandleTx(self.web3,tx, self.alert, self.contract,self.name).start()
+                time.sleep(random.randint(35,45))
 
-        except Exception as e:
-            logging.warning(f'Error in listener {str(self.alert)}-{str(self.contract)}')
-            logging.error(e)
-            #sendError(f'Error in listener {str(self.alert)}-{str(self.contract)}')
-            #sendError(str(e))
-            time.sleep(5)
-            pass
+            except Exception as e:
+                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
+                logging.error(e)
+                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
+                sendError(e)
+                time.sleep(random.randint(5,11))
+                continue
+
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class EventListener(Thread):
@@ -48,23 +53,26 @@ class EventListener(Thread):
         self.contract = contract
         self.event_name = event_name
         self.event_filter = []
+        patch_http_connection_pool(maxsize=1000)
 
     def run(self):
-        self.event_filter = eval(f'self.contract.events.{self.event_name}.createFilter(fromBlock="latest")')
-        try:
-            while True:
-                for event in self.event_filter.get_new_entries():
+        while True:
+            block0 = self.web3.eth.get_block_number()
+            try:
+                self.event_filter = eval(f'self.contract.events.{self.event_name}.createFilter(fromBlock={block0})')
+                block0 = self.web3.eth.get_block_number()
+                #logging.warning(self.event_filter)
+                for event in self.event_filter.get_all_entries():
                     logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                    HandleEvent(event, self.alert, self.event_name).start()
-                    time.sleep(5)
-
-        except Exception as e:
-            logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-            logging.error(e)
-            #sendError(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-            #sendError(str(e))
-            time.sleep(5)
-            pass
+                    HandleEvent(self.web3,event, self.alert, self.event_name).start()
+                time.sleep(random.randint(55,65))
+            except Exception as e:
+                logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
+                logging.error(e)
+                sendError(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
+                sendError(e)
+                time.sleep(random.randint(5,11))
+                continue
 
 
 # Define a Thread to listen separately on each state change
@@ -76,6 +84,7 @@ class StateChangeListener(Thread):
         self.contract = contract
         self.state_function = state_function
         self.argument = argument
+        patch_http_connection_pool(maxsize=1000)
         # If condition to take into account state function with no input params
         if self.argument is None:
             self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
@@ -83,9 +92,9 @@ class StateChangeListener(Thread):
             self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
 
     def run(self):
-        try:
-            self.old_value = self.value
-            while True:
+        self.old_value = self.value
+        while True:
+            try:
                 if self.old_value > 0:
                     # If condition to take into account state function with no input params
                     if self.argument is None:
@@ -98,17 +107,17 @@ class StateChangeListener(Thread):
                     if abs(self.change) > 0 and self.value > 0:
                         logging.info(f'State Change matching criteria found in {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
                         logging.info(formatPercent(self.change))
-                        HandleStateVariation(self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
+                        HandleStateVariation(self.web3,self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
                     self.old_value = self.value
-                time.sleep(60)
-        except Exception as e:
-            logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
-            logging.error(str(e))
-            #sendError(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
-            #sendError(str(e))
-            time.sleep(5)
-            pass
-            
+                time.sleep(random.randint(60,70))
+            except Exception as e:
+                logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
+                logging.error(str(e))
+                sendError(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
+                sendError(e)
+                time.sleep(random.randint(5,11))
+                continue
+
 # Define a Thread to listen separately to price/volume variation
 class CoinGeckoListener(Thread):
     def __init__(self, id, **kwargs):
@@ -117,9 +126,9 @@ class CoinGeckoListener(Thread):
         self.cg = CoinGeckoAPI()
 
     def run(self):
-        try:
-            self.old_value = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
-            while True:
+        self.old_value = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
+        while True:
+            try:
                 self.price = self.cg.get_price(ids=self.id, vs_currencies='usd')[self.id]['usd']
                 self.change = (self.price / self.old_value) - 1
                 logging.info('change : ' + str(formatPercent(self.change))+ ' / price : ' + str(self.price) + ' / old price : ' + str(self.old_value))
@@ -127,13 +136,13 @@ class CoinGeckoListener(Thread):
                 self.old_value = self.price
                 time.sleep(60)
 
-        except Exception as e:
-            logging.error(f'Error in CoinGecko Price Listener : {self.id}')
-            logging.error(str(e))
-            #sendError(f'Error in CoinGecko Price Listener : {self.id}')
-            #sendError(str(e))
-            time.sleep(5)
-            pass
+            except Exception as e:
+                logging.error(f'Error in CoinGecko Price Listener : {self.id}')
+                logging.error(str(e))
+                sendError(f'Error in CoinGecko Price Listener : {self.id}')
+                sendError(e)
+                time.sleep(random.randint(5,11))
+                continue
 
 # Define a Thread to listen separately to price variation
 class CoinGeckoVolumeListener(Thread):
@@ -142,13 +151,13 @@ class CoinGeckoVolumeListener(Thread):
         self.id = id
         self.cg = CoinGeckoAPI()
     def run(self):
-        try:
-            self.tickers = self.cg.get_coin_by_id(id=self.id, vs_currency='usd', days=1)['tickers']
-            self.old_value = 0
-            for i in range(0, len(self.tickers)):
-                self.old_value += self.tickers[i]['converted_volume']['usd']
+        self.tickers = self.cg.get_coin_by_id(id=self.id, vs_currency='usd', days=1)['tickers']
+        self.old_value = 0
+        for i in range(0, len(self.tickers)):
+            self.old_value += self.tickers[i]['converted_volume']['usd']
+        while True:
 
-            while True:
+            try:
                 self.tickers = self.cg.get_coin_by_id(id=self.id, vs_currency='usd', days=1)['tickers']
                 self.volume = 0
                 for i in range(0, len(self.tickers)):
@@ -160,13 +169,14 @@ class CoinGeckoVolumeListener(Thread):
                 self.old_value = self.volume
                 time.sleep(60)
 
-        except Exception as e:
-            logging.error(f'Error in CoinGecko Volume Listener : {self.id}')
-            logging.error(str(e))
-            #sendError(f'Error in CoinGecko Volume Listener : {self.id}')
-            #sendError(str(e))
-            time.sleep(5)
-            pass
+            except Exception as e:
+                logging.error(f'Error in CoinGecko Volume Listener : {self.id}')
+                logging.error(str(e))
+                sendError(f'Error in CoinGecko Volume Listener : {self.id}')
+                sendError(e)
+                time.sleep(random.randint(5,11))
+                continue
+            
 
 
 

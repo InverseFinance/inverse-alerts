@@ -1,5 +1,6 @@
 # import the following dependencies
 import json
+import random
 import os
 import logging
 import sys
@@ -7,16 +8,18 @@ import requests
 from datetime import datetime
 from pycoingecko import CoinGeckoAPI
 import pandas as pd
-from helpers import LoggerParams, sendError,patch_http_connection_pool
+from helpers import LoggerParams, sendError ,patch_http_connection_pool
 from dotenv import load_dotenv
 import fetchers
 from web3 import Web3
 from listeners import EventListener, StateChangeListener, TxListener,CoinGeckoListener,CoinGeckoVolumeListener
-#patch_http_connection_pool(maxsize=1000)
+patch_http_connection_pool(maxsize=1000)
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE')))
+
+
 
 # Get contracts metadata from excel
 sheet_contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
@@ -24,6 +27,7 @@ sheet_events = pd.read_excel('contracts.xlsx', sheet_name='alerts_events')
 sheet_state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
 sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
 sheet_calls = pd.read_excel('contracts.xlsx', sheet_name='alerts_calls')
+
 # Coingecko ids to monitor for changes
 ids = ['inverse-finance', 'dola-usd']
 
@@ -89,8 +93,8 @@ try:
                 # Organise state args for reading function
 
                 if alert == 'oracle':
-                    # Get an array of all markets to use in the Oracle calling
-                    state_arguments = fetchers.getAllMarkets('0x4dcf7407ae5c07f8681e1659f626e114a7667339')
+                    # Get an array of all markets to use in the Oracle calls
+                    state_arguments = fetchers.getAllMarkets(web3,'0x4dcf7407ae5c07f8681e1659f626e114a7667339')
                 elif alert == 'cash':
                     state_arguments = None
 
@@ -147,3 +151,4 @@ except Exception as e:
     logging.error(e)
     #sendError("Error alert :" + str(e))
     pass
+
