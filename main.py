@@ -17,16 +17,13 @@ patch_http_connection_pool(maxsize=1000)
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
-web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE')))
-
-
 
 # Get contracts metadata from excel
 sheet_contracts = pd.read_excel('contracts.xlsx', sheet_name='contracts')
 sheet_events = pd.read_excel('contracts.xlsx', sheet_name='alerts_events')
 sheet_state = pd.read_excel('contracts.xlsx', sheet_name='alerts_state')
 sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
-sheet_calls = pd.read_excel('contracts.xlsx', sheet_name='alerts_calls')
+#sheet_calls = pd.read_excel('contracts.xlsx', sheet_name='alerts_calls')
 
 # Coingecko ids to monitor for changes
 ids = ['inverse-finance', 'dola-usd']
@@ -34,7 +31,7 @@ ids = ['inverse-finance', 'dola-usd']
 events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
 tx_alerts = sheet_tx.columns.array
-calls_alerts = sheet_calls.columns.array
+#calls_alerts = sheet_calls.columns.array
 
 
 try:
@@ -44,14 +41,18 @@ try:
     # First loop to cover all alert tags  (then contract and events)
     for alert in events_alerts:
         # Define events corresponding to alert tag
-        events = eval(f'''sheet_events['{alert}'].dropna()''')
-
+        events = sheet_events[alert].dropna()
         # Get contracts filtering by alert tag and load their ABIs
         alert_contracts = sheet_contracts[sheet_contracts['tags_events'].str.contains(alert)]
-
         # Construct all contracts objects and put them in filter array
         filters = {"id": []}
         for i in range(0, len(alert_contracts['contract_address'])):
+            if alert_contracts.iloc[i]['chain_id']==1:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
+            elif alert_contracts.iloc[i]['chain_id']==10:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_OPT')))
+            elif alert_contracts.iloc[i]['chain_id']==250:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_FTM')))
             contract_address = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
             contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
             contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -73,7 +74,7 @@ try:
 
     for alert in state_alerts:
         # Define state functions corresponding to alert tag
-        state_functions = eval(f'''sheet_state['{alert}'].dropna()''')
+        state_functions = sheet_state[alert].dropna()
 
         # Get contracts filtering by alert tag and load their ABIs
         alert_contracts = sheet_contracts[sheet_contracts['tags_state'].str.contains(alert)]
@@ -81,6 +82,12 @@ try:
         # Define a set of filters containing the contract we are going to call (in oracle case only one)
         filters = {"id": []}
         for i in range(0, len(alert_contracts['contract_address'])):
+            if alert_contracts.iloc[i]['chain_id']==1:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
+            elif alert_contracts.iloc[i]['chain_id']==10:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_OPT')))
+            elif alert_contracts.iloc[i]['chain_id']==250:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_FTM')))
             contract_address = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
             contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
             contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -126,6 +133,12 @@ try:
 
         # Construct all address array
         for i in range(0, len(addresses['name'])):
+            if addresses.iloc[i]['chain_id']==1:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
+            elif addresses.iloc[i]['chain_id']==10:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_OPT')))
+            elif addresses.iloc[i]['chain_id']==250:
+                web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_FTM')))
             contract_name = addresses.iloc[i]['name']
             contract_address = web3.toChecksumAddress(addresses.iloc[i]['contract_address'])
             TxListener(web3, alert, contract_address,contract_name).start()

@@ -7,7 +7,7 @@ from threading import Thread
 from web3 import Web3
 from datetime import datetime
 import logging
-from helpers import colors, makeFields, sendError, sendWebhook, formatPercent, formatCurrency
+from helpers import colors, sendError, sendWebhook, formatPercent, formatCurrency
 from dotenv import load_dotenv
 import requests
 import pandas as pd
@@ -169,10 +169,11 @@ class HandleEvent(Thread):
             logging.info(str(datetime.now()) + " " + str(tx))
             send = False
             title = ''
+            content= ''
             fields = []
             image = ''
             color = colors.blurple
-            content = ''
+            
             webhook = ''
 
             if (self.alert == "dola3crv"):
@@ -519,7 +520,7 @@ class HandleEvent(Thread):
             elif (self.alert == "fed"):
                 webhook = os.getenv('WEBHOOK_FED')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/22517/1128427/3084f915-b906-4fdf-ac8c-ad5c0ce57e2b.jpg"
-                content = ''
+                
                 if (self.event_name in ["Expansion"]):
                     title = "Fed " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
@@ -589,13 +590,13 @@ class HandleEvent(Thread):
                     {"name":'Token 1 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1]))),"inline":True},
                     {"name":'Total Supply :',"value":str(fetchers.getSupply(self.web3,tx["address"])),"inline":False},
                     {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-                    content = ''
+                    
 
                     color = colors.dark_green
                     send = True
                 elif (self.event_name in ["Burn"]):
                     title = "Sushi New Liquidity Removal detected"
-                    content = ''
+                    
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
                     {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])) ,"inline":True},
                     {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
@@ -627,7 +628,7 @@ class HandleEvent(Thread):
                 watch_addresses =["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
                 if (self.event_name in ["Transfer"] and (((str(tx["args"]["from"]) or str(tx["args"]["sender"])) in watch_addresses) or ((str(tx["args"]["to"] or str(tx["args"]["receiver"]))) in watch_addresses))):
                     title = "Concave DOLA/3CRV activity detected"
-                    content = '' # '<@&945071604642222110>'
+                     # '<@&945071604642222110>'
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
                     {"name":'Transfer :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
                     {"name":'From :',"value":str(tx["args"]["from"]) or str(tx["args"]["sender"]),"inline":False},
@@ -640,7 +641,7 @@ class HandleEvent(Thread):
                 watch_addresses =["0xA79828DF1850E8a3A3064576f380D90aECDD3359"]
                 if (self.event_name in ["Transfer"] and (((str(tx["args"]["from"]) or str(tx["args"]["sender"])) in watch_addresses) or ((str(tx["args"]["to"] or str(tx["args"]["receiver"]))) in watch_addresses))):
                     title = "Zap Activity detected"
-                    content = ''#'<@&945071604642222110>'
+                    #'<@&945071604642222110>'
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
                     {"name":'Transfer :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
                     {"name":'From :',"value":str(tx["args"]["from"]) or str(tx["args"]["sender"]),"inline":False},
@@ -667,7 +668,7 @@ class HandleEvent(Thread):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 if (self.event_name in ["debtRepayment"]):
                     title = "Debt Repayment detected"
-                    content = ''
+                    
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
                     {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["underlying"])),"inline":True},
                     {"name":'Amount Received :',"value":str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"]))),"inline":True},
@@ -682,7 +683,7 @@ class HandleEvent(Thread):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 if (self.event_name in ["Conversion"]):
                     title = "Debt Conversion  detected"
-                    content = ''
+                    
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
                     {"name":'User :',"value":str(tx["args"]["user"]),"inline":True},
                     {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["anToken"])),"inline":True},
@@ -725,21 +726,39 @@ class HandleTx(Thread):
             title = ''
             fields = []
             color = colors.blurple
-            if (self.alert == 'multisig'):
+            if (self.alert == 'multisig' and self.web3.eth.chainId==1):
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
                 logging.info(str('Tx detected on ' + str(self.tx["address"])))
                 title = str('Tx detected on ' + str(self.name))
-                content = ''
+                
                 send = True
                 fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
                 {"name":'Link to transaction :',"value":"https://etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
+            if (self.alert == 'multisig' and self.web3.eth.chainId==10):
+                webhook = os.getenv('WEBHOOK_GOVERNANCE')
+
+                logging.info(str('Tx detected on ' + str(self.tx["address"])))
+                title = str('Tx detected on ' + str(self.name))
+
+                send = True
+                fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
+                {"name":'Link to transaction :',"value":"https://optimistic.etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
+            if (self.alert == 'multisig' and self.web3.eth.chainId==250):
+                webhook = os.getenv('WEBHOOK_GOVERNANCE')
+
+                logging.info(str('Tx detected on ' + str(self.tx["address"])))
+                title = str('Tx detected on ' + str(self.name))
+
+                send = True
+                fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
+                {"name":'Link to transaction :',"value":"https://ftmscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
             if (self.alert == 'shortfall'):
                 webhook = os.getenv('WEBHOOK_SHORTFALL')
 
                 logging.info(str('Shortfall address tx detected on ' + str(self.tx["address"])))
                 title = str('Shortfall address  detected on ' + str(self.tx["address"]))
-                content = ''
+                
                 send = True
                 fields = [{"name":'Address :',"value":str(self.tx["address"]),"inline":False},
                 {"name":'Link to transaction :',"value":"https://etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":False}]
@@ -766,7 +785,7 @@ class HandleCoingecko(Thread):
             if abs(self.change) > 0:
                 send = False
                 image = ''
-                content = ''
+                content=''
                 title = ''
                 fields = []
                 color = colors.blurple
@@ -817,7 +836,7 @@ class HandleCoingeckoVolume(Thread):
             if abs(self.change) > 0:
                 send = False
                 image = ''
-                content = ''
+                content=''
                 title = ''
                 fields = []
                 color = colors.blurple
@@ -849,7 +868,7 @@ class HandleCoingeckoVolume(Thread):
                     sendWebhook(webhook, title, fields, content, image, color)
 
         except Exception as e:
-            logging.warning(f'Error in coingecko variation handler')
+            logging.warning(f'Error in coingecko volume variation handler')
             logging.error(e)
-            #sendError(f'Error in state variation handler : {str(e)}')
+            #sendError(f'Error in coingecko volume variation handler : {str(e)}')
             pass

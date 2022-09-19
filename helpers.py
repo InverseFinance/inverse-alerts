@@ -40,19 +40,19 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
 
 def sendError(content):
     """
-    Seend a message to a discord channel exclusively used for reporting errors
+    Send a message to a discord channel exclusively used for reporting errors
     :param content: string
     :return:
     """
     load_dotenv()
     webhook = os.getenv('WEBHOOK_ERRORS')
     error = True
-    replacers = {'{': '(', '}': ')', ':': '='}  # etc....
+    replacers = {'{': '(', '}': ')',']': ')','[': ')',':': '='}  # etc....
 
     while error:
         try:
             for a, b in replacers.items():
-                content = content.replace(a,b)
+                content = str(content).replace(a,b)
             data = {"content": content}
             result = requests.post(webhook, json=data)
             result.raise_for_status()
