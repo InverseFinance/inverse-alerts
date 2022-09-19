@@ -7,29 +7,6 @@ from web3 import Web3
 import json
 import time
 
-def makeFields(names, values, inline):
-    """
-    :param names: array of names of the embed field
-    :param values: array of values of the embed field
-    :param inline: array of Boolean values if the fields is in line with the previous fields
-    """
-    try:
-        fields = []
-        a = names
-        b = values
-        c = inline
-
-        for i in range(0, len(a)):
-            fields.append({"name": a[i], "value": b[i], "inline": c[i]})
-
-        # print(fields = json.dumps(fields, indent=1))
-        return fields
-    except Exception as e:
-        logging.warning('Error in makeFields ')
-        sendError("Error in sending makeFields " + str(e))
-        logging.error(e)
-        pass
-
 def sendWebhook(webhook, title, fields, content, imageurl, color):
     """
     Send a webhook with embed (title,fields,image,url,color)
@@ -45,10 +22,11 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
     error = True
     while error:
         try:
-            data = f"""{{"content": '{content}'}}"""
-            data = eval(data)
-            embed = f"""[{{"fields":{fields},"title": '{title}',"color": '{color}',"image":{{"url": '{imageurl}'}}}}]"""
-            data["embeds"] = eval(embed)
+            data = {"content": content,
+                    "embeds":[{"fields": fields,
+                               "title": title,
+                               "color": color,
+                               "image": {"url": imageurl}}]}
             result = requests.post(webhook, json=data)
             result.raise_for_status()
         except requests.exceptions.HTTPError as err:
@@ -73,8 +51,9 @@ def sendError(content):
 
     while error:
         try:
-            data = f"""{{"content": '{json.dumps(content).replace(replacers)}'}}"""
-            data = eval(data)
+            for a, b in replacers.items():
+                content = content.replace(a,b)
+            data = {"content": content}
             result = requests.post(webhook, json=data)
             result.raise_for_status()
         except requests.exceptions.HTTPError as err:

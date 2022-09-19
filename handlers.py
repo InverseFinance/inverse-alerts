@@ -58,18 +58,12 @@ class HandleStateVariation(Thread):
                         color = colors.orange
                         send = True
                     if send:
-                        fields = f'''makeFields(
-                             ['Alert Level :',
-                             'Variation :',
-                             'Old Value :',
-                             'New Value :',
-                             'Link to Market :'], 
-                             ['{str(level)}',
-                             '{str(formatPercent(self.change))}',
-                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))}',
-                             '{str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))}',
-                             '{'https://etherscan.io/address/' + str(self.state_argument)}'], 
-                             [True, True,True,True,False])'''
+                        fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
+                                  {"name": 'Variation :', "value": str(formatPercent(self.change)),"inline": True},
+                                  {"name": 'Old Value :', "value": str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument)))), "inline": True},
+                                  {"name": 'New Value :', "value": str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument)))), "inline": True},
+                                  {"name": 'Link to Market :', "value": 'https://etherscan.io/address/' + str(self.state_argument), "inline": False}]
+
 
             if (self.alert == 'cash'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
@@ -94,18 +88,12 @@ class HandleStateVariation(Thread):
                         send = True
 
                     if send:
-                        fields = f'''makeFields(
-                             ['Alert Level :',
-                             'Variation :',
-                             'Old Value :',
-                             'New Value :',
-                             'Link to Market :'], 
-                             ['{str(level)}',
-                             '{str(formatPercent(self.change))}',
-                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
-                             '{str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
-                             '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                             [True, True,True,True,False])'''
+                        fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
+                                  {"name": 'Variation :',"value": str(formatPercent(self.change)), "inline" : True},
+                                  {"name": 'Old Value :',"value": str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline" : True},
+                                  {"name": 'New Value :',"value": str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline" : True},
+                                  {"name": 'Link to Market :',"value":'https://etherscan.io/address/' + str(self.contract.address), "inline" : False}]
+
 
             if (self.alert == 'supply'):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
@@ -129,18 +117,11 @@ class HandleStateVariation(Thread):
                         color = colors.orange
                         send = True
                     if send:
-                        fields = f'''makeFields(
-                             ['Alert Level :',
-                             'Variation :',
-                             'Old Value :',
-                             'New Value :',
-                             'Link to Pool :'], 
-                             ['{str(level)}',
-                             '{str(formatPercent(self.change))}',
-                             '{str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
-                             '{str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))))}',
-                             '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                             [True, True,True,True,False])'''
+                        fields = [{"name":'Alert Level :',"value":str(level),"inline": True},
+                        {"name":'Variation :', "value":str(formatPercent(self.change)), "inline": True},
+                        {"name":'Old Value :', "value":str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline": True},
+                        {"name":'New Value :', "value":str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline": True},
+                        {"name":'Link to Pool :', "value":'https://etherscan.io/address/' + str(self.contract.address), "inline": False}]
 
             if (self.alert == 'liquidation_incentive'):
                 webhook = os.getenv('WEBHOOK_MARKETS')
@@ -155,18 +136,11 @@ class HandleStateVariation(Thread):
                     color = colors.red
                     send = True
 
-                    fields = f'''makeFields(
-                         ['Alert Level :',
-                         'Variation :',
-                         'Old Value :',
-                         'New Value :',
-                         'Link to Pool :'], 
-                         ['{str(level)}',
-                         '{str(formatPercent(self.change))}',
-                         '{str(formatCurrency(self.old_value / 1e18))}',
-                         '{str(formatCurrency(self.value / 1e18))}',
-                         '{'https://etherscan.io/address/' + str(self.contract.address)}'], 
-                         [True, True,True,True,False])'''
+                    fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
+                    {"name": 'Variation :',"value": str(formatPercent(self.change)),"inline": True},
+                    {"name": 'Old Value :',"value": str(formatCurrency(self.old_value / 1e18)),"inline": True},
+                    {"name": 'New Value :',"value":str(formatCurrency(self.value / 1e18)),"inline": True},
+                    {"name": 'Link to Pool :',"value":'https://etherscan.io/address/' + str(self.contract.address),"inline": False}]
 
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
@@ -212,24 +186,15 @@ class HandleEvent(Thread):
                     send = True
                     if send:
                         title = "DOLA3CRV Pool Liquidity Removal event detected"
-                        fields = f'''makeFields(
-                        ['Block :',
-                        'DOLA Amount :',
-                        '3CRV Amount :',
-                        'Address :',
-                        'DOLA in Pool :',
-                        '3CRV in Pool :',
-                        'DOLA+3CRV in Pool',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                        '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                        [True,True,True,False,True,True,False,False])'''
+                        fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                        {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                        {"name":'3CRV Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                        {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                 elif (self.event_name == "RemoveLiquidityOne"):
                     if tx["args"]["coin_amount"]/1e18 > 300000:
                         content = '<@&945071604642222110>'
@@ -237,20 +202,13 @@ class HandleEvent(Thread):
                     send = True
                     if send:
                         title = "DOLA3CRV Pool Liquidity Removal event detected"
-                        fields = f'''makeFields(
-                        ['Block :',
-                        'Token Amount :',
-                        'DOLA in Pool :',
-                        '3CRV in Pool :',
-                        'DOLA+3CRV in Pool',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                        [True,False,True,False,True,False,False])'''
+                        fields = [{"name": 'Block :',"value": str(tx["blockNumber"]),"inline":True},
+                        {"name": 'Token Amount :',"value": str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":False},
+                        {"name": 'DOLA in Pool :',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                        {"name": '3CRV in Pool :',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                        {"name": 'DOLA+3CRV in Pool',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                        {"name":'Transaction :',"value": "https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                 elif (self.event_name == "AddLiquidity"):
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
                         content = '<@&945071604642222110>'
@@ -259,24 +217,15 @@ class HandleEvent(Thread):
                     send = True
                     if send:
                         title = "DOLA3CRV Pool Liquidity Add event detected"
-                        fields = f'''makeFields(
-                        ['Block :',
-                        'DOLA Amount :',
-                        '3CRV Amount :',
-                        'Address :',
-                        'DOLA in Pool :',
-                        '3CRV in Pool :',
-                        'DOLA+3CRV in Pool',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                        '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                        [True,True,True,False,True,True,False,False])'''
+                        fields = [{"name":'Block :',"value": str(tx["blockNumber"]),"inline":True},
+                        {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                        {"name":'3CRV Amount :',"value": str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                        {"name":'Address :',"value": str(tx["address"]),"inline":False},
+                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
             elif (self.alert == "dola3crv_zap"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/833844/1457892/bccc1e5b-4b60-4b28-85da-fbd558a2fd69.jpg"
@@ -287,24 +236,15 @@ class HandleEvent(Thread):
                     send = True
                     if send:
                         title = "DOLA3CRV Pool Liquidity Removal event detected"
-                        fields = f'''makeFields(
-                        ['Block :',
-                        'DOLA Amount :',
-                        '3CRV Amount :',
-                        'Address :',
-                        'DOLA in Pool :',
-                        '3CRV in Pool :',
-                        'DOLA+3CRV in Pool',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                        '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                        [True,True,True,False,True,True,False,False])'''
+                        fields = [{"name":'Block :',"value": str(tx["blockNumber"]),"inline":True},
+                        {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                        {"name":'3CRV Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                        {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                 elif (self.event_name == "RemoveLiquidityOne"):
                     if tx["args"]["coin_amount"]/1e18 > 300000:
                         content = '<@&945071604642222110>'
@@ -312,20 +252,13 @@ class HandleEvent(Thread):
                     send = True
                     if send:
                         title = "DOLA3CRV Pool Liquidity Removal event detected"
-                        fields = f'''makeFields(
-                        ['Block :',
-                        'Token Amount :',
-                        'DOLA in Pool :',
-                        '3CRV in Pool :',
-                        'DOLA+3CRV in Pool',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                        [True,False,True,False,True,False,False])'''
+                        fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                        {"name":'Token Amount :',"value":str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":False},
+                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
+                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                 elif (self.event_name == "AddLiquidity"):
 
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
@@ -335,24 +268,15 @@ class HandleEvent(Thread):
                     send = True
                     if send:
                         title = "DOLA3CRV Pool Liquidity Add event detected"
-                        fields = f'''makeFields(
-                        ['Block :',
-                        'DOLA Amount :',
-                        '3CRV Amount :',
-                        'Address :',
-                        'DOLA in Pool :',
-                        '3CRV in Pool :',
-                        'DOLA+3CRV in Pool',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                        '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                        '{str(tx["address"])}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                        [True,True,True,False,True,True,False,False])'''
+                        fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                        {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                        {"name":'3CRV Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":False},
+                        {"name":'Address :',"value":str(tx["address"]),"inline":True},
+                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
             elif (self.alert == "dolafraxbp_pool"):
                 webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                 image = ""
@@ -362,110 +286,67 @@ class HandleEvent(Thread):
                     color = colors.red
                     send = True
                     title = "DOLAFRAX Pool Liquidity Removal event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'DOLA Amount :',
-                    'FRAX Amount :',
-                    'Address :',
-                    'DOLA in Pool :',
-                    'FRAX in Pool :',
-                    'DOLA+FRAX in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [True,True,True,False,True,True,False,False])'''
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                    {"name":'FRAX Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
+                    {"name":'FRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                    {"name":'DOLA+FRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                 elif (self.event_name == "RemoveLiquidityOne" and tx["args"]["coin_amount"] / 1e18 > 50000):
                     if tx["args"]["coin_amount"] / 1e18 > 500000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
                     title = "DOLAFRAX Pool Liquidity Removal event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'Token Amount :',
-                    'DOLA in Pool :',
-                    'FRAX in Pool :',
-                    'DOLA+FRAX in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["coin_amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,False,True,False,True,False,False])'''
+                    fields = [
+                    {"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Token Amount :',"value":str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":True},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
+                    {"name":'FRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                    {"name":'DOLA+FRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
+                    {"name": 'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                 elif (self.event_name == "AddLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
                     title = "DOLAFRAX Pool Liquidity Add event detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'DOLA Amount :',
-                    'FRAX Amount :',
-                    'Address :',
-                    'DOLA in Pool :',
-                    'FRAX in Pool :',
-                    'DOLA+FRAX in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18))}',
-                    '{str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18))}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}' ],
-                    [True,True,True,False,True,True,False,False])'''
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                    {"name":'FRAX Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
+                    {"name":'FRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                    {"name":'DOLA+FRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
             elif (self.alert == "dolafraxbp_gauge"):
                 webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                 image = ""
                 if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
                     title = "DOLAFRAX New Gauge Weight detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'Gauge Address :',
-                    'Weight :',
-                    'Total Weight :',
-                    'DOLA in Pool :',
-                    'crvFRAX in Pool :',
-                    'DOLA+crvFRAX in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(tx["args"]["gauge_addr"])}',
-                    '{str(tx["args"]["weight"])}',
-                    '{str(tx["args"]["total_weight"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [True,False,False,False,True,True,False,False])'''
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
+                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
+                    {"name":'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":False},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
+                    {"name":'crvFRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                    {"name":'DOLA+crvFRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                     content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
                 elif (self.event_name == "VoteForGauge" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
                     title = "DOLAFRAX Pool Vote For Gauge detected"
-                    fields = f'''makeFields(
-                                        ['Block :',
-                                        'User :',
-                                        'Gauge Address :',
-                                        'Weight :',
-                                        'DOLA in Pool :',
-                                        'crvFRAX in Pool :',
-                                        'DOLA+crvFRAX in Pool',
-                                        'Transaction :'],
-                                        ['{str(tx["blockNumber"])}',
-                                        '{str(tx["args"]["user"])}',
-                                        '{str(tx["args"]["gauge_addr"])}',
-                                        '{str(tx["args"]["weight"])}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1]))}',
-                                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                        [True,False,False,False,True,True,False,False])'''
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'User :',"value":str(tx["args"]["user"]),"inline":False},
+                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
+                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
+                    {"name":'crvFRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                    {"name":'DOLA+crvFRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
                     content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
@@ -474,47 +355,29 @@ class HandleEvent(Thread):
                 image = ""
                 if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a'):
                     title = "DOLA3CRV New Gauge Weight detected"
-                    fields = f'''makeFields(
-                    ['Block :',
-                    'Gauge Address :',
-                    'Weight :',
-                    'Total Weight :',
-                    'DOLA in Pool :',
-                    'DOLA3CRV in Pool :',
-                    'DOLA+DOLA3CRV in Pool',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(tx["args"]["gauge_addr"])}',
-                    '{str(tx["args"]["weight"])}',
-                    '{str(tx["args"]["total_weight"])}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [True,False,False,False,True,True,False,False])'''
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
+                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
+                    {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":False},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                    {"name":'DOLA3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                    {"name":'DOLA+DOLA3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                     content = '<@&945071604642222110>'
                     color = colors.dark_orange
                     send = True
                 elif (self.event_name == "VoteForGauge" and tx["args"]["gauge_addr"]=='0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a'):
                     title = "DOLA3CRV Pool Vote For Gauge detected"
-                    fields = f'''makeFields(
-                                        ['Block :',
-                                        'User :',
-                                        'Gauge Address :',
-                                        'Weight :',
-                                        'DOLA in Pool :',
-                                        '3CRV in Pool :',
-                                        'DOLA+3CRV in Pool',
-                                        'Transaction :'],
-                                        ['{str(tx["blockNumber"])}',
-                                        '{str(tx["args"]["user"])}',
-                                        '{str(tx["args"]["gauge_addr"])}',
-                                        '{str(tx["args"]["weight"])}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                                        '{str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1]))}',
-                                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                        [True,False,False,False,True,True,False,False])'''
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'User :',"value":str(tx["args"]["user"]),"inline":False},
+                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
+                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
+                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
+                    {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
+                    {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                     content = '<@&945071604642222110>'
                     color = colors.dark_orange
                     send = True
@@ -522,28 +385,17 @@ class HandleEvent(Thread):
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
-                    fields = f'''makeFields(
-                                ['Block Number :',
-                                'Minter :',
-                                'Market Symbol :',
-                                'Market Address :',
-                                'USD Value',
-                                'Mint Amount :',
-                                'Mint Tokens :',
-                                'Total Supply',
-                                'Total Cash :',
-                                'Transaction :'],
-                                ['{str(tx["blockNumber"])}',
-                                '{str(tx["args"]["minter"])}',
-                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                                '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["mintTokens"] / fetchers.getDecimals(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
-                                '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,True,True,False,True,True,True,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Minter :',"value":str(tx["args"]["minter"]),"inline":True},
+                    {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'USD Value',"value":str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Mint Amount :',"value":str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Mint Tokens :',"value":str(formatCurrency(tx["args"]["mintTokens"] / fetchers.getDecimals(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Supply',"value":str(formatCurrency(fetchers.getSupply(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                     if ((tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
                     color = colors.blurple
@@ -551,28 +403,17 @@ class HandleEvent(Thread):
                 elif (self.event_name == "Redeem"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Withdrawal event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
-                    fields = f'''makeFields(
-                                ['Block Number :',
-                                'Redeemer :',
-                                'Market Symbol :',
-                                'Market Address :',
-                                'USD Value',
-                                'Redeem Amount :',
-                                'Redeem Tokens :',
-                                'Total Supply',
-                                'Total Cash :',
-                                'Transaction :'],
-                                ['{str(tx["blockNumber"])}',
-                                '{str(tx["args"]["redeemer"])}',
-                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                                '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["redeemTokens"] / fetchers.getDecimals(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
-                                '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,True,True,False,True,True,True,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Redeemer :',"value":str(tx["args"]["redeemer"]),"inline":True},
+                    {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'USD Value',"value":str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Redeem Amount :',"value":str(formatCurrency(tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Redeem Tokens :',"value":str(formatCurrency(tx["args"]["redeemTokens"] / fetchers.getDecimals(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Supply',"value":str(formatCurrency(fetchers.getSupply(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                     if ((tx["args"]["redeemAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
 
@@ -581,30 +422,19 @@ class HandleEvent(Thread):
                 elif (self.event_name == "Borrow"):
                     webhook = os.getenv('WEBHOOK_BORROW')
                     title = "Lending Market : New Borrow event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
-                    fields = f'''makeFields(
-                                ['Block Number :',
-                                'Borrower :',
-                                'Market Symbol :',
-                                'Market Address :',
-                                'USD Value :',
-                                'Borrow Amount :',
-                                'Account Borrows :',
-                                'Total Borrows :',
-                                'Total Supply :',
-                                'Total Cash :',
-                                'Transaction :'],
-                                ['{str(tx["blockNumber"])}',
-                                '{str(tx["args"]["borrower"])}',
-                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                                '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
-                                '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,True,False,True,True,True,True,True,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Borrower :',"value":str(tx["args"]["borrower"]),"inline":True},
+                    {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'USD Value :',"value":str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Borrow Amount :',"value":str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Account Borrows :',"value":str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Borrows :',"value":str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Supply :',"value":str(formatCurrency(fetchers.getSupply(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
+
                     if ((tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
 
@@ -613,31 +443,18 @@ class HandleEvent(Thread):
                 elif (self.event_name == "RepayBorrow"):
                     webhook = os.getenv('WEBHOOK_BORROW')
                     title = "Lending Market : New Repayment event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Borrower :',"value":str(tx["args"]["borrower"]),"inline":True},
+                    {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'USD Value :',"value":str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))),"inline":True},
+                    {"name": 'Borrow Amount :',"value":str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Account Borrows :',"value":str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Borrows :',"value":str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Supply :',"value":str(formatCurrency(fetchers.getSupply(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
-                    fields = f'''makeFields(
-                                ['Block Number :',
-                                'Borrower :',
-                                'Market Symbol :',
-                                'Market Address :',
-                                'USD Value :',
-                                'Borrow Amount :',
-                                'Account Borrows :',
-                                'Total Borrows :',
-                                'Total Supply :',
-                                'Total Cash :',
-                                'Transaction :'],
-                                ['{str(tx["blockNumber"])}',
-                                '{str(tx["args"]["borrower"])}',
-                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                                '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(fetchers.getSupply(self.web3,tx["address"])))}',
-                                '{str(formatCurrency(fetchers.getCash(self.web3,tx["address"])))}',
-                                '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,True,False,True,True,True,True,True,True,True,False])'''
                     if ((tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
 
@@ -646,28 +463,17 @@ class HandleEvent(Thread):
                 elif (self.event_name == "LiquidateBorrow"):
                     title = "Lending Market New Liquidation event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
                     webhook = os.getenv('WEBHOOK_LIQUIDATIONS')
-                    fields = f'''makeFields(
-                                ['Block Number :',
-                                'Liquidator :',
-                                'Borrower :',
-                                'Market Address :',
-                                'Seized Amount :',
-                                'Seized Token  :',
-                                'Repay Amount :',
-                                'Repay Amount USD:',
-                                'Repay Token  :',
-                                'Transaction :'],
-                                ['{str(tx["blockNumber"])}',
-                                '{str(tx["args"]["liquidator"])}',
-                                '{str(tx["args"]["borrower"])}',
-                                '{str(tx["address"])}',
-                                '{str(formatCurrency(tx["args"]["seizeTokens"]/ fetchers.getDecimals(self.web3,tx["args"]["cTokenCollateral"])))}',
-                                '{str(fetchers.getSymbol(self.web3,tx["args"]["cTokenCollateral"]))}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(formatCurrency(tx["args"]["repayAmount"]* fetchers.getUnderlyingPrice(self.web3,tx["address"])/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"]))))}',
-                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                                '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [False,False,False,False,True,True,False,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Liquidator :',"value":str(tx["args"]["liquidator"]),"inline":False},
+                    {"name":'Borrower :',"value":str(tx["args"]["borrower"]),"inline":False},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'Seized Amount :',"value":str(formatCurrency(tx["args"]["seizeTokens"]/ fetchers.getDecimals(self.web3,tx["args"]["cTokenCollateral"]))),"inline":True},
+                    {"name":'Seized Token  :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["cTokenCollateral"])),"inline":True},
+                    {"name":'Repay Amount :',"value":str(formatCurrency(tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":False},
+                    {"name":'Repay Amount USD:',"value":str(formatCurrency(tx["args"]["repayAmount"]* fetchers.getUnderlyingPrice(self.web3,tx["address"])/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Repay Token  :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
                     if ((tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))>100000):
                         content = '<@&945071604642222110>'
 
@@ -679,77 +485,48 @@ class HandleEvent(Thread):
                 if (self.event_name == "ProposalCreated"):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"]))
 
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Proposal :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount(self.web3))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False])'''
+                    fields = [{"name":'Block Number :', "value":str(tx["blockNumber"]), "inline": False},
+                    {"name":'Proposal :', "value":"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount(self.web3)), "inline": False},
+                    {"name":'Transaction :', "value":"https://etherscan.io/tx/" + str(tx["transactionHash"]), "inline": False}]
 
                     color = colors.blurple
                     send = True
                 elif (self.event_name in ["ProposalCanceled"]):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"]))
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Proposal :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Proposal :',"value":"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"]),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                     color = colors.dark_red
                     send = True
                 elif (self.event_name in ["ProposalQueued"]):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",str(tx["event"]))
+                    fields = [{"name": 'Block Number :', "value": str(tx["blockNumber"]), "inline": False},
+                              {"name": 'Proposal :',"value": "https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"]), "inline": False},
+                              {"name": 'Transaction :',"value": "https://etherscan.io/tx/" + str(tx["transactionHash"]), "inline": False}]
 
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Proposal :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False])'''
 
                     color = colors.blurple
                     send = True
                 elif (self.event_name in ["ProposalExecuted"]):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",str(tx["event"]))
-
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Proposal :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{"https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"])}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False])'''
-
+                    fields = [{"name": 'Block Number :', "value": str(tx["blockNumber"]), "inline": False},
+                              {"name": 'Proposal :',"value": "https://www.inverse.finance/governance/proposals/mills/" + str( tx["args"]["id"]), "inline": False},
+                              {"name": 'Transaction :',"value": "https://etherscan.io/tx/" + str(tx["transactionHash"]), "inline": False}]
                     color = colors.dark_green
                     send = True
+
             elif (self.alert == "fed"):
                 webhook = os.getenv('WEBHOOK_FED')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/22517/1128427/3084f915-b906-4fdf-ac8c-ad5c0ce57e2b.jpg"
                 content = ''
                 if (self.event_name in ["Expansion"]):
                     title = "Fed " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
-
-                    fields = f'''makeFields([
-                    'Block Number :',
-                    'Fed Address :',
-                    'Amount :',
-                    'Total Supply :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(tx["address"])}',
-                    '{str(formatCurrency(tx["args"]["amount"] / 1e18))}',
-                    '{str(formatCurrency(fetchers.getSupply(self.web3,'0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Fed Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'Amount :',"value": str(formatCurrency(tx["args"]["amount"] / 1e18)),"inline":True},
+                    {"name":'Total Supply :',"value":str(formatCurrency(fetchers.getSupply(self.web3,'0x865377367054516e17014ccded1e7d814edc9ce4') / 1e18)),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                     color = colors.dark_red
                     send = True
@@ -783,87 +560,52 @@ class HandleEvent(Thread):
                         title = "Sushiswap New Buy event detected"
                         send = True
                     else:
-                        operation = 'Sell ' + str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(
+                        operation = 'Sell ' + str(formatCurrency(tx["args"]['amount0In'] / fetchers.getDecimals(self.web3,
                             fetchers.getSushiTokens(self.web3,tx["address"])[0]))) + " " + str(
                             fetchers.getSushiTokensSymbol(self.web3,tx["address"])[0])
                         color = colors.dark_red
                         title = "Sushiswap New Sell event detected"
                         send = True
 
-                    fields = f'''makeFields(
-                                ['Block Number :',
-                                'Name :',
-                                'Symbol :',
-                                'Address :',
-                                'Operation :',
-                                'USD value :',
-                                'Transaction :'],
-                                ['{str(tx["blockNumber"])}',
-                                '{str(fetchers.getName(self.web3,tx["address"]))}',
-                                '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                                '{str(tx["address"])}',
-                                '{str(operation)}',
-                                '{str(formatCurrency(((tx["args"]["amount0Out"] + tx["args"]["amount0In"]) / fetchers.getDecimals(self.web3,fetchers.getSushiTokens(self.web3,tx["address"])[0])) * fetchers.getUnderlyingPrice(self.web3,'0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b')))}',
-                                '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                                [True,True,True,False,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])),"inline":True},
+                    {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'Operation :',"value":str(operation),"inline":True},
+                    {"name":'USD value :',"value":str(formatCurrency(((tx["args"]["amount0Out"] + tx["args"]["amount0In"]) / fetchers.getDecimals(self.web3,fetchers.getSushiTokens(self.web3,tx["address"])[0])) * fetchers.getUnderlyingPrice(self.web3,'0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b'))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":True}]
 
                 elif (self.event_name in ["Mint"]):
                     title = "Sushi New Liquidity Add event detected"
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])),"inline":True},
+                    {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'amountADesired :',"value":str(tx["args"]["amountADesired"] / 1e18),"inline":True},
+                    {"name":'amountBDesired :',"value":str(tx["args"]["amountBDesired"] / 1e18),"inline":True},
+                    {"name":'amountAMin :',"value":str(tx["args"]["amountAMin"] / 1e18),"inline":False},
+                    {"name":'amountBMin :',"value":str(tx["args"]["amountBMin"] / 1e18),"inline":True},
+                    {"name":'Token 0 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0]))),"inline":False},
+                    {"name":'Token 1 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1]))),"inline":True},
+                    {"name":'Total Supply :',"value":str(fetchers.getSupply(self.web3,tx["address"])),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
                     content = ''
-                    fields = f'''makeFields(
-                            ['Block Number :',
-                            'Name :',
-                            'Symbol :',
-                            'Address :',
-                            'amountADesired :',
-                            'amountBDesired :',
-                            'amountAMin :',
-                            'amountBMin :',
-                            'Token 0 :',
-                            'Token 1 :',
-                            'Total Supply :',
-                            'Transaction :'],
-                            ['{str(tx["blockNumber"])}',
-                            '{str(fetchers.getName(self.web3,tx["address"]))}',
-                            '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                            '{str(tx["address"])}',
-                            '{str(tx["args"]["amountADesired"] / 1e18)}',
-                            '{str(tx["args"]["amountBDesired"] / 1e18)}',
-                            '{str(tx["args"]["amountAMin"] / 1e18)}',
-                            '{str(tx["args"]["amountBMin"] / 1e18)}',
-                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0])))}',
-                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1])))}',
-                            '{str(fetchers.getSupply(self.web3,tx["address"]))}',
-                            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                            [True,True,True,False,False,True,False,True,True,True,True,False])'''
 
                     color = colors.dark_green
                     send = True
                 elif (self.event_name in ["Burn"]):
                     title = "Sushi New Liquidity Removal detected"
                     content = ''
-                    fields = f'''makeFields(
-                            ['Block Number :',
-                            'Name :',
-                            'Symbol :',
-                            'Address :',
-                            'Amount 0 :',
-                            'Amount 1 :',
-                            'Total Reserves 0 :',
-                            'Total Reserves 1 :',
-                            'Total Supply :',
-                            'Transaction :'],
-                            ['{str(tx["blockNumber"])}',
-                            '{str(fetchers.getName(self.web3,tx["address"]))}',
-                            '{str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                            '{str(tx["address"])}',
-                            '{str(tx["args"]["amount0"] / 1e18)}',
-                            '{str(tx["args"]["amount1"] / 1e18)}',
-                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0])))}',
-                            '{str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1])))}',
-                            '{str(fetchers.getSupply(self.web3,tx["address"]))}',
-                            '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                            [True,True,False,True,True,True,True,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])) ,"inline":True},
+                    {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'Amount 0 :',"value":str(tx["args"]["amount0"] / 1e18),"inline":True},
+                    {"name":'Amount 1 :',"value":str(tx["args"]["amount1"] / 1e18),"inline":True},
+                    {"name":'Total Reserves 0 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0]))),"inline":True},
+                    {"name":'Total Reserves 1 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1]))),"inline":True},
+                    {"name":'Total Supply :',"value":str(fetchers.getSupply(self.web3,tx["address"])),"inline":True},
+                    {"name": 'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
                     color = colors.dark_red
                     send = True
             elif (self.alert == "unitroller"):
@@ -874,14 +616,9 @@ class HandleEvent(Thread):
                     title = "Comptroller Markets " + re.sub(r"(\w)([A-Z])", r"\1 \2",
                                                             str(tx["event"])) + " event detected"
                     content = '<@&945071604642222110>'
-                    fields = f'''makeFields(
-                        ['Block Number :',
-                        'Address :',
-                        'Transaction :'],
-                        ['{str(tx["blockNumber"])}',
-                        '{str(tx["address"])}',
-                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                        [False,False,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                 color = colors.dark_orange
                 send = True
@@ -891,21 +628,12 @@ class HandleEvent(Thread):
                 if (self.event_name in ["Transfer"] and (((str(tx["args"]["from"]) or str(tx["args"]["sender"])) in watch_addresses) or ((str(tx["args"]["to"] or str(tx["args"]["receiver"]))) in watch_addresses))):
                     title = "Concave DOLA/3CRV activity detected"
                     content = '' # '<@&945071604642222110>'
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Transfer :',
-                    'From :',
-                    'To :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                    '{str(tx["args"]["from"]) or str(tx["args"]["sender"])}',
-                    '{str(tx["args"]["to"]) or str(tx["args"]["receiver"])}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False,False,False])'''
-
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Transfer :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'From :',"value":str(tx["args"]["from"]) or str(tx["args"]["sender"]),"inline":False},
+                    {"name":'To :',"value":str(tx["args"]["to"]) or str(tx["args"]["receiver"]),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
                     color = colors.dark_orange
-
                     send = True
             elif (self.alert == "transfer_temp"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
@@ -913,21 +641,12 @@ class HandleEvent(Thread):
                 if (self.event_name in ["Transfer"] and (((str(tx["args"]["from"]) or str(tx["args"]["sender"])) in watch_addresses) or ((str(tx["args"]["to"] or str(tx["args"]["receiver"]))) in watch_addresses))):
                     title = "Zap Activity detected"
                     content = ''#'<@&945071604642222110>'
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Transfer :',
-                    'From :',
-                    'To :',
-                    'Transaction :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(self.web3,fetchers.getSymbol(tx["address"]))}',
-                    '{str(tx["args"]["from"]) or str(tx["args"]["sender"])}',
-                    '{str(tx["args"]["to"]) or str(tx["args"]["receiver"])}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-                    [False,False,False,False,False])'''
-
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Transfer :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'From :',"value":str(tx["args"]["from"]) or str(tx["args"]["sender"]),"inline":False},
+                    {"name":'To :',"value":str(tx["args"]["to"]) or str(tx["args"]["receiver"]),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
                     color = colors.dark_orange
-
                     send = True
             elif (self.alert == "profits"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
@@ -935,47 +654,27 @@ class HandleEvent(Thread):
 
                 if (self.event_name in ["Transfer"] and (str(tx["args"]["from"]) in feds and str(tx["args"]["to"])=='0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
                     title = "Fed Profit Taking detected"
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Transfer :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'From :',"value":str(tx["args"]["from"]) or str(tx["args"]["sender"]),"inline":False},
+                    {"name":'To :',"value":str(tx["args"]["to"]) or str(tx["args"]["receiver"]),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False},
+                    {"name":'Fed Address :',"value":"https://etherscan.io/address/" + str(tx["args"]["from"]),"inline":False}]
                     content = '<@&945071604642222110>'
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Transfer :',
-                    'From :',
-                    'To :',
-                    'Transaction :'
-                    'Fed Address :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"]))}',
-                    '{str(tx["args"]["from"])}',
-                    '{str(tx["args"]["to"])}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
-                    '{"https://etherscan.io/address/" + str(tx["args"]["from"])}'],
-                    [False,False,False,False,False])'''
-
                     color = colors.dark_orange
-
                     send = True
             elif (self.alert == "debt_repayment"):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 if (self.event_name in ["debtRepayment"]):
                     title = "Debt Repayment detected"
                     content = ''
-                    fields = f'''makeFields(
-                    ['Block Number :',
-                    'Token Repaid :',
-                    'Amount Received :',
-                    'Amount Paid :',
-                    'Received/Paid ratio :',
-                    'Transaction :',
-                    'Debt Repayment Contract :'],
-                    ['{str(tx["blockNumber"])}',
-                    '{str(fetchers.getSymbol(self.web3,tx["args"]["underlying"]))}',
-                    '{str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"])))}',
-                    '{str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"])))}',
-                    '{str(formatPercent(tx["args"]["receiveAmount"]/tx["args"]["paidAmount"]))}',
-                    '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
-                    '{"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0"}'],
-                    [False,True,True,True,True,False,False])'''
-
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["underlying"])),"inline":True},
+                    {"name":'Amount Received :',"value":str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"]))),"inline":True},
+                    {"name":'Amount Paid :',"value":str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"]))),"inline":True},
+                    {"name": 'Received/Paid ratio :',"value":str(formatPercent(tx["args"]["receiveAmount"]/tx["args"]["paidAmount"])),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False},
+                    {"name":'Debt Repayment Contract :',"value":"https://etherscan.io/address/0x9eb6BF2E582279cfC1988d3F2043Ff4DF18fa6A0","inline":False}]
                     color = colors.dark_orange
 
                     send = True
@@ -984,22 +683,13 @@ class HandleEvent(Thread):
                 if (self.event_name in ["Conversion"]):
                     title = "Debt Conversion  detected"
                     content = ''
-                    fields = f'''makeFields(
-                                        ['Block Number :',
-                                        'User :',
-                                        'Token Repaid :',
-                                        'DOLA Amount :',
-                                        'Underlying Amount :',
-                                        'Transaction :',
-                                        'Debt Conversion Contract :'],
-                                        ['{str(tx["blockNumber"])}',
-                                        '{str(tx["args"]["user"])}',
-                                        '{str(fetchers.getSymbol(self.web3,tx["args"]["anToken"]))}',
-                                        '{str(formatCurrency(tx["args"]["dolaAmount"] / 1e18))}',
-                                        '{str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(self.web3,tx["args"]["anToken"])))}',
-                                        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}',
-                                        '{"https://etherscan.io/address/0x1ff9c712B011cBf05B67A6850281b13cA27eCb2A"}'],
-                                        [False,True,True,True,True,False,False])'''
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'User :',"value":str(tx["args"]["user"]),"inline":True},
+                    {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["anToken"])),"inline":True},
+                    {"name": 'DOLA Amount :',"value":str(formatCurrency(tx["args"]["dolaAmount"] / 1e18)),"inline":True},
+                    {"name":'Underlying Amount :',"value":str(formatCurrency(tx["args"]["underlyingAmount"] / fetchers.getDecimals(self.web3,tx["args"]["anToken"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False},
+                    {"name":'Debt Conversion Contract :',"value":"https://etherscan.io/address/0x1ff9c712B011cBf05B67A6850281b13cA27eCb2A","inline":False}]
                     color = colors.dark_orange
                     send = True
 
@@ -1042,12 +732,8 @@ class HandleTx(Thread):
                 title = str('Tx detected on ' + str(self.name))
                 content = ''
                 send = True
-                fields = f'''makeFields(
-                     ['Multisig :',
-                     'Link to transaction :'], 
-                     ['{str(self.tx["address"])}',
-                     '{"https://etherscan.io/tx/" + str(self.tx["transactionHash"])}'], 
-                     [False,False])'''
+                fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
+                {"name":'Link to transaction :',"value":"https://etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
             if (self.alert == 'shortfall'):
                 webhook = os.getenv('WEBHOOK_SHORTFALL')
 
@@ -1055,17 +741,10 @@ class HandleTx(Thread):
                 title = str('Shortfall address  detected on ' + str(self.tx["address"]))
                 content = ''
                 send = True
-                fields = f'''makeFields(
-                     ['Address :',
-                     'Link to transaction :'], 
-                     ['{str(self.tx["address"])}',
-                     '{"https://etherscan.io/tx/" + str(self.tx["transactionHash"])}'], 
-                     [False,False])'''
-
+                fields = [{"name":'Address :',"value":str(self.tx["address"]),"inline":False},
+                {"name":'Link to transaction :',"value":"https://etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":False}]
             if send:
                 sendWebhook(webhook, title, fields, content, image, color)
-
-
         except Exception as e:
             logging.warning('Error in tx handler')
             logging.error(e)
@@ -1110,19 +789,11 @@ class HandleCoingecko(Thread):
                     send = True
 
                 if send:
-                    fields = f'''makeFields(
-                                 ['Alert Level :',
-                                 'Variation :',
-                                 'Old Value :',
-                                 'New Value :',
-                                 'Link to Market :'], 
-                                 ['{str(level)}',
-                                 '{str(formatPercent(self.change))}',
-                                 '{str(formatCurrency(self.old_value))}',
-                                 '{str(formatCurrency(self.value))}',
-                                 '{'https://www.coingecko.com/en/coins/inverse-finance'}'], 
-                                 [True, True,True,True,False])'''
-
+                    fields = [{"name":'Alert Level :',"value":str(level),"inline":False},
+                    {"name":'Variation :',"value":str(formatPercent(self.change)),"inline":True},
+                    {"name":'Old Value :',"value":str(formatCurrency(self.old_value)),"inline":True},
+                    {"name":'New Value :',"value":str(formatCurrency(self.value)),"inline":True},
+                    {"name":'Link to Market :',"value": 'https://www.coingecko.com/en/coins/inverse-finance',"inline":False}]
                     sendWebhook(webhook, title, fields, content, image, color)
 
         except Exception as e:
@@ -1169,18 +840,11 @@ class HandleCoingeckoVolume(Thread):
                     send = True
 
                 if send:
-                    fields = f'''makeFields(
-                                 ['Alert Level :',
-                                 'Variation :',
-                                 'Old Value :',
-                                 'New Value :',
-                                 'Link to Market :'], 
-                                 ['{str(level)}',
-                                 '{str(formatPercent(self.change))}',
-                                 '{str(formatCurrency(self.old_value))}',
-                                 '{str(formatCurrency(self.value))}',
-                                 '{'https://www.coingecko.com/en/coins/inverse-finance'}'], 
-                                 [True, True,True,True,False])'''
+                    fields = [{"name": 'Alert Level :', "value": str(level), "inline": False},
+                              {"name": 'Variation :', "value": str(formatPercent(self.change)), "inline": True},
+                              {"name": 'Old Value :', "value": str(formatCurrency(self.old_value)), "inline": True},
+                              {"name": 'New Value :', "value": str(formatCurrency(self.value)), "inline": True},
+                              {"name": 'Link to Market :',"value": 'https://www.coingecko.com/en/coins/inverse-finance', "inline": False}]
 
                     sendWebhook(webhook, title, fields, content, image, color)
 
