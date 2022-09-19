@@ -13,7 +13,7 @@ def getBalance(web3,address, token_address):
     contract = web3.eth.contract(address=token_name, abi=token_ABI)
 
     balance = contract.functions.balanceOf(address).call()
-    balance = balance / getDecimals(token_address)
+    balance = balance / getDecimals(web3,token_address)
     if (balance == 0): balance = 0
 
     return balance
@@ -42,7 +42,7 @@ def getSupply(web3,address):
     contract = web3.eth.contract(address=address, abi=ABI)
 
     supply = contract.functions.totalSupply().call()
-    supply = supply / getDecimals(address)
+    supply = supply / getDecimals(web3,address)
 
     if (supply == 0): supply = 0
 
@@ -147,8 +147,8 @@ def getSushiTokensName(web3,address):
 def getSushiTokensSymbol(web3,address):
     symbols = []
 
-    symbols.append(getSymbol(getSushiTokens(web3,address)[0]))
-    symbols.append(getSymbol(getSushiTokens(web3,address)[1]))
+    symbols.append(getSymbol(web3,getSushiTokens(web3,address)[0]))
+    symbols.append(getSymbol(web3,getSushiTokens(web3,address)[1]))
 
     return symbols
 
@@ -240,7 +240,7 @@ def getUnderlyingPrice(web3,address):
 
     contract = web3.eth.contract(address=oracle_name, abi=oracle_ABI)
     underlying_decimals = getDecimals(web3,getUnderlying(web3,address))
-    price = contract.functions.getUnderlyingPrice(web3,address).call()
+    price = contract.functions.getUnderlyingPrice(address).call()
     if address == web3.toChecksumAddress('0x17786f3813E6bA35343211bd8Fe18EC4de14F28b'):
         price = price / 1e28
     else:
