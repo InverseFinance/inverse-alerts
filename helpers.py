@@ -58,9 +58,9 @@ def sendError(content):
             result.raise_for_status()
         except requests.exceptions.HTTPError as err:
             logging.error(err)
-            logging.info("Error in sending message to webhook. Waiting 5 seconds to retry... code {}.".format(result.status_code))
+            logging.info("Error in sending message to webhook. Waiting 10 seconds to retry... code {}.".format(result.status_code))
             # time sleep is used to avoid throttling the error webhook w/ too many attempts
-            time.sleep(5)
+            time.sleep(10)
             error = True
         else:
             error = False
