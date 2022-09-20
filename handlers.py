@@ -480,6 +480,68 @@ class HandleEvent(Thread):
 
                     color = colors.blurple
                     send = True
+            elif (self.alert in ["lending127"]):
+
+                if (self.event_name == "Borrow"):
+                    webhook = os.getenv('WEBHOOK_127')
+                    title = "Lending Market : New Borrow event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Borrower :',"value":str(tx["args"]["borrower"]),"inline":True},
+                    {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'USD Value :',"value":str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])) * fetchers.getUnderlyingPriceFuse(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Borrow Amount :',"value":str(formatCurrency(tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Account Borrows :',"value":str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Borrows :',"value":str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Supply :',"value":str(formatCurrency(fetchers.getSupply(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
+
+                    if ((tx["args"]["borrowAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])) * fetchers.getUnderlyingPriceFuse(self.web3,tx["address"]))>100000):
+                        content = '<@&945071604642222110>'
+
+                    color = colors.blurple
+                    send = True
+                elif (self.event_name == "RepayBorrow"):
+                    webhook = os.getenv('WEBHOOK_BORROW')
+                    title = "Lending Market : New Repayment event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Borrower :',"value":str(tx["args"]["borrower"]),"inline":True},
+                    {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":'USD Value :',"value":str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])) * fetchers.getUnderlyingPriceFuse(self.web3,tx["address"]))),"inline":True},
+                    {"name": 'Borrow Amount :',"value":str(formatCurrency(tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Account Borrows :',"value":str(formatCurrency(tx["args"]["accountBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Borrows :',"value":str(formatCurrency(tx["args"]["totalBorrows"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Total Supply :',"value":str(formatCurrency(fetchers.getSupply(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
+                    if ((tx["args"]["repayAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])) * fetchers.getUnderlyingPriceFuse(self.web3,tx["address"]))>100000):
+                        content = '<@&945071604642222110>'
+
+                    color = colors.blurple
+                    send = True
+                elif (self.event_name == "LiquidateBorrow"):
+                    title = "Lending Market New Liquidation event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
+                    webhook = os.getenv('WEBHOOK_LIQUIDATIONS')
+                    fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
+                    {"name":'Liquidator :',"value":str(tx["args"]["liquidator"]),"inline":False},
+                    {"name":'Borrower :',"value":str(tx["args"]["borrower"]),"inline":False},
+                    {"name":'Market Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":'Seized Amount :',"value":str(formatCurrency(tx["args"]["seizeTokens"]/ fetchers.getDecimals(self.web3,tx["args"]["cTokenCollateral"]))),"inline":True},
+                    {"name":'Seized Token  :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["cTokenCollateral"])),"inline":True},
+                    {"name":'Repay Amount :',"value":str(formatCurrency(tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":False},
+                    {"name":'Repay Amount USD:',"value":str(formatCurrency(tx["args"]["repayAmount"]* fetchers.getUnderlyingPriceFuse(self.web3,tx["address"])/ fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))),"inline":True},
+                    {"name":'Repay Token  :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
+                    if ((tx["args"]["repayAmount"]/ fetchers.getDecimals(self.web3,fetchers.getUnderlyingFuse(self.web3,tx["address"])))>100000):
+                        content = '<@&945071604642222110>'
+
+                    color = colors.blurple
+                    send = True
             elif (self.alert == "governance"):
                 content = "<@&899302193608409178>"
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
