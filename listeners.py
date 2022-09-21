@@ -21,13 +21,13 @@ class TxListener(Thread):
         self.contract = contract
         self.name = name
         self.tx_filter = []
-
+        self.block0 = self.web3.eth.get_block_number()
+        self.block1 = self.block0
     def run(self):
-        block0 = self.web3.eth.get_block_number()
         while True:
             try:
-                block1 = block0
-                self.tx_filter = self.web3.eth.filter({"fromBlock": block0, "address": self.contract})
+                self.block1 = self.block0
+                self.tx_filter = self.web3.eth.filter({"fromBlock": self.block0, "address": self.contract})
                 block0 = self.web3.eth.get_block_number()
                 for tx in self.tx_filter.get_all_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
@@ -38,7 +38,7 @@ class TxListener(Thread):
             except Exception as e:
                 logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
                 logging.error(e)
-                block0 = block1
+                self.block0 = self.block1
                 sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
                 sendError(e)
                 time.sleep(random.uniform(5,11))
@@ -54,14 +54,15 @@ class EventListener(Thread):
         self.contract = contract
         self.event_name = event_name
         self.event_filter = []
+        self.block0 = self.web3.eth.get_block_number()
+        self.block1 = self.block0
 
     def run(self):
-        block0 = self.web3.eth.get_block_number()
         while True:
             try:
-                block1 = block0
-                self.event_filter = eval(f'self.contract.events.{self.event_name}.createFilter(fromBlock={block0})')
-                block0 = self.web3.eth.get_block_number()
+                self.block1 = self.block0
+                self.event_filter = eval(f'self.contract.events.{self.event_name}.createFilter(fromBlock={self.block0})')
+                self.block0 = self.web3.eth.get_block_number()
                 #logging.warning(self.event_filter)
                 for event in self.event_filter.get_all_entries():
                     logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
@@ -72,7 +73,7 @@ class EventListener(Thread):
                 logging.error(e)
                 sendError(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 sendError(e)
-                block0 = block1
+                self.block0 = self.block1
                 time.sleep(random.uniform(5,11))
                 continue
 

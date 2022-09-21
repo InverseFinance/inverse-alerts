@@ -846,7 +846,8 @@ class HandleTx(Thread):
                 
                 send = True
                 fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
-                {"name":'Link to transaction :',"value":"https://etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
+                {"name":'Link to transaction :',"value":"https://etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True},
+                {"name":'Transaction :',"value":json.dumps(self.tx),"inline":False}]
             if (self.alert == 'multisig' and self.web3.eth.chainId==10):
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
@@ -855,7 +856,8 @@ class HandleTx(Thread):
 
                 send = True
                 fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
-                {"name":'Link to transaction :',"value":"https://optimistic.etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
+                {"name":'Link to transaction :',"value":"https://optimistic.etherscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True},
+                {"name":'Transaction :',"value":json.dumps(self.tx),"inline":False}]
             if (self.alert == 'multisig' and self.web3.eth.chainId==250):
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
@@ -864,7 +866,8 @@ class HandleTx(Thread):
 
                 send = True
                 fields = [{"name":'Multisig :',"value":str(self.tx["address"]),"inline":True},
-                {"name":'Link to transaction :',"value":"https://ftmscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True}]
+                {"name":'Link to transaction :',"value":"https://ftmscan.io/tx/" + str(self.tx["transactionHash"]),"inline":True},
+                {"name":'Transaction :',"value":json.dumps(self.tx),"inline":False}]
             if (self.alert == 'shortfall'):
                 webhook = os.getenv('WEBHOOK_SHORTFALL')
 
