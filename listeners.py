@@ -21,26 +21,27 @@ class TxListener(Thread):
         self.contract = contract
         self.name = name
         self.tx_filter = []
-        patch_http_connection_pool(maxsize=1000)
 
     def run(self):
+        block0 = self.web3.eth.get_block_number()
         while True:
-            block0 = self.web3.eth.get_block_number()
             try:
-                self.tx_filter = eval(f'''self.web3.eth.filter({{"fromBlock":{block0},"address":'{self.contract}'}})''')
+                block1 = block0
+                self.tx_filter = self.web3.eth.filter({"fromBlock": block0, "address": self.contract})
                 block0 = self.web3.eth.get_block_number()
                 for tx in self.tx_filter.get_all_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
                     logging.info(json.dumps(tx))
                     HandleTx(self.web3,tx, self.alert, self.contract,self.name).start()
-                time.sleep(random.randint(35,45))
+                time.sleep(random.uniform(30,60))
 
             except Exception as e:
                 logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
                 logging.error(e)
+                block0 = block1
                 sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
                 sendError(e)
-                time.sleep(random.randint(5,11))
+                time.sleep(random.uniform(5,11))
                 continue
 
 
@@ -53,25 +54,26 @@ class EventListener(Thread):
         self.contract = contract
         self.event_name = event_name
         self.event_filter = []
-        patch_http_connection_pool(maxsize=1000)
 
     def run(self):
+        block0 = self.web3.eth.get_block_number()
         while True:
-            block0 = self.web3.eth.get_block_number()
             try:
+                block1 = block0
                 self.event_filter = eval(f'self.contract.events.{self.event_name}.createFilter(fromBlock={block0})')
                 block0 = self.web3.eth.get_block_number()
                 #logging.warning(self.event_filter)
                 for event in self.event_filter.get_all_entries():
                     logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                    HandleEvent(self.web3,event, self.alert, self.event_name).start()
-                time.sleep(random.randint(55,65))
+                    HandleEvent(self.web3, event, self.alert, self.event_name).start()
+                time.sleep(random.uniform(30,60))
             except Exception as e:
                 logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 logging.error(e)
                 sendError(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 sendError(e)
-                time.sleep(random.randint(5,11))
+                block0 = block1
+                time.sleep(random.uniform(5,11))
                 continue
 
 
@@ -109,13 +111,13 @@ class StateChangeListener(Thread):
                         logging.info(formatPercent(self.change))
                         HandleStateVariation(self.web3,self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
                     self.old_value = self.value
-                time.sleep(random.randint(60,70))
+                time.sleep(random.uniform(30,60))
             except Exception as e:
                 logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
                 logging.error(str(e))
                 sendError(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
                 sendError(e)
-                time.sleep(random.randint(5,11))
+                time.sleep(random.uniform(5,11))
                 continue
 
 # Define a Thread to listen separately to price/volume variation
@@ -141,7 +143,7 @@ class CoinGeckoListener(Thread):
                 logging.error(str(e))
                 sendError(f'Error in CoinGecko Price Listener : {self.id}')
                 sendError(e)
-                time.sleep(random.randint(5,11))
+                time.sleep(random.uniform(5,11))
                 continue
 
 # Define a Thread to listen separately to price variation
@@ -174,7 +176,7 @@ class CoinGeckoVolumeListener(Thread):
                 logging.error(str(e))
                 sendError(f'Error in CoinGecko Volume Listener : {self.id}')
                 sendError(e)
-                time.sleep(random.randint(5,11))
+                time.sleep(random.uniform(5,11))
                 continue
             
 
