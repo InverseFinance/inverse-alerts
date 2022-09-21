@@ -1,6 +1,9 @@
 import json
 import os
 from ens import ENS
+import os
+from dotenv import load_dotenv
+#from web3 import Web3
 
 
 # Common used functions
@@ -34,7 +37,7 @@ def getDecimals(web3,address):
     return decimals
 
 
-def getSupply(web3,address):
+def getSupply(web3, address):
     #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
     address = web3.toChecksumAddress(address)
     ABI = json.loads(

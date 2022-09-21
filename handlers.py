@@ -173,7 +173,7 @@ class HandleEvent(Thread):
             fields = []
             image = ''
             color = colors.blurple
-            
+
             webhook = ''
 
             if (self.alert == "dola3crv"):
@@ -617,7 +617,7 @@ class HandleEvent(Thread):
             elif (self.alert == "fed"):
                 webhook = os.getenv('WEBHOOK_FED')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/22517/1128427/3084f915-b906-4fdf-ac8c-ad5c0ce57e2b.jpg"
-                
+
                 if (self.event_name in ["Expansion"]):
                     title = "Fed " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"])) + " event detected"
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
@@ -687,13 +687,13 @@ class HandleEvent(Thread):
                     {"name":'Token 1 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][1]))),"inline":True},
                     {"name":'Total Supply :',"value":str(fetchers.getSupply(self.web3,tx["address"])),"inline":False},
                     {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-                    
+
 
                     color = colors.dark_green
                     send = True
                 elif (self.event_name in ["Burn"]):
                     title = "Sushi New Liquidity Removal detected"
-                    
+
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":True},
                     {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])) ,"inline":True},
                     {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
@@ -763,9 +763,10 @@ class HandleEvent(Thread):
                     send = True
             elif (self.alert == "debt_repayment"):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
+                image = "https://dune.com/embeds/1291754/2213835/4c5b629f-a6b0-4575-98a1-9d5fae4fab33"
                 if (self.event_name in ["debtRepayment"]):
                     title = "Debt Repayment detected"
-                    
+
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
                     {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["underlying"])),"inline":True},
                     {"name":'Amount Received :',"value":str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"]))),"inline":True},
@@ -778,9 +779,9 @@ class HandleEvent(Thread):
                     send = True
             elif (self.alert == "debt_conversion"):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
+                image = "https://dune.com/embeds/1291809/2213790/9e5c3845-66c0-496f-b42a-49a2fbd20df9"
                 if (self.event_name in ["Conversion"]):
                     title = "Debt Conversion  detected"
-                    
                     fields = [{"name":'Block Number :',"value":str(tx["blockNumber"]),"inline":False},
                     {"name":'User :',"value":str(tx["args"]["user"]),"inline":True},
                     {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["anToken"])),"inline":True},

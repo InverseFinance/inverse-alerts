@@ -8,7 +8,7 @@ import requests
 from datetime import datetime
 from pycoingecko import CoinGeckoAPI
 import pandas as pd
-from helpers import LoggerParams, sendError ,patch_http_connection_pool
+from helpers import LoggerParams, sendError , patch_http_connection_pool
 from dotenv import load_dotenv
 import fetchers
 from web3 import Web3
@@ -26,7 +26,7 @@ sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
 #sheet_calls = pd.read_excel('contracts.xlsx', sheet_name='alerts_calls')
 
 # Coingecko ids to monitor for changes
-ids = ['inverse-finance', 'dola-usd']
+ids = ['inverse-finance', 'dola-usd','lp-3pool-curve']
 
 events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
