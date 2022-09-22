@@ -26,7 +26,10 @@ sheet_tx = pd.read_excel('contracts.xlsx', sheet_name='alerts_tx')
 #sheet_calls = pd.read_excel('contracts.xlsx', sheet_name='alerts_calls')
 
 # Coingecko ids to monitor for changes
-ids = ['inverse-finance', 'dola-usd','lp-3pool-curve']
+ids = ['inverse-finance',
+       'dola-usd',
+       'lp-3pool-curve',
+       'frax']
 
 events_alerts = sheet_events.columns.array
 state_alerts = sheet_state.columns.array
