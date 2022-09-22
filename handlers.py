@@ -176,56 +176,118 @@ class HandleEvent(Thread):
 
             webhook = ''
 
-            if (self.alert == "dola3crv"):
-                webhook = os.getenv('WEBHOOK_DOLA3CRV')
-                image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/833844/1457892/bccc1e5b-4b60-4b28-85da-fbd558a2fd69.jpg"
+
+            if (self.alert == "curve_liquidity"):
+                pool_address = tx["address"]
+
+                if pool_address=="0xAA5A67c256e27A5d80712c51971408db3370927D":
+                    webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                    token_0 = 'DOLA'
+                    token_1 = '3CRV'
+                    token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                    token_1_address = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
+                    token_0_total = fetchers.getBalance(self.web3,pool_address,token_0_address)
+                    token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
+                elif pool_address=="0xE57180685E3348589E9521aa53Af0BCD497E884d":
+                    webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
+                    token_0 = 'DOLA'
+                    token_1 = 'crvFRAX'
+                    token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                    token_1_address = '0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC'
+                    token_0_total = fetchers.getBalance(self.web3,pool_address,token_0_address)
+                    token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
+
+                image = ""
                 if (self.event_name == "RemoveLiquidity"):
-
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
-                    if send:
-                        title = "DOLA3CRV Pool Liquidity Removal event detected"
-                        fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
-                        {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
-                        {"name":'3CRV Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
-                        {"name":'Address :',"value":str(tx["address"]),"inline":False},
-                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
-                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
-                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
-                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+                    title = token_0 + token_1+ " Pool Liquidity Removal event detected"
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name": token_0+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                    {"name":token_1+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
-                elif (self.event_name == "RemoveLiquidityOne"):
-                    if tx["args"]["coin_amount"]/1e18 > 300000:
+                elif (self.event_name == "RemoveLiquidityOne" ):
+                    if tx["args"]["coin_amount"] / 1e18 > 500000:
                         content = '<@&945071604642222110>'
                     color = colors.red
                     send = True
-                    if send:
-                        title = "DOLA3CRV Pool Liquidity Removal event detected"
-                        fields = [{"name": 'Block :',"value": str(tx["blockNumber"]),"inline":True},
-                        {"name": 'Token Amount :',"value": str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":False},
-                        {"name": 'DOLA in Pool :',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
-                        {"name": '3CRV in Pool :',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
-                        {"name": 'DOLA+3CRV in Pool',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
-                        {"name":'Transaction :',"value": "https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-
+                    title = token_0+token_1+" Pool Liquidity Removal event detected"
+                    fields = [
+                    {"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Token Amount :',"value":str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":True},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name": 'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
                 elif (self.event_name == "AddLiquidity"):
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1])/1e18 > 300000:
+                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
                         content = '<@&945071604642222110>'
+
+                    title = token_0+token_1+" Pool Liquidity Add event detected"
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":token_0+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
+                    {"name":token_1+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":True},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                     color = colors.dark_green
                     send = True
-                    if send:
-                        title = "DOLA3CRV Pool Liquidity Add event detected"
-                        fields = [{"name":'Block :',"value": str(tx["blockNumber"]),"inline":True},
-                        {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
-                        {"name":'3CRV Amount :',"value": str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
-                        {"name":'Address :',"value": str(tx["address"]),"inline":False},
-                        {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
-                        {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
-                        {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
-                        {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+            elif (self.alert == "gauge_liquidity"):
+                if tx["address"]=="0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a":
+                    webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                    pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
+                    token_0 = 'DOLA'
+                    token_1 = '3CRV'
+                    token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                    token_1_address = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
+                    token_0_total = fetchers.getBalance(self.web3,pool_address,token_0_address)
+                    token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
+                elif tx["address"]=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
+                    webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
+                    pool_address = "0xE57180685E3348589E9521aa53Af0BCD497E884d"
+                    token_0 = 'DOLA'
+                    token_1 = 'crvFRAX'
+                    token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                    token_1_address = '0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC'
+                    token_0_total = fetchers.getBalance(self.web3,pool_address,token_0_address)
+                    token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
+                image = ""
+                if (self.event_name == "Withdraw"):
+                    title = "New Gauge Withdrawal Detected"
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Provider :',"value": str(tx["args"]["provider"]),"inline":False},
+                    {"name":'Amount :',"value": str(formatCurrency(tx["args"]["value"]/1e18)),"inline":False},
+                    {"name": 'Address :', "value": str(tx["address"]), "inline": True},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
+                    color = colors.red
+                    send = True
+                if (self.event_name == "Deposit"):
+                    title = "New Gauge Deposit Detected"
+                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
+                    {"name":'Provider :',"value": str(tx["args"]["provider"]),"inline":False},
+                    {"name":'Amount :',"value": str(formatCurrency(tx["args"]["value"]/1e18)),"inline":False},
+                    {"name":'Address :',"value":str(tx["address"]),"inline":False},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
+
+                    color = colors.dark_green
+                    send = True
 
             elif (self.alert == "dola3crv_zap"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
@@ -278,110 +340,60 @@ class HandleEvent(Thread):
                         {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
                         {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
-            elif (self.alert == "dolafraxbp_pool"):
-                webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
+            elif (self.alert == "gauge_controller"):
+                if tx["args"]["gauge_addr"]=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
+                    webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
+                    pool_address="0xE57180685E3348589E9521aa53Af0BCD497E884d"
+                    token_0 = 'DOLA'
+                    token_1 = 'crvFRAX'
+                    token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                    token_1_address = '0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC'
+                    token_0_total = fetchers.getBalance(self.web3,pool_address,token_0_address)
+                    token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
+
+                elif tx["args"]["gauge_addr"]=="0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a":
+                    webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                    pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
+                    token_0 = 'DOLA'
+                    token_1 = '3CRV'
+                    token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                    token_1_address = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
+                    token_0_total = fetchers.getBalance(self.web3,pool_address,token_0_address)
+                    token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
+
                 image = ""
-                if (self.event_name == "RemoveLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
-                    if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
-                        content = '<@&945071604642222110>'
-                    color = colors.red
-                    send = True
-                    title = "DOLAFRAX Pool Liquidity Removal event detected"
-                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
-                    {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
-                    {"name":'FRAX Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
-                    {"name":'Address :',"value":str(tx["address"]),"inline":False},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
-                    {"name":'FRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
-                    {"name":'DOLA+FRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
-                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
-                elif (self.event_name == "RemoveLiquidityOne" and tx["args"]["coin_amount"] / 1e18 > 50000):
-                    if tx["args"]["coin_amount"] / 1e18 > 500000:
-                        content = '<@&945071604642222110>'
-                    color = colors.red
-                    send = True
-                    title = "DOLAFRAX Pool Liquidity Removal event detected"
-                    fields = [
-                    {"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
-                    {"name":'Token Amount :',"value":str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":True},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
-                    {"name":'FRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
-                    {"name":'DOLA+FRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
-                    {"name": 'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-
-                elif (self.event_name == "AddLiquidity" and (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000):
-                    title = "DOLAFRAX Pool Liquidity Add event detected"
-                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
-                    {"name":'DOLA Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
-                    {"name":'FRAX Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
-                    {"name":'Address :',"value":str(tx["address"]),"inline":True},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
-                    {"name":'FRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
-                    {"name":'DOLA+FRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
-                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-
-            elif (self.alert == "dolafraxbp_gauge"):
-                webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
-                image = ""
-                if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
-                    title = "DOLAFRAX New Gauge Weight detected"
-                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
-                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
-                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
-                    {"name":'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":False},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
-                    {"name":'crvFRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
-                    {"name":'DOLA+crvFRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
-                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-
-                    content = '<@&945071604642222110>'
-                    color = colors.red
-                    send = True
-                elif (self.event_name == "VoteForGauge" and tx["args"]["gauge_addr"]=='0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c'):
-                    title = "DOLAFRAX Pool Vote For Gauge detected"
-                    fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
-                    {"name":'User :',"value":str(tx["args"]["user"]),"inline":False},
-                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
-                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0])),"inline":True},
-                    {"name":'crvFRAX in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
-                    {"name":'DOLA+crvFRAX in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":False},
-                    {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
-                    content = '<@&945071604642222110>'
-                    color = colors.red
-                    send = True
-            elif (self.alert == "dola3crv_gauge"):
-                webhook = os.getenv('WEBHOOK_DOLA3CRV')
-                image = ""
-                if (self.event_name == "NewGaugeWeight" and tx["args"]["gauge_addr"]=='0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a'):
-                    title = "DOLA3CRV New Gauge Weight detected"
+                if (self.event_name == "NewGaugeWeight"):
+                    title = token_0+token_1+" New Gauge Weight detected"
                     fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
                     {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
                     {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
                     {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":False},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
-                    {"name":'DOLA3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
-                    {"name":'DOLA+DOLA3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                    {"name": 'Address :', "value": str(tx["address"]), "inline": True},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
                     {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                     content = '<@&945071604642222110>'
-                    color = colors.dark_orange
+                    color = colors.dark_green
                     send = True
-                elif (self.event_name == "VoteForGauge" and tx["args"]["gauge_addr"]=='0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a'):
-                    title = "DOLA3CRV Pool Vote For Gauge detected"
+                elif (self.event_name == "VoteForGauge"):
+                    title = token_0+token_1+" Pool Vote For Gauge detected"
                     fields = [{"name":'Block :',"value":str(tx["blockNumber"]),"inline":True},
                     {"name":'User :',"value":str(tx["args"]["user"]),"inline":False},
                     {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
                     {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
-                    {"name":'DOLA in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
-                    {"name":'3CRV in Pool :',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
-                    {"name":'DOLA+3CRV in Pool',"value":str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
+                    {"name": 'Address :', "value": str(tx["address"]), "inline": True},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
                     {"name":'Transaction :',"value":"https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                     content = '<@&945071604642222110>'
-                    color = colors.dark_orange
+                    color = colors.dark_green
                     send = True
+
             elif (self.alert in ["lending1", "lending2"]):
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
@@ -578,6 +590,7 @@ class HandleEvent(Thread):
 
                     color = colors.blurple
                     send = True
+
             elif (self.alert == "governance"):
                 content = "<@&899302193608409178>"
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
@@ -720,6 +733,7 @@ class HandleEvent(Thread):
 
                 color = colors.dark_orange
                 send = True
+
             elif (self.alert == "transfer"):
                 webhook = os.getenv('WEBHOOK_CONCAVE')
                 watch_addresses =["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
@@ -761,6 +775,7 @@ class HandleEvent(Thread):
                     content = '<@&945071604642222110>'
                     color = colors.dark_orange
                     send = True
+
             elif (self.alert == "debt_repayment"):
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 image = "https://dune.com/embeds/1291754/2213835/4c5b629f-a6b0-4575-98a1-9d5fae4fab33"
