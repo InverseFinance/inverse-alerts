@@ -14,13 +14,14 @@ from helpers import sendError, formatPercent, patch_http_connection_pool
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
-    def __init__(self, web3, alert, contract,name, **kwargs):
+    def __init__(self, web3, alert, contract, name, frequency, **kwargs):
         super(TxListener, self).__init__(**kwargs)
         self.web3 = web3
         self.alert = alert
         self.contract = contract
         self.name = name
         self.tx_filter = []
+        self.frequency = frequency
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
     def run(self):
@@ -33,7 +34,7 @@ class TxListener(Thread):
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
                     logging.info(json.dumps(tx))
                     HandleTx(self.web3,tx, self.alert, self.contract,self.name).start()
-                time.sleep(random.uniform(30,60))
+                time.sleep(self.frequency)
 
             except Exception as e:
                 logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
@@ -47,13 +48,14 @@ class TxListener(Thread):
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class EventListener(Thread):
-    def __init__(self, web3, alert, contract, event_name, **kwargs):
+    def __init__(self, web3, alert, contract, event_name, frequency, **kwargs):
         super(EventListener, self).__init__(**kwargs)
         self.web3 = web3
         self.alert = alert
         self.contract = contract
         self.event_name = event_name
         self.event_filter = []
+        self.frequency = frequency
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
 
@@ -67,7 +69,7 @@ class EventListener(Thread):
                 for event in self.event_filter.get_all_entries():
                     logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                     HandleEvent(self.web3, event, self.alert, self.event_name).start()
-                time.sleep(random.uniform(30,60))
+                time.sleep(self.frequency)
             except Exception as e:
                 logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 logging.error(e)
@@ -80,13 +82,14 @@ class EventListener(Thread):
 
 # Define a Thread to listen separately on each state change
 class StateChangeListener(Thread):
-    def __init__(self, web3, alert, contract, state_function, argument, **kwargs):
+    def __init__(self, web3, alert, contract, state_function, argument, frequency, **kwargs):
         super(StateChangeListener, self).__init__(**kwargs)
         self.web3 = web3
         self.alert = alert
         self.contract = contract
         self.state_function = state_function
         self.argument = argument
+        self.frequency = frequency
         patch_http_connection_pool(maxsize=1000)
         # If condition to take into account state function with no input params
         if self.argument is None:
@@ -112,7 +115,7 @@ class StateChangeListener(Thread):
                         logging.info(formatPercent(self.change))
                         HandleStateVariation(self.web3,self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
                     self.old_value = self.value
-                time.sleep(random.uniform(30,60))
+                time.sleep(self.frequency)
             except Exception as e:
                 logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
                 logging.error(str(e))

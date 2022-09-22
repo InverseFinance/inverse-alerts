@@ -47,12 +47,17 @@ try:
         # Construct all contracts objects and put them in filter array
         filters = {"id": []}
         for i in range(0, len(alert_contracts['contract_address'])):
+
             if alert_contracts.iloc[i]['chain_id']==1:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
+                frequency = random.uniform(30,60)
             elif alert_contracts.iloc[i]['chain_id']==10:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_OPT')))
+                frequency = random.uniform(10,20)
             elif alert_contracts.iloc[i]['chain_id']==250:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_FTM')))
+                frequency = random.uniform(30,60)
+
             contract_address = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
             contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
             contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -63,7 +68,7 @@ try:
             # Third loop to cover all events, in contract, in alert tag
             for event_name in events:
                 # Initiate Thread per alert/contract/event listened
-                EventListener(web3, alert, contract, event_name).start()
+                EventListener(web3, alert, contract, event_name,frequency).start()
                 n_alert += 1
 
                 # Log alert-contract-event
@@ -82,12 +87,14 @@ try:
         # Define a set of filters containing the contract we are going to call (in oracle case only one)
         filters = {"id": []}
         for i in range(0, len(alert_contracts['contract_address'])):
+
             if alert_contracts.iloc[i]['chain_id']==1:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
             elif alert_contracts.iloc[i]['chain_id']==10:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_OPT')))
             elif alert_contracts.iloc[i]['chain_id']==250:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_FTM')))
+
             contract_address = web3.toChecksumAddress(alert_contracts.iloc[i]['contract_address'])
             contract_abi = json.loads(str(alert_contracts.iloc[i]['ABI']))
             contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -105,10 +112,17 @@ try:
                 elif alert == 'cash':
                     state_arguments = None
 
+                if alert_contracts.iloc[i]['chain_id'] == 1:
+                    frequency = random.uniform(30, 60)
+                elif alert_contracts.iloc[i]['chain_id'] == 10:
+                    frequency = random.uniform(10, 20)
+                elif alert_contracts.iloc[i]['chain_id'] == 250:
+                    frequency = random.uniform(30, 60)
+
                 if state_arguments is not None:
                     # Initiate Thread per alert/contract/state function listened
                     for argument in state_arguments:
-                        StateChangeListener(web3, alert, contract, state_function, argument).start()
+                        StateChangeListener(web3, alert, contract, state_function, argument, frequency).start()
                         n_alert += 1
 
                         # Log alert-contract-event
@@ -116,7 +130,7 @@ try:
                             str(datetime.now()) + ' ' + alert + '-' + contract.address + '-' + state_function + '-' + str(
                                 n_alert) + ' started listening at state function ' + state_function + ' on contract ' + contract.address)
                 else:
-                    StateChangeListener(web3, alert, contract, state_function, None).start()
+                    StateChangeListener(web3, alert, contract, state_function, None,frequency).start()
                     n_alert += 1
 
                     # Log alert-contract-event
@@ -135,13 +149,16 @@ try:
         for i in range(0, len(addresses['name'])):
             if addresses.iloc[i]['chain_id']==1:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
+                frequency = random.uniform(30,60)
             elif addresses.iloc[i]['chain_id']==10:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_OPT')))
+                frequency = random.uniform(10,20)
             elif addresses.iloc[i]['chain_id']==250:
                 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_FTM')))
+                frequency = random.uniform(30,60)
             contract_name = addresses.iloc[i]['name']
             contract_address = web3.toChecksumAddress(addresses.iloc[i]['contract_address'])
-            TxListener(web3, alert, contract_address,contract_name).start()
+            TxListener(web3, alert, contract_address,contract_name,frequency).start()
             n_alert += 1
 
             # Log alerts-contract

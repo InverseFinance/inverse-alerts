@@ -207,7 +207,7 @@ class HandleEvent(Thread):
                         {"name": 'Token Amount :',"value": str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":False},
                         {"name": 'DOLA in Pool :',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0])),"inline":True},
                         {"name": '3CRV in Pool :',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":False},
-                        {"name": 'DOLA+3CRV in Pool',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xE57180685E3348589E9521aa53Af0BCD497E884d')[1])),"inline":True},
+                        {"name": 'DOLA+3CRV in Pool',"value": str(formatCurrency(fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[0] + fetchers.getCurveBalances(self.web3,'0xaa5a67c256e27a5d80712c51971408db3370927d')[1])),"inline":True},
                         {"name":'Transaction :',"value": "https://etherscan.io/tx/" + str(tx["transactionHash"]),"inline":False}]
 
                 elif (self.event_name == "AddLiquidity"):

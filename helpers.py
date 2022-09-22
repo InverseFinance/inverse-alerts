@@ -51,7 +51,7 @@ def sendError(content):
     i = 0
     while error and i<5 :
         try:
-            i =+ 1
+            i = i+ 1
             for a, b in replacers.items():
                 content = str(content).replace(a,b)
             data = {"content": content}
