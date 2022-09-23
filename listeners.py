@@ -9,6 +9,7 @@ import sys
 import requests
 from dotenv import load_dotenv
 from web3 import Web3
+from web3._utils.events import construct_event_topic_set
 from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
 from helpers import sendError, formatPercent, patch_http_connection_pool
 
@@ -32,7 +33,6 @@ class TxListener(Thread):
                 self. block0 = self.web3.eth.get_block_number()
                 for tx in self.tx_filter.get_all_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
-                    logging.info(json.dumps(tx))
                     HandleTx(self.web3,tx, self.alert, self.contract,self.name).start()
                 time.sleep(self.frequency)
 
@@ -54,7 +54,9 @@ class EventListener(Thread):
         self.alert = alert
         self.contract = contract
         self.event_name = event_name
-        self.event_filter = []
+        self.topics = list()
+        self.logs = list()
+        self.events = tuple()
         self.frequency = frequency
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
@@ -63,13 +65,18 @@ class EventListener(Thread):
         while True:
             try:
                 self.block1 = self.block0
-                self.event_filter = eval(f'self.contract.events.{self.event_name}.createFilter(fromBlock={self.block0})')
+                self.topics = eval(f'construct_event_topic_set(self.contract.events.{self.event_name}().abi, self.web3.codec, {{}})')
+                self.logs = self.web3.eth.get_logs({"address": self.contract.address, "topics": self.topics, "fromBlock": self.block0})
                 self.block0 = self.web3.eth.get_block_number()
-                #logging.warning(self.event_filter)
-                for event in self.event_filter.get_all_entries():
-                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                    HandleEvent(self.web3, event, self.alert, self.event_name).start()
+
+                if self.logs != []:
+                    self.events = eval(f'self.contract.events.{self.event_name}().processReceipt({{"logs": self.logs}})')
+                    for event in self.events:
+                        logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
+                        HandleEvent(self.web3, event, self.alert, self.event_name).start()
+
                 time.sleep(self.frequency)
+
             except Exception as e:
                 logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 logging.error(e)
@@ -182,7 +189,3 @@ class CoinGeckoVolumeListener(Thread):
                 sendError(e)
                 time.sleep(random.uniform(5,11))
                 continue
-            
-
-
-
