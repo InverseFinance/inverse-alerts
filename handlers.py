@@ -1,18 +1,12 @@
 # import the following dependencies
-import os
-import json
-import re
-import fetchers
+import os,json,re,fetchers,logging,requests,sys
+import pandas as pd
+from helpers import colors, sendError, sendWebhook, formatPercent, formatCurrency
 from threading import Thread
 from web3 import Web3
 from web3._utils.events import construct_event_topic_set
 from datetime import datetime
-import logging
-from helpers import colors, sendError, sendWebhook, formatPercent, formatCurrency
 from dotenv import load_dotenv
-import requests
-import pandas as pd
-import sys
 
 # Define state change to handle and logs to the console/send to discord
 class HandleStateVariation(Thread):
@@ -668,7 +662,11 @@ class HandleEvent(Thread):
                     send = True
             elif (self.alert == "profits"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
-                feds =["0xcc180262347F84544c3a4854b87C34117ACADf94","0x7765996dAe0Cf3eCb0E74c016fcdFf3F055A5Ad8","0x5Fa92501106d7E4e8b4eF3c4d08112b6f306194C"]
+
+                feds =["0xcc180262347F84544c3a4854b87C34117ACADf94",
+                       "0x7765996dAe0Cf3eCb0E74c016fcdFf3F055A5Ad8",
+                       "0x5Fa92501106d7E4e8b4eF3c4d08112b6f306194C"]
+
                 if tx["args"]["from"] is not None:
                     from_address = tx["args"]["from"]
                     to_address = tx["args"]["to"]

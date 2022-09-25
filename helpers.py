@@ -67,19 +67,17 @@ def sendError(content):
         else:
             error = False
 
-
 # Format to 0,000.00
 def formatCurrency(value):
     value = "{:,.2f}".format(value)
     return value
-
 
 # Format to 00.00 %
 def formatPercent(value):
     value = "{:.2%}".format(value)
     return value
 
-
+# Logger settings
 def LoggerParams():
     """
     Configure our logger to write in debug.log
@@ -96,25 +94,7 @@ def LoggerParams():
     # Mute warning when pool is full :: overriden by poolsize parameter
     logging.getLogger("urllib3").setLevel(logging.ERROR)
 
-
-def patch_http_connection_pool(**constructor_kwargs):
-    """
-    This allows to override the default parameters of the
-    HTTPConnectionPool constructor.
-    For example, to increase the poolsize to fix problems
-    with "HttpSConnectionPool is full, discarding connection"
-    call this function with maxsize=16 (or whatever size
-    you want to give to the connection pool)
-    """
-    from urllib3 import connectionpool, poolmanager
-
-    class MyHTTPConnectionPool(connectionpool.HTTPConnectionPool):
-        def __init__(self, *args,**kwargs):
-            kwargs.update(constructor_kwargs)
-            super(MyHTTPConnectionPool, self).__init__(*args,**kwargs)
-    poolmanager.pool_classes_by_scheme['http'] = MyHTTPConnectionPool
-
-
+# Define easiy colors for discord
 class colors:
     """
     This color class allows to pass readable arguments to theDiscord Embed

@@ -1,19 +1,13 @@
 # import the following dependencies
-import json
-import random
-import os
-import logging
-import sys
-import requests
+import json, random, os, logging, sys, requests,fetchers
+import pandas as pd
 from datetime import datetime
 from pycoingecko import CoinGeckoAPI
-import pandas as pd
-from helpers import LoggerParams, sendError , patch_http_connection_pool
+from helpers import LoggerParams, sendError
 from dotenv import load_dotenv
-import fetchers
 from web3 import Web3
 from listeners import EventListener, StateChangeListener, TxListener,CoinGeckoListener,CoinGeckoVolumeListener
-patch_http_connection_pool(maxsize=1000)
+
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()

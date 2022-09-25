@@ -1,17 +1,12 @@
-import time
-import logging
-import random
+import time,logging,random,json,sys,requests
 from threading import Thread
 from pycoingecko import CoinGeckoAPI
 from datetime import datetime
-import json
-import sys
-import requests
 from dotenv import load_dotenv
 from web3 import Web3
 from web3._utils.events import construct_event_topic_set
 from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
-from helpers import sendError, formatPercent, patch_http_connection_pool
+from helpers import sendError, formatPercent
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
@@ -44,7 +39,6 @@ class TxListener(Thread):
                 sendError(e)
                 time.sleep(random.uniform(5,11))
                 continue
-
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class EventListener(Thread):
@@ -86,7 +80,6 @@ class EventListener(Thread):
                 time.sleep(random.uniform(5,11))
                 continue
 
-
 # Define a Thread to listen separately on each state change
 class StateChangeListener(Thread):
     def __init__(self, web3, alert, contract, state_function, argument, frequency, **kwargs):
@@ -97,7 +90,6 @@ class StateChangeListener(Thread):
         self.state_function = state_function
         self.argument = argument
         self.frequency = frequency
-        patch_http_connection_pool(maxsize=1000)
         # If condition to take into account state function with no input params
         if self.argument is None:
             self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
