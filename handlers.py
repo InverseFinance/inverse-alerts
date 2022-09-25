@@ -200,6 +200,7 @@ class HandleEvent(Thread):
                     token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1300762/2228671/f10870d8-4e95-474d-a47a-d75b05cd2a99.jpg"
 
+
                 if (self.event_name == "RemoveLiquidity"):
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
                         content = '<@&945071604642222110>'
@@ -207,9 +208,10 @@ class HandleEvent(Thread):
                     send = True
                     title = token_0 + token_1+ " Pool Liquidity Removal event detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
+                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
+                    {"name":'Provider :',"value":str(f'[{tx["args"]["provider"]}](https://etherscan.io/address/{tx["args"]["provider"]})'),"inline":False},
                     {"name": token_0+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
                     {"name":token_1+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
-                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
                     {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
                     {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
                     {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
@@ -223,6 +225,8 @@ class HandleEvent(Thread):
                     title = token_0+token_1+" Pool Liquidity Removal event detected"
                     fields = [
                     {"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
+                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
+                    {"name":'Provider :',"value":str(f'[{tx["args"]["provider"]}](https://etherscan.io/address/{tx["args"]["provider"]})'),"inline":False},
                     {"name":'Token Amount :',"value":str(formatCurrency(tx["args"]["coin_amount"] / 1e18)),"inline":True},
                     {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
                     {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
@@ -234,9 +238,10 @@ class HandleEvent(Thread):
 
                     title = token_0+token_1+" Pool Liquidity Add event detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
+                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
+                    {"name":'Provider :',"value":str(f'[{tx["args"]["provider"]}](https://etherscan.io/address/{tx["args"]["provider"]})'),"inline":False},
                     {"name":token_0+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][0] / 1e18)),"inline":True},
                     {"name":token_1+' Amount :',"value":str(formatCurrency(tx["args"]["token_amounts"][1] / 1e18)),"inline":True},
-                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":True},
                     {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
                     {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
                     {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
@@ -244,6 +249,16 @@ class HandleEvent(Thread):
 
                     color = colors.dark_green
                     send = True
+
+                concave = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10",
+                                   "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
+
+                if tx["args"]["provider"] in concave:
+                    webhook = os.getenv('WEBHOOK_CONCAVE')
+                    title = 'Concave Activity : ' + title
+                    content = '<@&945071604642222110>'
+
+
             elif (self.alert == "gauge_controller"):
                 if tx["args"]["gauge_addr"]=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
                     webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
@@ -632,7 +647,8 @@ class HandleEvent(Thread):
 
             elif (self.alert == "transfer"):
                 webhook = os.getenv('WEBHOOK_CONCAVE')
-                watch_addresses =["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
+                watch_addresses = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10",
+                                   "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
                 try:
                     from_address = tx["args"]["from"]
                     to_address = tx["args"]["to"]
@@ -672,15 +688,30 @@ class HandleEvent(Thread):
                     color = colors.dark_orange
                     send = True
             elif (self.alert == "harvest"):
-                webhook = os.getenv('WEBHOOK_DOLA3CRV')
-
+                pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
+                token_0 = 'DOLA'
+                token_1 = '3CRV'
+                token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
+                token_1_address = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
+                token_0_total = fetchers.getBalance(self.web3, pool_address, token_0_address)
+                token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
                 if (self.event_name in ["Harvested"]):
                     title = "Yearn Harvest detected"
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
-                    {"name":'Tx :',"value": json.dumps(tx) ,"inline":False},
+                    {"name": 'Pool Address :', "value": str(f'[{pool_address}](https://etherscan.io/address/{pool_address})'), "inline": False},
+                    {"name": 'Strategy Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
+                    {"name":'Total Profit :',"value": str(formatCurrency(tx["args"]["profit"]/1e18)) ,"inline":True},
+                    {"name":'Inverse Profit :',"value": str(formatCurrency(tx["args"]["profit"]*0.8/1e18)) ,"inline":True},
+                    {"name":'Yearn Profit :',"value": str(formatCurrency(tx["args"]["profit"]*0.2/1e18)) ,"inline":True},
+                    {"name":'Loss :',"value": str(formatCurrency(tx["args"]["loss"]/1e18)) ,"inline":False},
+                    {"name":'Debt Payment :',"value": str(formatCurrency(tx["args"]["debtPayment"]/1e18)) ,"inline":False},
+                    {"name":'Debt Outstanding :',"value": str(formatCurrency(tx["args"]["debtOutstanding"]/1e18)) ,"inline":False},
+                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
                     content = '<@&945071604642222110>'
-                    color = colors.dark_orange
+                    color = colors.dark_green
                     send = True
 
             elif (self.alert == "debt_repayment"):
