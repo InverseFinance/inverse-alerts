@@ -37,6 +37,7 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
         else:
             logging.info("Embed delivered successfully to webhook "+str(webhook)+" code {}.".format(result.status_code))
             error = False
+            break
 
 def sendError(content):
     """
