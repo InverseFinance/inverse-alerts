@@ -279,10 +279,11 @@ class HandleEvent(Thread):
                     title = token_0+token_1+" New Gauge Weight detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
-                    {"name":'Weight :',"value":str(formatPercent(tx["args"]["weight"]/1000)),"inline":True},
+                    {"name":'% Weight :',"value":str(formatPercent(tx["args"]["weight"]/1000)),"inline":True},
                     {"name":'veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
+                    {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
                     {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":True},
-                    {"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
+                    #{"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
                     #{"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
                     #{"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
                     #{"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
@@ -297,8 +298,9 @@ class HandleEvent(Thread):
                     {"name":'User :',"value":str(f'[{tx["args"]["user"]}](https://etherscan.io/address/{tx["args"]["user"]})'),"inline":False},
                     {"name":'Gauge Address :',"value":str(f'[{tx["args"]["gauge_addr"]}](https://etherscan.io/address/{tx["args"]["gauge_addr"]})'),"inline":False},
                     {"name":'Weight :',"value":str(formatPercent(tx["args"]["weight"]/10000)),"inline":True},
-                    {"name":'veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
-                    {"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
+                    {"name":'% veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
+                    {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
+                    #{"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
                     #{"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
                     #{"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
                     #{"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":True},
@@ -879,7 +881,7 @@ class HandleCoingecko(Thread):
                     {"name":'Variation :',"value":str(formatPercent(self.change)),"inline":True},
                     {"name":'Old Value :',"value":str(formatCurrency(self.old_value)),"inline":True},
                     {"name":'New Value :',"value":str(formatCurrency(self.value)),"inline":True},
-                    {"name":'Link to Market :',"value": 'https://www.coingecko.com/en/coins/inverse-finance',"inline":False}]
+                    {"name":'Link to Market :',"value": 'https://www.coingecko.com/en/coins/'+self.id,"inline":False}]
                     sendWebhook(webhook, title, fields, content, image, color)
 
         except Exception as e:
@@ -930,7 +932,7 @@ class HandleCoingeckoVolume(Thread):
                               {"name": 'Variation :', "value": str(formatPercent(self.change)), "inline": True},
                               {"name": 'Old Value :', "value": str(formatCurrency(self.old_value)), "inline": True},
                               {"name": 'New Value :', "value": str(formatCurrency(self.value)), "inline": True},
-                              {"name": 'Link to Market :',"value": 'https://www.coingecko.com/en/coins/inverse-finance', "inline": False}]
+                              {"name": 'Link to Market :',"value": 'https://www.coingecko.com/en/coins/'+self.id, "inline": False}]
 
                     sendWebhook(webhook, title, fields, content, image, color)
 

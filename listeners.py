@@ -25,7 +25,7 @@ class TxListener(Thread):
             try:
                 self.block1 = self.block0
                 self.tx_filter = self.web3.eth.filter({"fromBlock": self.block0, "address": self.contract})
-                self. block0 = self.web3.eth.get_block_number()
+                self.block0 = self.web3.eth.get_block_number()
                 for tx in self.tx_filter.get_all_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
                     HandleTx(self.web3,tx, self.alert, self.contract,self.name).start()
