@@ -167,8 +167,10 @@ try:
     for id in ids:
         CoinGeckoListener(id).start()
         n_alert +=1
+
         logging.info("Started Coingecko Listener " + str(id))
         CoinGeckoVolumeListener(id).start()
+
         n_alert +=1
         logging.info("Started Coingecko Listener " + str(id))
 

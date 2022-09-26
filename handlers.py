@@ -279,12 +279,13 @@ class HandleEvent(Thread):
                     title = token_0+token_1+" New Gauge Weight detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
-                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
-                    {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":False},
-                    {"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": True},
-                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
-                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
-                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name":'Weight :',"value":str(formatPercent(tx["args"]["weight"]/1000)),"inline":True},
+                    {"name":'veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
+                    {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":True},
+                    {"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
+                    #{"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    #{"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    #{"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
                     content = '<@&945071604642222110>'
@@ -294,12 +295,13 @@ class HandleEvent(Thread):
                     title = token_0+token_1+" Pool Vote For Gauge detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'User :',"value":str(f'[{tx["args"]["user"]}](https://etherscan.io/address/{tx["args"]["user"]})'),"inline":False},
-                    {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
-                    {"name":'Weight :',"value":str(tx["args"]["weight"]),"inline":False},
-                    {"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": True},
-                    {"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
-                    {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
-                    {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
+                    {"name":'Gauge Address :',"value":str(f'[{tx["args"]["gauge_addr"]}](https://etherscan.io/address/{tx["args"]["gauge_addr"]})'),"inline":False},
+                    {"name":'Weight :',"value":str(formatPercent(tx["args"]["weight"]/10000)),"inline":True},
+                    {"name":'veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
+                    {"name": 'Address :', "value": str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'), "inline": False},
+                    #{"name":token_0+' in Pool :',"value":str(formatCurrency(token_0_total)),"inline":True},
+                    #{"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
+                    #{"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
                     content = '<@&945071604642222110>'
@@ -583,19 +585,19 @@ class HandleEvent(Thread):
                         send = True
 
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
+                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":True},
                     {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])),"inline":True},
                     {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
-                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":True},
                     {"name":'Operation :',"value":str(operation),"inline":True},
                     {"name":'USD value :',"value":str(formatCurrency(((tx["args"]["amount0Out"] + tx["args"]["amount0In"]) / fetchers.getDecimals(self.web3,fetchers.getSushiTokens(self.web3,tx["address"])[0])) * fetchers.getUnderlyingPrice(self.web3,'0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b'))),"inline":True},
-                    {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":True}]
+                    {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
                 elif (self.event_name in ["Mint"]):
                     title = "Sushi New Liquidity Add event detected"
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
+                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
                     {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])),"inline":True},
                     {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
-                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
                     {"name":'amountADesired :',"value":str(tx["args"]["amountADesired"] / 1e18),"inline":True},
                     {"name":'amountBDesired :',"value":str(tx["args"]["amountBDesired"] / 1e18),"inline":True},
                     {"name":'amountAMin :',"value":str(tx["args"]["amountAMin"] / 1e18),"inline":False},
@@ -612,9 +614,9 @@ class HandleEvent(Thread):
                     title = "Sushi New Liquidity Removal detected"
 
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
+                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":True},
                     {"name":'Name :',"value":str(fetchers.getName(self.web3,tx["address"])) ,"inline":True},
                     {"name":'Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
-                    {"name":'Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":True},
                     {"name":'Amount 0 :',"value":str(tx["args"]["amount0"] / 1e18),"inline":True},
                     {"name":'Amount 1 :',"value":str(tx["args"]["amount1"] / 1e18),"inline":True},
                     {"name":'Total Reserves 0 :',"value":str(fetchers.getBalance(self.web3,tx["address"], fetchers.getSushiTokens(self.web3,tx["address"][0]))),"inline":True},
@@ -626,7 +628,10 @@ class HandleEvent(Thread):
 
             elif (self.alert == "unitroller"):
                 webhook = os.getenv('WEBHOOK_UNITROLLER')
-                if (self.event_name in ["NewBorrowCap", "NewSupplyCap", "NewCollateralFactor", "NewPriceOracle",
+                if (self.event_name in ["NewBorrowCap",
+                                        "NewSupplyCap",
+                                        "NewCollateralFactor",
+                                        "NewPriceOracle",
                                         "MarketListed",
                                         "MarketUnlisted"]):
                     title = "Comptroller Markets " + re.sub(r"(\w)([A-Z])", r"\1 \2",
