@@ -229,7 +229,7 @@ class HandleEvent(Thread):
                     {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
                     {"name": 'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
-                    if tx["args"]["coin_amount"] / 1e18 > 50000:
+                    if (tx["args"]["coin_amount"] / 1e18) > 50000:
                         send = True
                 elif (self.event_name == "AddLiquidity"):
                     if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 500000:
@@ -313,7 +313,7 @@ class HandleEvent(Thread):
                     #{"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
-                    content = 'hex test'
+                    content = '<@&945071604642222110>'
                     color = colors.dark_green
                     send = True
 
@@ -707,8 +707,16 @@ class HandleEvent(Thread):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
 
                 feds =["0xcc180262347F84544c3a4854b87C34117ACADf94",
+                       "0x7eC0D931AFFBa01b77711C2cD07c76B970795CDd",#stabilizer
+                       "0xC564EE9f21Ed8A2d8E7e76c085740d5e4c5FaFbE",#fantom bridge
                        "0x7765996dAe0Cf3eCb0E74c016fcdFf3F055A5Ad8",
-                       "0x5Fa92501106d7E4e8b4eF3c4d08112b6f306194C"]
+                       "0x5Fa92501106d7E4e8b4eF3c4d08112b6f306194C",
+                       "0xe3277f1102C1ca248aD859407Ca0cBF128DB0664",
+                       "0x5E075E40D01c82B6Bf0B0ecdb4Eb1D6984357EF7",
+                       "0x9060A61994F700632D16D6d2938CA3C7a1D344Cb",
+                       "0xCBF33D02f4990BaBcba1974F1A5A8Aea21080E36",
+                       "0x4d7928e993125A9Cefe7ffa9aB637653654222E2",
+                       "0x57D59a73CDC15fe717D2f1D433290197732659E2"]
 
                 if tx["args"]["from"] is not None:
                     from_address = tx["args"]["from"]
@@ -718,13 +726,12 @@ class HandleEvent(Thread):
                     to_address = tx["args"]["receiver"]
 
                 if (self.event_name in ["Transfer"] and (from_address in feds and to_address=='0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
-                    title = "Fed Profit Taking detected"
+                    title = "Profit Taking detected"
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
-                    {"name":'Transfer :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Profit :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
                     {"name":'From :',"value":str(f'[{from_address}](https://etherscan.io/address/{from_address})'),"inline":False},
                     {"name":'To :',"value":str(f'[{to_address}](https://etherscan.io/address/{to_address})'),"inline":False},
-                    {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False},
-                    {"name":'Fed Address :',"value":str(f'[{from_address}](https://etherscan.io/address/{from_address})'),"inline":False}]
+                    {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
                     content = '<@&945071604642222110>'
                     color = colors.dark_orange
                     send = True
@@ -733,7 +740,7 @@ class HandleEvent(Thread):
                 token_0 = 'DOLA'
                 token_1 = '3CRV'
                 token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
-                token_1_address = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
+                token_1_address = '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490'
                 token_0_total = fetchers.getBalance(self.web3, pool_address, token_0_address)
                 token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
                 if (self.event_name in ["Harvested"]):
