@@ -10,3 +10,7 @@ debug.log
 tests/test.py
 *.xlsx#
 tests/test2.py
+alerts.py
+tests/test_tx_alert.py
+tests/test_event_alert.py
+messages.py
