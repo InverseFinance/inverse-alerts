@@ -7,6 +7,6 @@
 debug.log
 *lock.contracts.xlsx#
 .~lock.contracts.xlsx\#
-test.py
+tests/test.py
 *.xlsx#
-test2.py
+tests/test2.py
