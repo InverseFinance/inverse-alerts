@@ -161,8 +161,7 @@ class HandleEvent(Thread):
         try:
             tx = json.loads(Web3.toJSON(self.event))
 
-            # logs result table and start writing message
-            logging.info(str(datetime.now()) + " " + str(tx))
+
             send = False
             title = ''
             content= ''
@@ -174,6 +173,8 @@ class HandleEvent(Thread):
 
 
             if (self.alert == "curve_liquidity"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
                 pool_address = tx["address"]
 
                 if pool_address=="0xAA5A67c256e27A5d80712c51971408db3370927D":
@@ -260,6 +261,8 @@ class HandleEvent(Thread):
 
 
             elif (self.alert == "gauge_controller"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
                 if str(tx["args"]["gauge_addr"])=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
                     webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                     pool_address="0xE57180685E3348589E9521aa53Af0BCD497E884d"
@@ -318,6 +321,8 @@ class HandleEvent(Thread):
                     send = True
 
             elif (self.alert in ["lending1", "lending2"]):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
@@ -415,7 +420,10 @@ class HandleEvent(Thread):
 
                     color = colors.blurple
                     send = True
+
             elif (self.alert in ["lendingfuse127"]):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_127')
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
@@ -515,6 +523,9 @@ class HandleEvent(Thread):
                     send = True
 
             elif (self.alert == "governance"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
+
                 content = "<@&899302193608409178>"
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
                 if (self.event_name == "ProposalCreated"):
@@ -551,6 +562,9 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             elif (self.alert == "fed"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
+
                 webhook = os.getenv('WEBHOOK_FED')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/22517/1128427/3084f915-b906-4fdf-ac8c-ad5c0ce57e2b.jpg"
 
@@ -575,6 +589,9 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             elif (self.alert == "swap"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
+
                 webhook = os.getenv('WEBHOOK_SWAP')
                 if (self.event_name == "Swap"):
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/838610/1466237/8e64e858-5db5-4692-922d-5f9fe6b7a8c6.jpg"
@@ -633,6 +650,8 @@ class HandleEvent(Thread):
                     send = True
 
             elif (self.alert == "unitroller"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
                 webhook = os.getenv('WEBHOOK_UNITROLLER')
                 if (self.event_name in ["NewBorrowCap",
                                         "NewSupplyCap",
@@ -650,26 +669,37 @@ class HandleEvent(Thread):
                 color = colors.dark_orange
                 send = True
 
-            elif (self.alert == "transfer"):
+            elif (self.alert == "concave"):
+
                 webhook = os.getenv('WEBHOOK_CONCAVE')
                 watch_addresses = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10",
                                    "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
                 try:
                     from_address = tx["args"]["from"]
                     to_address = tx["args"]["to"]
+                    value = tx["args"]["value"]
                 except ValueError:
-                    from_address = tx["args"]["sender"]
-                    to_address = tx["args"]["receiver"]
+                    try:
+                        from_address = tx["args"]["_from"]
+                        to_address = tx["args"]["_to"]
+                        value = tx["args"]["_value"]
+                    except ValueError:
+                        from_address = tx["args"]["src"]
+                        to_address = tx["args"]["dist"]
+                        value = tx["args"]["wad"]
 
                 if self.event_name in ["Transfer"] and (
                         (from_address in watch_addresses) or (to_address in watch_addresses)):
+                    # logs result table and start writing message
+                    logging.info(str(datetime.now()) + " " + str(tx))
+
                     title = "Concave DOLA/3CRV activity detected"
                     # '<@&945071604642222110>'
                     fields = [{"name": 'Block Number :',
                                "value": str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),
                                "inline": False},
                               {"name": 'Transfer :', "value": str(formatCurrency(
-                                  tx["args"]["value"] / fetchers.getDecimals(self.web3, tx["address"]))) + ' ' + str(
+                                  value / fetchers.getDecimals(self.web3, tx["address"]))) + ' ' + str(
                                   fetchers.getSymbol(self.web3, tx["address"])), "inline": False},
                               {"name": 'From :',
                                "value": str(f'[{from_address}](https://etherscan.io/address/{from_address})'),
@@ -692,6 +722,10 @@ class HandleEvent(Thread):
                 ratio = float(value) / float(usdc_balance)
 
                 if ratio > 0.005 and ((from_address in watch_addresses) or (to_address in watch_addresses)):
+
+                    # logs result table and start writing message
+                    logging.info(str(datetime.now()) + " " + str(tx))
+
                     title = "fraxUSDC High activity detected"
                     #content = '<@&945071604642222110>'
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
@@ -718,17 +752,28 @@ class HandleEvent(Thread):
                        "0x4d7928e993125A9Cefe7ffa9aB637653654222E2",
                        "0x57D59a73CDC15fe717D2f1D433290197732659E2"]
 
-                if tx["args"]["from"] is not None:
+                try:
                     from_address = tx["args"]["from"]
                     to_address = tx["args"]["to"]
-                elif tx["args"]["sender"] is not None:
-                    from_address = tx["args"]["sender"]
-                    to_address = tx["args"]["receiver"]
+                    value = tx["args"]["value"]
+                except ValueError:
+                    try:
+                        from_address = tx["args"]["_from"]
+                        to_address = tx["args"]["_to"]
+                        value = tx["args"]["_value"]
+                    except ValueError:
+                        from_address = tx["args"]["src"]
+                        to_address = tx["args"]["dist"]
+                        value = tx["args"]["wad"]
+
 
                 if (self.event_name in ["Transfer"] and (from_address in feds and to_address=='0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
+                    # logs result table and start writing message
+                    logging.info(str(datetime.now()) + " " + str(tx))
+
                     title = "Profit Taking detected"
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
-                    {"name":'Profit :',"value":str(formatCurrency(tx["args"]["value"]/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
+                    {"name":'Profit :',"value":str(formatCurrency(value/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
                     {"name":'From :',"value":str(f'[{from_address}](https://etherscan.io/address/{from_address})'),"inline":False},
                     {"name":'To :',"value":str(f'[{to_address}](https://etherscan.io/address/{to_address})'),"inline":False},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
@@ -736,6 +781,9 @@ class HandleEvent(Thread):
                     color = colors.dark_orange
                     send = True
             elif (self.alert == "harvest"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
+
                 pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
                 token_0 = 'DOLA'
                 token_1 = '3CRV'
@@ -762,6 +810,9 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             elif (self.alert == "debt_repayment"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
+
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1291754/2213835/4c5b629f-a6b0-4575-98a1-9d5fae4fab33"
                 if (self.event_name in ["debtRepayment"]):
@@ -771,13 +822,15 @@ class HandleEvent(Thread):
                     {"name":'Token Repaid :',"value":str(fetchers.getSymbol(self.web3,tx["args"]["underlying"])),"inline":True},
                     {"name":'Amount Received :',"value":str(formatCurrency(tx["args"]["receiveAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"]))),"inline":True},
                     {"name":'Amount Paid :',"value":str(formatCurrency(tx["args"]["paidAmount"]/fetchers.getDecimals(self.web3,tx["args"]["underlying"]))),"inline":True},
-                    {"name": 'Received/Paid ratio :',"value":str(formatPercent(tx["args"]["receiveAmount"]/tx["args"]["paidAmount"])),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False},
                     {"name":'Debt Repayment Contract :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False}]
                     color = colors.dark_orange
 
                     send = True
             elif (self.alert == "debt_conversion"):
+                # logs result table and start writing message
+                logging.info(str(datetime.now()) + " " + str(tx))
+
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1291809/2213790/9e5c3845-66c0-496f-b42a-49a2fbd20df9.jpg"
                 if (self.event_name in ["Conversion"]):
@@ -940,6 +993,7 @@ class HandleCoingeckoVolume(Thread):
         self.id = id
         self.old_value = old_value
         self.change = change
+        self.diff = abs(value - old_value)
 
 
     def run(self):
@@ -969,7 +1023,7 @@ class HandleCoingeckoVolume(Thread):
                     color = colors.orange
                     send = True
 
-                if send:
+                if send and (self.diff > 500000):
                     fields = [{"name": 'Alert Level :', "value": str(level), "inline": False},
                               {"name": 'Variation :', "value": str(formatPercent(self.change)), "inline": True},
                               {"name": 'Old Value :', "value": str(formatCurrency(self.old_value)), "inline": True},
