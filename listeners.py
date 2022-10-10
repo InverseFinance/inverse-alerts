@@ -66,8 +66,7 @@ class EventListener(Thread):
                 if self.logs != []:
                     self.events = eval(f'self.contract.events.{self.event_name}().processReceipt({{"logs": self.logs}})')
                     for event in self.events:
-                        logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                        HandleEvent(self.web3, event, self.alert, self.event_name).start()
+                        HandleEvent(self.web3, event, self.alert,self.contract, self.event_name).start()
 
                 time.sleep(self.frequency)
 
