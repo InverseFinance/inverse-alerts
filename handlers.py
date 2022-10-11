@@ -325,7 +325,7 @@ class HandleEvent(Thread):
                     {"name":'Total Cash :',"value":str(formatCurrency(fetchers.getCash(self.web3,tx["address"]))),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
-                    if ((tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})')) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
+                    if ((tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                         content = '<@&945071604642222110>'
                     color = colors.blurple
                     send = True

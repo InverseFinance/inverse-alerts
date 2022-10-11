@@ -14,10 +14,10 @@ LoggerParams()
 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
-alert = 'governance'
-event_name = 'ProposalCreated'
-tx_hash= '0x0acc8bc3ab3574875a82719885bcbb6880ce5993dbdf681634a13ba733697c74'
-contract_address = web3.toChecksumAddress('0xBeCCB6bb0aa4ab551966A7E4B97cec74bb359Bf6')
+alert = 'lending1'
+event_name = 'Mint'
+tx_hash= '0x171e38f539734a85257e42adc2a0649a176e82d56a8d8fd24e26b0215e51b0ff'
+contract_address = web3.toChecksumAddress('0x1637e4e9941D55703a7A5E7807d6aDA3f7DCD61B')
 
 # Fetch tx_info to get blockHash for log filter
 tx_info = json.loads(Web3.toJSON(web3.eth.get_transaction(tx_hash)))
