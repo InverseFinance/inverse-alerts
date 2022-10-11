@@ -161,17 +161,13 @@ class HandleEvent(Thread):
     def run(self):
         try:
             tx = json.loads(Web3.toJSON(self.event))
-
-
             send = False
             title = ''
             content= ''
             fields = []
             image = ''
             color = colors.blurple
-
             webhook = ''
-
 
             if (self.alert == "curve_liquidity"):
                 # logs result table and start writing message
@@ -260,7 +256,6 @@ class HandleEvent(Thread):
                     webhook = os.getenv('WEBHOOK_CONCAVE')
                     title = 'Concave Activity : ' + title
                     content = '<@&945071604642222110>'
-
             elif (self.alert == "gauge_controller"):
                 # logs result table and start writing message
                 logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
@@ -313,7 +308,6 @@ class HandleEvent(Thread):
                     content = '<@&945071604642222110>'
                     color = colors.dark_green
                     send = True
-
             elif (self.alert in ["lending1", "lending2"]):
                 # logs result table and start writing message
                 logging.info(str(datetime.now()) + " " + str(tx))
@@ -324,7 +318,6 @@ class HandleEvent(Thread):
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'Minter :',"value":str(f'[{tx["args"]["minter"]}](https://etherscan.io/address/{tx["args"]["minter"]})'),"inline":True},
                     {"name":'Market Symbol :',"value":str(fetchers.getSymbol(self.web3,tx["address"])),"inline":True},
-                    {"name":'Market Address :',"value":str(f'[{tx["address"]}](https://etherscan.io/address/{tx["address"]})'),"inline":False},
                     {"name":'USD Value',"value":str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))),"inline":True},
                     {"name":'Mint Amount :',"value":str(formatCurrency(tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])))),"inline":True},
                     {"name":'Mint Tokens :',"value":str(formatCurrency(tx["args"]["mintTokens"] / fetchers.getDecimals(self.web3,tx["address"]))),"inline":True},
@@ -415,7 +408,6 @@ class HandleEvent(Thread):
 
                     color = colors.blurple
                     send = True
-
             elif (self.alert in ["lendingfuse127"]):
                 # logs result table and start writing message
                 logging.info(str(datetime.now()) + " " + str(tx))
@@ -517,23 +509,30 @@ class HandleEvent(Thread):
 
                     color = colors.blurple
                     send = True
-
             elif (self.alert == "governance"):
+
                 # logs result table and start writing message
                 logging.info(str(datetime.now()) + " " + str(tx))
                 logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-
                 content = "<@&899302193608409178>"
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
+
                 if (self.event_name == "ProposalCreated"):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"]))
 
-                    fields = [{"name":'Block Number :', "value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'), "inline": False},
-                    {"name":'Proposal :', "value":"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount(self.web3)), "inline": False},
-                    {"name":'Transaction :', "value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'), "inline": False}]
+                    fields = [{"name":'Block Number :', "value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'), "inline": True},
+                            {"name": 'Start Block :',"value": str(f'[{tx["args"]["startBlock"]}](https://etherscan.io/block/{tx["args"]["startBlock"]})'),"inline": True},
+                            {"name": 'End Block :',"value": str(f'[{tx["args"]["endBlock"]}](https://etherscan.io/block/{tx["args"]["endBlock"]})'),"inline": True},
+                            {"name":'Proposal :', "value":"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount(self.web3)), "inline": False},
+                            {"name":'Proposer :', "value":str(f'[{tx["args"]["proposer"]}](https://etherscan.io/address/{tx["args"]["proposer"]})'), "inline": False},
+                            #{"name":'Targets :', "value":str({tx["args"]["targets"]}), "inline": False},
+                            #{"name":'Values :', "value":str({tx["args"]["values"]}), "inline": False},
+                            {"name":'Description :', "value":str(f'{tx["args"]["description"][0:400]}...'), "inline": False},
+                            {"name":'Transaction :', "value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'), "inline": False}]
 
-                    color = colors.blurple
+                    color = colors.dark_green
                     send = True
+
                 elif (self.event_name in ["ProposalCanceled"]):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event"]))
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
@@ -542,15 +541,16 @@ class HandleEvent(Thread):
 
                     color = colors.dark_red
                     send = True
+
                 elif (self.event_name in ["ProposalQueued"]):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",str(tx["event"]))
                     fields = [{"name": 'Block Number :', "value": str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'), "inline": False},
                               {"name": 'Proposal :',"value": "https://www.inverse.finance/governance/proposals/mills/" + str(tx["args"]["id"]), "inline": False},
                               {"name": 'Transaction :',"value": str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'), "inline": False}]
 
-
                     color = colors.blurple
                     send = True
+
                 elif (self.event_name in ["ProposalExecuted"]):
                     title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2",str(tx["event"]))
                     fields = [{"name": 'Block Number :', "value": str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'), "inline": False},
@@ -558,6 +558,7 @@ class HandleEvent(Thread):
                               {"name": 'Transaction :',"value": str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'), "inline": False}]
                     color = colors.dark_green
                     send = True
+
             elif (self.alert == "fed"):
                 # logs result table and start writing message
                 logging.info(str(datetime.now()) + " " + str(tx))
@@ -647,7 +648,6 @@ class HandleEvent(Thread):
                     {"name": 'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
                     color = colors.dark_red
                     send = True
-
             elif (self.alert == "unitroller"):
                 # logs result table and start writing message
                 logging.info(str(datetime.now()) + " " + str(tx))
@@ -669,25 +669,26 @@ class HandleEvent(Thread):
 
                 color = colors.dark_orange
                 send = True
-
             elif (self.alert == "concave"):
 
                 webhook = os.getenv('WEBHOOK_CONCAVE')
                 watch_addresses = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10",
                                    "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
-                try:
+
+                if tx["args"]["from"] is not None:
                     from_address = tx["args"]["from"]
                     to_address = tx["args"]["to"]
                     value = tx["args"]["value"]
-                except ValueError:
-                    try:
-                        from_address = tx["args"]["_from"]
-                        to_address = tx["args"]["_to"]
-                        value = tx["args"]["_value"]
-                    except ValueError:
-                        from_address = tx["args"]["src"]
-                        to_address = tx["args"]["dist"]
-                        value = tx["args"]["wad"]
+
+                elif tx["args"]["_from"] is not None:
+                    from_address = tx["args"]["_from"]
+                    to_address = tx["args"]["_to"]
+                    value = tx["args"]["_value"]
+
+                elif  tx["args"]["src"] is not None:
+                    from_address = tx["args"]["src"]
+                    to_address = tx["args"]["dst"]
+                    value = tx["args"]["wad"]
 
                 if self.event_name in ["Transfer"] and (
                         (from_address in watch_addresses) or (to_address in watch_addresses)):
@@ -726,11 +727,11 @@ class HandleEvent(Thread):
                 if ratio > 0.005 and ((from_address in watch_addresses) or (to_address in watch_addresses)):
 
                     # logs result table and start writing message
-                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                     logging.info(str(datetime.now()) + " " + str(tx))
+                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
 
                     title = "fraxUSDC High activity detected"
-                    #content = '<@&945071604642222110>'
+                    content = '<@&945071604642222110>'
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'From :',"value":str(f'[{from_address}](https://etherscan.io/address/{from_address})'),"inline":False},
                     {"name":'To :',"value":str(f'[{to_address}](https://etherscan.io/address/{to_address})'),"inline":False},
@@ -739,7 +740,6 @@ class HandleEvent(Thread):
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
                     color = colors.dark_orange
                     send = True
-
             elif (self.alert == "profits"):
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
 
@@ -755,26 +755,24 @@ class HandleEvent(Thread):
                        "0x4d7928e993125A9Cefe7ffa9aB637653654222E2",
                        "0x57D59a73CDC15fe717D2f1D433290197732659E2"]
 
-
                 try:
                     from_address = tx["args"]["from"]
                     to_address = tx["args"]["to"]
                     value = tx["args"]["value"]
-                except ValueError:
+                except:
                     try:
                         from_address = tx["args"]["_from"]
                         to_address = tx["args"]["_to"]
                         value = tx["args"]["_value"]
-                    except ValueError:
+                    except:
                         from_address = tx["args"]["src"]
-                        to_address = tx["args"]["dist"]
+                        to_address = tx["args"]["dst"]
                         value = tx["args"]["wad"]
-
 
                 if (self.event_name in ["Transfer"] and (from_address in feds and to_address=='0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
                     # logs result table and start writing message
-                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                     logging.info(str(datetime.now()) + " " + str(tx))
+                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
 
                     title = "Profit Taking detected"
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
@@ -799,7 +797,6 @@ class HandleEvent(Thread):
                 token_1_address = '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490'
                 token_0_total = fetchers.getBalance(self.web3, pool_address, token_0_address)
                 token_1_total = fetchers.getBalance(self.web3, pool_address, token_1_address)
-                print("ok")
 
                 if (self.event_name in ["Harvested"]):
                     title = "Yearn Harvest detected"
@@ -816,11 +813,10 @@ class HandleEvent(Thread):
                     {"name":token_1+' in Pool :',"value":str(formatCurrency(token_1_total)),"inline":True},
                     {"name":token_0+'+'+token_1+' in Pool',"value":str(formatCurrency(token_0_total + token_1_total)),"inline":False},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
-                    print("ok")
                     content = '<@&945071604642222110>'
+                    image = 'https://dune.com/api/screenshot?url=https://dune.com/embeds/1382819/2351787/0e47fbff-397e-43b5-94f3-a4e40067dffa.jpg'
                     color = colors.dark_green
                     send = True
-
             elif (self.alert == "debt_repayment"):
                 # logs result table and start writing message
                 logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
@@ -881,7 +877,7 @@ class HandleEvent(Thread):
                 sendWebhook(webhook, title, fields, content, image, color)
 
         except Exception as e:
-            logging.warning('Error in event handler')
+            logging.warning(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
             logging.error(e)
             #sendError(f'Error in event handler : {str(e)}')
             pass
