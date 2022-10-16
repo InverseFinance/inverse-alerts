@@ -4,18 +4,12 @@ This repository is a Python Smart contract alerting system, allowing to send to 
 conditions based on Ethereum Transactions or state variables.
 This was originally implemented for Inverse Finance Market monitoring and Risk Management purposes.
 
-The version in prod is running on a Remote Server running an Ethereum light node.
+The version in prod is running on a Remote Server ( previously running an Ethereum light node).
 
 ### Ethereum Endpoint
 
-This script is heavily requesting the RPC endpoint. Hence we recommend listening to events by running a private node
-with Geth in order to avoid paying high API query fees or to increase sleeping time in `listeners.py`.
-Filters being now supported on light nodes, you don't have to index a full archive node before being able to start.
-Just install Geth and start a light node using :
-
-`geth --syncmode light --http --http.addr 0.0.0.0`
-
-This might take a while to synchronize the first time, once your node is up-to-date you can start running the alerts.
+Running on a light node before the merge, this possibility is unfortunately not available anymore for the time being. 
+Therefore we have switched our local node infrastructure to a provider and improved querying rates.
 
 ### Install requirements
 
@@ -50,9 +44,8 @@ Execute main.py in your Python env or venv :
 
 `[Path to your project]/venv/Scripts/python.exe main.py`
 
-Alternatively you can use the CMD batch files available. You can use `run`, `run-geth-light`, or `run-with-geth` to correspondingly
-run the script alone, run a Geth light node or both at the same time. Make sure you have installed Geth and that you are 
-running Python in the proper environment.
+Alternatively you can use the CMD batch files available. You can use `run` to run the script alone.
+Make sure you are running Python in the proper environment.
 
 ### Listeners
 
@@ -104,28 +97,5 @@ if (self.alert == 'cash'):
     webhook = os.getenv('WEBHOOK_MARKETS')
     if self.state_function == 'cash':
     ...and so on
-```
-   Additionally, this script is heavily relying on discord embed functionality allowing to format messages in a 
-   user-friendly manner. Using the function `makeFields`, always make sure you are returning as many fields as titles,
-   that the inline parameter and color code of your alert are defined :
-
-```
-elif (self.alert == "governance"):
-    content = ""
-    webhook = os.getenv('WEBHOOK_GOVERNANCE')
-    if (self.event_name == "ProposalCreated"):
-        title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(tx["event "]))
-
-        fields = f'''makeFields(
-        ['Block Number :',
-        'Proposal :',
-        'Transaction :'],
-        ['{str(tx["blockNumber"])}',
-        '{"https://www.inverse.finance/governance/proposals/mills/" + str(fetchers.getProposalCount())}',
-        '{"https://etherscan.io/tx/" + str(tx["transactionHash"])}'],
-        [False,False,False])'''
-
-        color = colors.blurple
-        send = True
 ```
    
