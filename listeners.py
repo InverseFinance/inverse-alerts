@@ -67,6 +67,7 @@ class EventListener(Thread):
                     self.events = eval(f'self.contract.events.{self.event_name}().processReceipt({{"logs": self.logs}})')
                     for event in self.events:
                         HandleEvent(self.web3, event, self.alert,self.contract, self.event_name).start()
+                        time.sleep(1)
 
                 time.sleep(self.frequency)
 
