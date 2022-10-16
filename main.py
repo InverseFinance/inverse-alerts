@@ -169,10 +169,10 @@ try:
         n_alert +=1
 
         logging.info("Started Coingecko Listener " + str(id))
-        CoinGeckoVolumeListener(id).start()
+        #CoinGeckoVolumeListener(id).start()
 
-        n_alert +=1
-        logging.info("Started Coingecko Listener " + str(id))
+        #n_alert +=1
+        #logging.info("Started Coingecko Listener " + str(id))
 
     logging.info(str(datetime.now()) + ' ' + 'Total alerts running : ' + str(n_alert))
 
