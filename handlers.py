@@ -173,8 +173,6 @@ class HandleEvent(Thread):
 
             if (self.alert == "curve_liquidity"):
                 # logs result table and start writing message
-                logging.info(str(tx))
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 pool_address = tx["address"]
 
                 if pool_address=="0xAA5A67c256e27A5d80712c51971408db3370927D":
@@ -260,9 +258,6 @@ class HandleEvent(Thread):
                     title = 'Concave Activity : ' + title
                     content = '<@&945071604642222110>'
             elif (self.alert == "gauge_controller"):
-                # logs result table and start writing message
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                logging.info(str(tx))
                 if str(tx["args"]["gauge_addr"])=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
                     webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                     pool_address="0xE57180685E3348589E9521aa53Af0BCD497E884d"
@@ -271,7 +266,7 @@ class HandleEvent(Thread):
                     token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
                     token_1_address = '0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC'
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1349566/2302403/6731fd1b-9cb1-4ca8-a321-1025b786a010.jpg"
-                    send = True
+
                 elif str(tx["args"]["gauge_addr"])=="0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a":
                     webhook = os.getenv('WEBHOOK_DOLA3CRV')
                     pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
@@ -280,7 +275,7 @@ class HandleEvent(Thread):
                     token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
                     token_1_address = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1348784/2301280/9afceee3-e958-441a-b77a-5558a7a08595.jpg"
-                    send = True
+
 
                 if (self.event_name == "NewGaugeWeight"):
                     title = token_0 + token_1 +" New Gauge Weight detected"
@@ -292,8 +287,6 @@ class HandleEvent(Thread):
                     {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
 
-                    content = '<@&945071604642222110>'
-                    color = colors.dark_green
                 elif (self.event_name == "VoteForGauge"):
                     title = token_0 + token_1 + " Pool Vote For Gauge detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
@@ -303,13 +296,12 @@ class HandleEvent(Thread):
                     {"name":'% veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
                     {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
-                    content = '<@&945071604642222110>'
-                    color = colors.dark_green
+
+                content = '<@&945071604642222110>'
+                color = colors.dark_green
+                send = True
 
             elif (self.alert in ["lending1", "lending2"]):
-                # logs result table and start writing message
-                logging.info(str(tx))
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
@@ -327,6 +319,7 @@ class HandleEvent(Thread):
                         content = '<@&945071604642222110>'
                     color = colors.blurple
                     send = True
+
                 elif (self.event_name == "Redeem"):
                     webhook = os.getenv('WEBHOOK_SUPPLY')
                     title = "Lending Market : New Withdrawal event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
@@ -387,6 +380,7 @@ class HandleEvent(Thread):
 
                     color = colors.blurple
                     send = True
+
                 elif (self.event_name == "LiquidateBorrow"):
                     title = "Lending Market New Liquidation event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
                     webhook = os.getenv('WEBHOOK_LIQUIDATIONS')
@@ -407,9 +401,6 @@ class HandleEvent(Thread):
                     color = colors.blurple
                     send = True
             elif (self.alert in ["lendingfuse127"]):
-                # logs result table and start writing message
-                logging.info(str(tx))
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 if (self.event_name == "Mint"):
                     webhook = os.getenv('WEBHOOK_127')
                     title = "Lending Market : New Deposit event detected for " + str(fetchers.getSymbol(self.web3,tx["address"]))
@@ -508,10 +499,6 @@ class HandleEvent(Thread):
                     color = colors.blurple
                     send = True
             elif (self.alert == "governance"):
-
-                # logs result table and start writing message
-                logging.info(str(tx))
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
                 content = "<@&899302193608409178>"
                 webhook = os.getenv('WEBHOOK_GOVERNANCE')
 
@@ -557,10 +544,6 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             elif (self.alert == "fed"):
-                # logs result table and start writing message
-                logging.info(str(tx))
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-
                 webhook = os.getenv('WEBHOOK_FED')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/22517/1128427/3084f915-b906-4fdf-ac8c-ad5c0ce57e2b.jpg"
 
@@ -689,9 +672,6 @@ class HandleEvent(Thread):
 
                 if self.event_name in ["Transfer"] and (
                         (from_address in watch_addresses) or (to_address in watch_addresses)):
-                    # logs result table and start writing message
-                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                    logging.info(str(tx))
 
                     title = "Concave DOLA/3CRV activity detected"
                     # '<@&945071604642222110>'
@@ -712,6 +692,7 @@ class HandleEvent(Thread):
                                "inline": False}]
                     color = colors.dark_orange
                     send = True
+
             elif (self.alert == "transf_usdc"):
                 webhook = os.getenv('WEBHOOK_FRAXUSDC')
                 watch_addresses = ["0xdcE7f2C36809CE8d3807E24990d03eef8194FC8e"]
@@ -767,10 +748,6 @@ class HandleEvent(Thread):
                         value = tx["args"]["wad"]
 
                 if (self.event_name in ["Transfer"] and (from_address in feds and to_address=='0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
-                    # logs result table and start writing message
-                    logging.info(str(tx))
-                    logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-
                     title = "Profit Taking detected"
                     fields = [{"name":'Block Number :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'Profit :',"value":str(formatCurrency(value/fetchers.getDecimals(self.web3,tx["address"])))+' '+str(fetchers.getSymbol(self.web3,tx["address"])),"inline":False},
@@ -781,12 +758,7 @@ class HandleEvent(Thread):
                     color = colors.dark_orange
                     send = True
             elif (self.alert == "harvest"):
-                # logs result table and start writing message
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                logging.info(str(tx))
-
                 webhook = os.getenv('WEBHOOK_DOLA3CRV')
-
                 pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
                 token_0 = 'DOLA'
                 token_1 = '3CRV'
@@ -815,10 +787,6 @@ class HandleEvent(Thread):
                     color = colors.dark_green
                     send = True
             elif (self.alert == "debt_repayment"):
-                # logs result table and start writing message
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                logging.info(str(tx))
-
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1291754/2213835/4c5b629f-a6b0-4575-98a1-9d5fae4fab33"
                 if (self.event_name in ["debtRepayment"]):
@@ -834,10 +802,6 @@ class HandleEvent(Thread):
 
                     send = True
             elif (self.alert == "debt_conversion"):
-                # logs result table and start writing message
-                logging.info(f'Event found in {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                logging.info(str(tx))
-
                 webhook = os.getenv('WEBHOOK_DEBTREPAYMENT')
                 image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1291809/2213790/9e5c3845-66c0-496f-b42a-49a2fbd20df9.jpg"
                 if (self.event_name in ["Conversion"]):
@@ -892,7 +856,7 @@ class HandleTx(Thread):
         try:
             self.tx = json.loads(Web3.toJSON(self.tx))
             # logs result table and start writing message
-            logging.info(str(datetime.now()) + " " + str(self.tx))
+            logging.info(str(self.tx))
 
             send = False
             image = ''

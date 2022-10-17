@@ -1,18 +1,65 @@
-import os
-import requests
-import logging
-import sys
+import os,random,requests,logging,sys,json,time
 from dotenv import load_dotenv
 from web3 import Web3
-import json
-import time
+load_dotenv()
+
+def fixFromToValue(string):
+    string = json.dumps(string)
+
+    string = string.replace("_from","from")
+    string = string.replace("_to","to")
+    string = string.replace("_value","value")
+    string = string.replace("src","from")
+    string = string.replace("dst","to")
+    string = string.replace("wad","value")
+    string = string.replace("src","from")
+    string = string.replace("dst","to")
+    string = string.replace("wad","value")
+
+    string = json.loads(string)
+    return string
+
+def fixFromToFilters(string,token_address):
+
+    if token_address in["0xD533a949740bb3306d119CC777fa900bA034cd52"]:
+        string = str(string)
+        string = string.replace("from","_from")
+        string = string.replace("to","_to")
+
+    elif token_address == "0x6B175474E89094C44Da98b954EedeAC495271d0F":
+        string = str(string)
+        string = string.replace("from","src")
+        string = string.replace("to","dst")
+
+
+    if isinstance(string, str): string  = eval(string)
+
+    return string
+
+def getRPC(chainid):
+    if chainid==1:
+        rpc = os.getenv('QUICKNODE_ETH')
+    elif chainid==10:
+        rpc = os.getenv('QUICKNODE_OPT')
+    elif chainid==250:
+        rpc = os.getenv('QUICKNODE_FTM')
+    return rpc
+
+def assignFrequency(chainid):
+    if chainid==1:
+        frequency = random.uniform(60,120)
+    elif chainid==10:
+        frequency = random.uniform(10,15)
+    elif chainid==250:
+        frequency = random.uniform(10,15)
+    return frequency
 
 def sendWebhook(webhook, title, fields, content, imageurl, color):
     """
     Send a webhook with embed (title,fields,image,url,color)
     content is used for the body of the message and tagging roles
     :param webhook: string webhook link to send the message to
-    :param title: self explanatory, string
+    :param title: self-explanatory, string
     :param fields: a json string of fields with names, values, and inLine paramter filled (use the function makefields)
     :param content: the text body of the message, can be used for tagging roles
     :param imageurl: string link to an embedded image url
@@ -122,3 +169,37 @@ class colors:
     darker_grey = 0x546e7a
     blurple = 0x7289da
     greyple = 0x99aab5
+
+# Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
+def getABI(address):
+    try:
+        # First try to get the ABI from the ABI folder
+        #logging.info('Loading ABI from file')
+        contract_abi = json.load(open(f'ABI/{address}.json'))
+        #logging.info(contract_abi)
+        #logging.info('ABI loaded from file')
+        return contract_abi
+    except:
+        # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
+        logging.info(f"Can't find ABI locally. Fetching ABI from Etherscan for contract{address}")
+        contract_abi = requests.get('https://api.etherscan.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
+        logging.info(f'ABI Found : {contract_abi}')
+        # Then save it to the ABI folder
+        logging.info('Saving ABI...')
+        with open(f'ABI/{address}.json', 'w') as outfile:
+            outfile.write(str(contract_abi))
+        logging.info(f'ABI Saved to ABI/{address}.json')
+        #and return object
+        return contract_abi
+
+# A simple Contract Class with name, address and ABI
+class Contract(object):
+    def __init__(self,address):
+        self.address = Web3.toChecksumAddress(address)
+        self.ABI = getABI(self.address)
+
+    def get_address(self):
+        return self.address
+
+    def get_ABI(self):
+        return self.ABI
