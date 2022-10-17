@@ -60,7 +60,7 @@ dispatch this latter to the appropriate webhook.
 
 ### Adding an alert
 
-To add an alert head to `contract.xlsx`. This file is used to update the contract, events and return result triggered by
+To add an alert head to `contract.py` and `alert.py`. Those files are used to update the contract, events and return result triggered by
 the different alerts.
 It is to be amended carefully since the smallest typo will generate errors.
 
