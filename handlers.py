@@ -10,146 +10,6 @@ from web3._utils.events import construct_event_topic_set
 from datetime import datetime
 from dotenv import load_dotenv
 
-
-# Define state change to handle and logs to the console/send to discord
-class HandleStateVariation(Thread):
-    def __init__(self, web3,old_value,value, change, alert, contract, state_function, state_argument, **kwargs):
-        super(HandleStateVariation, self).__init__(**kwargs)
-        self.web3 = web3
-        self.value = value
-        self.change = change
-        self.contract = contract
-        self.alert = alert
-        self.state_function = state_function
-        self.state_argument = state_argument
-        self.old_value = old_value
-
-    def run(self):
-        try:
-            send = False
-            image = ''
-            content = ''
-            webhook = ''
-            title = ''
-            fields = []
-            color = colors.blurple
-            level = 0
-            if (self.alert == 'oracle'):
-                webhook = os.getenv('WEBHOOK_MARKETS')
-                if self.state_function == 'getUnderlyingPrice':
-                    logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))
-                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Oracle'
-
-                    if abs(self.change) > 0.2:
-                        content = '<@&945071604642222110>'
-                        level = 3
-                        color = colors.red
-                        send = True
-                    elif abs(self.change) > 0.1:
-                        level = 2
-                        color = colors.dark_orange
-                        send = True
-                    elif abs(self.change) > 0.05:
-                        level = 1
-                        color = colors.orange
-                        send = True
-                    if send:
-                        fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
-                                  {"name": 'Variation :', "value": str(formatPercent(self.change)),"inline": True},
-                                  {"name": 'Old Value :', "value": str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument)))), "inline": True},
-                                  {"name": 'New Value :', "value": str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument)))), "inline": True},
-                                  {"name": 'Link to Market :', "value": 'https://etherscan.io/address/' + str(self.state_argument), "inline": False}]
-
-
-            if (self.alert == 'cash'):
-                webhook = os.getenv('WEBHOOK_MARKETS')
-                if self.state_function == 'getCash':
-                    logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getName(self.web3,self.contract.address)) + ' balance')
-                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))) + ' Cash balance'
-
-                    if abs(self.change) > 0.2:
-                        content = '<@&945071604642222110>'
-                        level = 3
-                        color = colors.red
-                        send = True
-                    elif abs(self.change) > 0.1:
-                        level = 2
-                        color = colors.dark_orange
-                        send = True
-                    elif abs(self.change) > 0.05:
-                        level = 1
-                        color = colors.orange
-                        send = True
-
-                    if send:
-                        fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
-                                  {"name": 'Variation :',"value": str(formatPercent(self.change)), "inline" : True},
-                                  {"name": 'Old Value :',"value": str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline" : True},
-                                  {"name": 'New Value :',"value": str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline" : True},
-                                  {"name": 'Link to Market :',"value":'https://etherscan.io/address/' + str(self.contract.address), "inline" : False}]
-
-
-            if (self.alert == 'supply'):
-                webhook = os.getenv('WEBHOOK_DOLA3CRV')
-                if self.state_function == 'totalSupply':
-                    logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getName(self.web3,self.contract.address))+ ' total supply')
-                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Supply'
-
-                    if abs(self.change) > 0.015:
-                        content = '<@&945071604642222110>'
-                        level = 3
-                        color = colors.red
-                        send = True
-                    elif abs(self.change) > 0.01:
-                        level = 2
-                        color = colors.dark_orange
-                        send = True
-                    elif abs(self.change) > 0.005:
-                        level = 1
-                        color = colors.orange
-                        send = True
-                    if send:
-                        fields = [{"name":'Alert Level :',"value":str(level),"inline": True},
-                        {"name":'Variation :', "value":str(formatPercent(self.change)), "inline": True},
-                        {"name":'Old Value :', "value":str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline": True},
-                        {"name":'New Value :', "value":str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline": True},
-                        {"name":'Link to Pool :', "value":'https://etherscan.io/address/' + str(self.contract.address), "inline": False}]
-
-            if (self.alert == 'liquidation_incentive'):
-                webhook = os.getenv('WEBHOOK_MARKETS')
-                if self.state_function == 'liquidationIncentiveMantissa':
-                    logging.info(str(self.change) + '% change detected on ' + str(
-                        fetchers.getName(self.web3,self.contract.address))+ ' Liquidation incentive')
-                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
-                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Liquidation incentive'
-
-                    content = '<@&945071604642222110>'
-                    level = 3
-                    color = colors.red
-                    send = True
-
-                    fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
-                    {"name": 'Variation :',"value": str(formatPercent(self.change)),"inline": True},
-                    {"name": 'Old Value :',"value": str(formatCurrency(self.old_value / 1e18)),"inline": True},
-                    {"name": 'New Value :',"value":str(formatCurrency(self.value / 1e18)),"inline": True},
-                    {"name": 'Link to Pool :',"value":'https://etherscan.io/address/' + str(self.contract.address),"inline": False}]
-
-            if send:
-                sendWebhook(webhook, title, fields, content, image, color)
-
-
-        except Exception as e:
-            logging.warning(f'Error in state variation handler')
-            logging.error(e)
-            #sendError(f'Error in state variation handler : {str(e)}')
-            pass
-
 # Define event to handle and logs to the console/send to discord
 class HandleEvent(Thread):
     def __init__(self, web3,event, alert,contract, event_name, **kwargs):
@@ -258,6 +118,7 @@ class HandleEvent(Thread):
                     title = 'Concave Activity : ' + title
                     content = '<@&945071604642222110>'
             elif (self.alert == "gauge_controller"):
+                watch_addresses = ["0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c","0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a"]
                 if str(tx["args"]["gauge_addr"])=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
                     webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                     pool_address="0xE57180685E3348589E9521aa53Af0BCD497E884d"
@@ -266,7 +127,6 @@ class HandleEvent(Thread):
                     token_0_address = '0x865377367054516e17014CcdED1e7d814EDC9ce4'
                     token_1_address = '0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC'
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1349566/2302403/6731fd1b-9cb1-4ca8-a321-1025b786a010.jpg"
-
                 elif str(tx["args"]["gauge_addr"])=="0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a":
                     webhook = os.getenv('WEBHOOK_DOLA3CRV')
                     pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
@@ -277,7 +137,7 @@ class HandleEvent(Thread):
                     image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1348784/2301280/9afceee3-e958-441a-b77a-5558a7a08595.jpg"
 
 
-                if (self.event_name == "NewGaugeWeight"):
+                if (self.event_name == "NewGaugeWeight" and (tx["args"]["gauge_addr"] in watch_addresses)):
                     title = token_0 + token_1 +" New Gauge Weight detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'Gauge Address :',"value":str(tx["args"]["gauge_addr"]),"inline":False},
@@ -286,8 +146,11 @@ class HandleEvent(Thread):
                     {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
                     {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
+                    content = '<@&945071604642222110>'
+                    color = colors.dark_green
+                    send = True
 
-                elif (self.event_name == "VoteForGauge"):
+                elif (self.event_name == "VoteForGauge" and (tx["args"]["gauge_addr"] in watch_addresses)):
                     title = token_0 + token_1 + " Pool Vote For Gauge detected"
                     fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
                     {"name":'User :',"value":str(f'[{tx["args"]["user"]}](https://etherscan.io/address/{tx["args"]["user"]})'),"inline":False},
@@ -296,10 +159,10 @@ class HandleEvent(Thread):
                     {"name":'% veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
                     {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
                     {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
+                    content = '<@&945071604642222110>'
+                    color = colors.dark_green
+                    send = True
 
-                content = '<@&945071604642222110>'
-                color = colors.dark_green
-                send = True
 
             elif (self.alert in ["lending1", "lending2"]):
                 if (self.event_name == "Mint"):
@@ -840,6 +703,143 @@ class HandleEvent(Thread):
             logging.warning(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
             logging.error(e)
             #sendError(f'Error in event handler : {str(e)}')
+            pass
+
+# Define state change to handle and logs to the console/send to discord
+class HandleStateVariation(Thread):
+    def __init__(self, web3,old_value,value, change, alert, contract, state_function, state_argument, **kwargs):
+        super(HandleStateVariation, self).__init__(**kwargs)
+        self.web3 = web3
+        self.value = value
+        self.change = change
+        self.contract = contract
+        self.alert = alert
+        self.state_function = state_function
+        self.state_argument = state_argument
+        self.old_value = old_value
+
+    def run(self):
+        try:
+            send = False
+            image = ''
+            content = ''
+            webhook = ''
+            title = ''
+            fields = []
+            color = colors.blurple
+            level = 0
+            if (self.alert == 'oracle'):
+                webhook = os.getenv('WEBHOOK_MARKETS')
+                if self.state_function == 'getUnderlyingPrice':
+                    logging.info(str(self.change) + '% change detected on ' + str(
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))))
+                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Oracle'
+
+                    if abs(self.change) > 0.2:
+                        content = '<@&945071604642222110>'
+                        level = 3
+                        color = colors.red
+                        send = True
+                    elif abs(self.change) > 0.1:
+                        level = 2
+                        color = colors.dark_orange
+                        send = True
+                    elif abs(self.change) > 0.05:
+                        level = 1
+                        color = colors.orange
+                        send = True
+                    if send:
+                        fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
+                                  {"name": 'Variation :', "value": str(formatPercent(self.change)),"inline": True},
+                                  {"name": 'Old Value :', "value": str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument)))), "inline": True},
+                                  {"name": 'New Value :', "value": str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.state_argument)))), "inline": True},
+                                  {"name": 'Link to Market :', "value": 'https://etherscan.io/address/' + str(self.state_argument), "inline": False}]
+
+            if (self.alert == 'cash'):
+                webhook = os.getenv('WEBHOOK_MARKETS')
+                if self.state_function == 'getCash':
+                    logging.info(str(self.change) + '% change detected on ' + str(
+                        fetchers.getName(self.web3,self.contract.address)) + ' balance')
+                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.contract.address))) + ' Cash balance'
+
+                    if abs(self.change) > 0.2:
+                        content = '<@&945071604642222110>'
+                        level = 3
+                        color = colors.red
+                        send = True
+                    elif abs(self.change) > 0.1:
+                        level = 2
+                        color = colors.dark_orange
+                        send = True
+                    elif abs(self.change) > 0.05:
+                        level = 1
+                        color = colors.orange
+                        send = True
+
+                    if send:
+                        fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
+                                  {"name": 'Variation :',"value": str(formatPercent(self.change)), "inline" : True},
+                                  {"name": 'Old Value :',"value": str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline" : True},
+                                  {"name": 'New Value :',"value": str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline" : True},
+                                  {"name": 'Link to Market :',"value":'https://etherscan.io/address/' + str(self.contract.address), "inline" : False}]
+
+            if (self.alert == 'supply'):
+                webhook = os.getenv('WEBHOOK_DOLA3CRV')
+                if self.state_function == 'totalSupply':
+                    logging.info(str(self.change) + '% change detected on ' + str(
+                        fetchers.getName(self.web3,self.contract.address))+ ' total supply')
+                    title = str(formatPercent(self.change)) + ' change detected on ' + str(
+                        fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Supply'
+
+                    if abs(self.change) > 0.015:
+                        content = '<@&945071604642222110>'
+                        level = 3
+                        color = colors.red
+                        send = True
+                    elif abs(self.change) > 0.01:
+                        level = 2
+                        color = colors.dark_orange
+                        send = True
+                    elif abs(self.change) > 0.005:
+                        level = 1
+                        color = colors.orange
+                        send = True
+                    if send:
+                        fields = [{"name":'Alert Level :',"value":str(level),"inline": True},
+                        {"name":'Variation :', "value":str(formatPercent(self.change)), "inline": True},
+                        {"name":'Old Value :', "value":str(formatCurrency(self.old_value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline": True},
+                        {"name":'New Value :', "value":str(formatCurrency(self.value / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,self.contract.address)))), "inline": True},
+                        {"name":'Link to Pool :', "value":'https://etherscan.io/address/' + str(self.contract.address), "inline": False}]
+
+            if (self.alert == 'liquidation_incentive'):
+                webhook = os.getenv('WEBHOOK_MARKETS')
+                if self.state_function == 'liquidationIncentiveMantissa':
+                    logging.info(str(self.change) + '% change detected on ' +
+                                 str(fetchers.getName(self.web3,self.contract.address))+ ' Liquidation incentive')
+                    title = str(formatPercent(self.change)) + ' change detected on ' +\
+                            str(fetchers.getSymbol(self.web3,fetchers.getUnderlying(self.web3,self.state_argument))) + ' Liquidation incentive'
+
+                    fields = [{"name": 'Alert Level :',"value": str(level),"inline": True},
+                    {"name": 'Variation :',"value": str(formatPercent(self.change)),"inline": True},
+                    {"name": 'Old Value :',"value": str(formatCurrency(self.old_value / 1e18)),"inline": True},
+                    {"name": 'New Value :',"value":str(formatCurrency(self.value / 1e18)),"inline": True},
+                    {"name": 'Link to Pool :',"value":'https://etherscan.io/address/' + str(self.contract.address),"inline": False}]
+
+                    content = '<@&945071604642222110>'
+                    level = 3
+                    color = colors.red
+                    send = True
+
+            if send:
+                sendWebhook(webhook, title, fields, content, image, color)
+
+
+        except Exception as e:
+            logging.warning(f'Error in state variation handler')
+            logging.error(e)
+            #sendError(f'Error in state variation handler : {str(e)}')
             pass
 
 # Define state change to handle and logs to the console/send to discord

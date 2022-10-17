@@ -61,11 +61,9 @@ try:
                         state_function = state_alerts[i]['functions'][k]['name']
                         state_arguments = eval(str(state_alerts[i]['functions'][k]['arg']))
 
-                        if state_arguments is not None:
-                            for argument in state_arguments:
-                                StateChangeListener(web3, alert, contract, state_function, argument, frequency).start()
-                        else:
-                            StateChangeListener(web3, alert, contract, state_function, None, frequency).start()
+                        for argument in state_arguments:
+                            StateChangeListener(web3, alert, contract, state_function, argument, frequency).start()
+
                         n += 1
                         logging.info(alert + '-' +
                                      contract.address + '-' +
@@ -90,7 +88,7 @@ try:
                     # Log alerts-contract
                     logging.info(alert + '-' +
                                  str(contract_name) + '-' +
-                                 str(n) + ' started listening at transactions on Multisig '
+                                 str(n) + ' started listening at transactions on '
                                  + str(contract_name))
 
     for i in coingecko_alerts:

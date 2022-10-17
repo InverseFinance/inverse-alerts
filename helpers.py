@@ -4,6 +4,9 @@ from web3 import Web3
 load_dotenv()
 
 def fixFromToValue(string):
+    """
+    format the difference version of 'from'/'to'/'value to one comprehensive output with from and to
+    """
     string = json.dumps(string)
 
     string = string.replace("_from","from")
@@ -20,6 +23,9 @@ def fixFromToValue(string):
     return string
 
 def fixFromToFilters(string,token_address):
+    """
+    Amend the from/to filter depending on the token to produce valid filters
+    """
 
     if token_address in["0xD533a949740bb3306d119CC777fa900bA034cd52"]:
         string = str(string)
@@ -31,12 +37,14 @@ def fixFromToFilters(string,token_address):
         string = string.replace("from","src")
         string = string.replace("to","dst")
 
-
     if isinstance(string, str): string  = eval(string)
 
     return string
 
 def getRPC(chainid):
+    """
+    Return an RPC based on the ChainId provided
+    """
     if chainid==1:
         rpc = os.getenv('QUICKNODE_ETH')
     elif chainid==10:
@@ -138,7 +146,7 @@ def LoggerParams():
             logging.StreamHandler(sys.stdout)
         ]
     )
-    # Mute warning when pool is full :: overriden by poolsize parameter
+    # Mute warning when pool is full
     logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 # Define easiy colors for discord
