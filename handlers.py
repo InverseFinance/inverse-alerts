@@ -22,12 +22,12 @@ class HandleEvent(Thread):
             try:
                 self.tx = json.loads(Web3.toJSON(self.event))
                 send = False
+                webhook = ''
                 title = ''
                 content= ''
                 fields = []
                 image = ''
                 color = colors.blurple
-                webhook = ''
                 
                 address=self.tx["address"]
                 blockNumber=self.tx["blockNumber"]
@@ -541,7 +541,7 @@ class HandleEvent(Thread):
                     webhook = os.getenv('WEBHOOK_CONCAVE')
                     watch_addresses = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
 
-                    tx = fixFromToValue(tx)
+                    self.tx = fixFromToValue(self.tx)
 
                     from_address = self.tx["args"]["from"]
                     to_address = self.tx["args"]["to"]
@@ -583,7 +583,7 @@ class HandleEvent(Thread):
                 elif (self.alert == "profits"):
                     webhook = os.getenv('WEBHOOK_DOLA3CRV')
 
-                    tx = fixFromToValue(tx)
+                    self.tx = fixFromToValue(self.tx)
                     from_address = self.tx["args"]["from"]
                     to_address = self.tx["args"]["to"]
                     value = self.tx["args"]["value"]
