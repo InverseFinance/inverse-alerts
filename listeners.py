@@ -7,6 +7,7 @@ from web3._utils.events import construct_event_topic_set
 from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
 from helpers import sendError, formatPercent
 
+
 # Define a Thread to listen separately on each contract/event in the contract file
 class EventListener(Thread):
     def __init__(self, web3, alert, contract, event_name,filters, frequency, **kwargs):
@@ -29,22 +30,30 @@ class EventListener(Thread):
             try:
                 self.topics = []
 
+                #create a topic for every filter in alerts.py and bundle them in self.topics
                 for filter in self.filters:
                     self.block1 = self.block0
                     self.sub_topic = eval(f'construct_event_topic_set(self.contract.events.{self.event_name}().abi, self.web3.codec, {str(filter)})')
                     self.topics.append(self.sub_topic)
 
+                # Fetch logs for every subtopic and bundle logs together
                 for subtopic in self.topics:
-                    self.logs = self.web3.eth.get_logs({"address": self.contract.address, "topics": subtopic, "fromBlock": self.block0})
-                    self.block0 = self.web3.eth.get_block_number()
+                    new_logs = self.web3.eth.get_logs({"address": self.contract.address, "topics": subtopic, "fromBlock": self.block0})
+                    if new_logs != []:
+                        for item in new_logs:
+                            self.logs.append(item)
 
-                    if self.logs != []:
-                        self.events = eval(f'self.contract.events.{self.event_name}().processReceipt({{"logs": self.logs}})')
-                        for event in self.events:
-                            logging.info(f'Event found in {self.alert}-{self.contract.address}-{self.event_name}')
-                            logging.info(event)
-                            HandleEvent(self.web3, event, self.alert,self.contract, self.event_name).start()
+                self.block0 = self.web3.eth.get_block_number()
 
+                # Fetch for event in the filtered logs
+                if self.logs != []:
+                    self.events = eval(f'self.contract.events.{self.event_name}().processReceipt({{"logs": self.logs}})')
+                    for event in self.events:
+                        logging.info(f'Event found in {self.alert}-{self.contract.address}-{self.event_name}')
+                        logging.info(event)
+                        HandleEvent(self.web3, event, self.alert,self.contract, self.event_name).start()
+
+                self.logs = list()
                 time.sleep(self.frequency)
 
             except Exception as e:
@@ -88,9 +97,17 @@ class StateChangeListener(Thread):
                     if abs(self.change) > 0 and self.value > 0:
                         logging.info(f'State Change matching criteria found in {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
                         logging.info(formatPercent(self.change))
-                        HandleStateVariation(self.web3,self.old_value,self.value, self.change, self.alert, self.contract, self.state_function, self.argument).start()
+                        HandleStateVariation(self.web3,
+                                             self.old_value,
+                                             self.value,
+                                             self.change,
+                                             self.alert,
+                                             self.contract,
+                                             self.state_function,
+                                             self.argument).start()
                     self.old_value = self.value
                 time.sleep(self.frequency)
+
             except Exception as e:
                 logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
                 logging.error(str(e))

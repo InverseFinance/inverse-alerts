@@ -7,7 +7,7 @@ def fixFromToValue(string):
     """
     format the difference version of 'from'/'to'/'value to one comprehensive output with from and to
     """
-    string = json.dumps(string)
+    string = str(string)
 
     string = string.replace("_from","from")
     string = string.replace("_to","to")
@@ -84,11 +84,18 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
                                "image": {"url": imageurl}}]}
             result = requests.post(webhook, json=data)
             result.raise_for_status()
+            time.sleep(random.uniform(5, 10))
         except requests.exceptions.HTTPError as err:
             logging.error(err)
             sendError("Error in sending message to webhook. Waiting 5 seconds to retry...")
             time.sleep(5)
             error = True
+        except Exception as e:
+            logging.error("Unknown error in sending message to webhook. Please inspect the logs.")
+            logging.error(e)
+            sendError('<@578956365205209098>')
+            sendError("Unknown error in sending message to webhook. Please inspect the logs.")
+            sendError(e)
         else:
             logging.info("Embed delivered successfully to webhook "+str(webhook)+" code {}.".format(result.status_code))
             error = False
@@ -117,6 +124,7 @@ def sendError(content):
             logging.error(err)
             logging.info("Error in sending message to webhook. Waiting 10 seconds to retry... code {}.".format(result.status_code))
             # time sleep is used to avoid throttling the error webhook w/ too many attempts
+
             time.sleep(10)
             error = True
         else:
