@@ -190,12 +190,21 @@ class CoinGeckoVolumeListener(Thread):
             try:
                 self.tickers = self.cg.get_coin_by_id(id=self.id, vs_currency='usd', days=1)['tickers']
                 self.volume = 0
+
                 for i in range(0, len(self.tickers)):
                     self.volume += self.tickers[i]['converted_volume']['usd']
 
                 self.change = (self.volume / self.old_value) - 1
-                logging.info('change : ' + str(formatPercent(self.change))+ ' / volume : ' + str(self.volume) + ' / old volume : ' + str(self.old_value))
-                HandleCoingeckoVolume(self.id, self.old_value, self.volume, self.change).start()
+
+                logging.info('change : ' + str(formatPercent(self.change))+
+                             ' / volume : ' + str(self.volume) +
+                             ' / old volume : ' + str(self.old_value))
+
+                HandleCoingeckoVolume(self.id,
+                                      self.old_value,
+                                      self.volume,
+                                      self.change).start()
+
                 self.old_value = self.volume
                 time.sleep(60)
 

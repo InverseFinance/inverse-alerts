@@ -121,19 +121,26 @@ class HandleEvent(Thread):
                     gauge_address = str(tx["args"]["gauge_addr"])
                     #Need to filter again due to multisig transactions
 
-                    if gauge_address=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
+                    if gauge_address not in gauges:
+                        break
+                    elif gauge_address=="0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c":
                         webhook = os.getenv('WEBHOOK_DOLAFRAXBP')
                         pool_address="0xE57180685E3348589E9521aa53Af0BCD497E884d"
                         token_0 = "DOLA"
                         token_1 = "crvFRAX"
                         image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1349566/2302403/6731fd1b-9cb1-4ca8-a321-1025b786a010.jpg"
+                        content = '<@&945071604642222110>'
+                        color = colors.dark_green
+                        send = True
                     elif gauge_address=="0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a":
                         webhook = os.getenv('WEBHOOK_DOLA3CRV')
                         pool_address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
                         token_0 = "DOLA"
                         token_1 = "3CRV"
                         image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1348784/2301280/9afceee3-e958-441a-b77a-5558a7a08595.jpg"
-
+                        content = '<@&945071604642222110>'
+                        color = colors.dark_green
+                        send = True
 
                     if (self.event_name == "NewGaugeWeight" and (gauge_address in gauges)):
                         title = token_0 + token_1 +" New Gauge Weight detected"
@@ -145,10 +152,6 @@ class HandleEvent(Thread):
                         {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
                         {"name": 'Total Weight :',"value":str(tx["args"]["total_weight"]),"inline":True},
                         {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
-                        content = '<@&945071604642222110>'
-                        color = colors.dark_green
-                        send = True
-
                     elif (self.event_name == "VoteForGauge" and (gauge_address in gauges)):
                         title = token_0 + token_1 + " Pool Vote For Gauge detected"
                         fields = [{"name":'Block :',"value":str(f'[{tx["blockNumber"]}](https://etherscan.io/block/{tx["blockNumber"]})'),"inline":False},
@@ -159,9 +162,6 @@ class HandleEvent(Thread):
                         {"name":'% veCRV Weight :',"value":str(formatCurrency(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  * tx["args"]["weight"]/10000)),"inline":True},
                         {"name":'% veCRV Supply :',"value":str(formatPercent(fetchers.getBalance(self.web3,tx["args"]["user"],'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2')  / fetchers.getSupply(self.web3,'0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2'))),"inline":True},
                         {"name":'Transaction :',"value":str(f'[{tx["transactionHash"]}](https://etherscan.io/tx/{tx["transactionHash"]})'),"inline":False}]
-                        content = '<@&945071604642222110>'
-                        color = colors.dark_green
-                        send = True
 
                 elif (self.alert in ["lending1", "lending2"]):
                     if (self.event_name == "Mint"):

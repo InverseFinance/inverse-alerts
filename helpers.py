@@ -186,6 +186,11 @@ class colors:
     blurple = 0x7289da
     greyple = 0x99aab5
 
+def hex_and_pad(i):
+    unpadded_hex_value = hex(i).rstrip("L")
+    return "0x" + unpadded_hex_value[2:].zfill(64)
+
+
 # Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
 def getABI(address):
     try:
