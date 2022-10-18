@@ -5,7 +5,7 @@ load_dotenv()
 
 def fixFromToValue(string):
     """
-    format the difference version of 'from'/'to'/'value to one comprehensive output with from and to
+    format the different version of 'from'/'to'/'value to one comprehensive output with from and to
     """
     string = str(string)
 

@@ -108,8 +108,7 @@ class HandleEvent(Thread):
                         if (tx["args"]["token_amounts"][0] + tx["args"]["token_amounts"][1]) / 1e18 > 50000:
                             send = True
 
-                    concave = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10",
-                                       "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
+                    concave = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10","0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
 
                     if tx["args"]["provider"] in concave:
                         webhook = os.getenv('WEBHOOK_CONCAVE')
@@ -119,7 +118,6 @@ class HandleEvent(Thread):
                 elif (self.alert == "gauge_controller"):
                     gauges = ["0xBE266d68Ce3dDFAb366Bb866F4353B6FC42BA43c","0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a"]
                     gauge_address = str(tx["args"]["gauge_addr"])
-                    #Need to filter again due to multisig transactions
 
                     if gauge_address not in gauges:
                         break
@@ -179,6 +177,7 @@ class HandleEvent(Thread):
 
                         if ((tx["args"]["mintAmount"] / fetchers.getDecimals(self.web3,fetchers.getUnderlying(self.web3,tx["address"])) * fetchers.getUnderlyingPrice(self.web3,tx["address"]))>100000):
                             content = '<@&945071604642222110>'
+
                         color = colors.blurple
                         send = True
 

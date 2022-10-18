@@ -138,10 +138,10 @@ class TxListener(Thread):
                 time.sleep(self.frequency)
 
             except Exception as e:
-                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
+                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}-{str(self.name)}')
                 logging.error(e)
                 self.block0 = self.block1
-                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract)}')
+                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract)}-{str(self.name)}')
                 sendError(e)
                 time.sleep(random.uniform(5,11))
                 continue
