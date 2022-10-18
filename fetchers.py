@@ -2,32 +2,36 @@ import json,os,requests
 import pandas as pd
 from ens import ENS
 from dotenv import load_dotenv
-from helpers import getABI
+from helpers import *
 from web3._utils.events import construct_event_topic_set
 
 load_dotenv()
-
+ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 # Catch the token where the tx of RemoveLiquidityOne happens
 def getRemovedTokenSymbol(web3, txHash,poolAddress):
-    usdc_address = web3.toChecksumAddress('0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
-    dola_address =web3.toChecksumAddress('0x865377367054516e17014ccded1e7d814edc9ce4')
-    dai_address = web3.toChecksumAddress('0x6b175474e89094c44da98b954eedeac495271d0f')
-    crvFRAX_address = web3.toChecksumAddress('0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC')
-    crv3_address = web3.toChecksumAddress('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490')
-    usdt_address = web3.toChecksumAddress('0xdac17f958d2ee523a2206206994597c13d831ec7')
+    USDC = web3.toChecksumAddress('0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
+    DOLA =web3.toChecksumAddress('0x865377367054516e17014ccded1e7d814edc9ce4')
+    DAI = web3.toChecksumAddress('0x6b175474e89094c44da98b954eedeac495271d0f')
+    crvFRAX = web3.toChecksumAddress('0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC')
+    CRV3 = web3.toChecksumAddress('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490')
+    USDT = web3.toChecksumAddress('0xdac17f958d2ee523a2206206994597c13d831ec7')
 
     tx = json.loads(web3.toJSON(web3.eth.get_transaction(txHash)))
     blockHash = tx["blockHash"]
-    for token in ('dola','usdc','dai','crvFRAX','crv3','usdt'):
-        contract = web3.eth.contract(address=eval(f'{token}_address'), abi=eval(f'getABI({token}_address)'))
-
-        topics = construct_event_topic_set(contract.events.Transfer().abi, web3.codec, {})
-        logs = web3.eth.get_logs({"address":contract.address,"blockHash": blockHash})
-        events = contract.events.Transfer().processReceipt({"logs": logs})
-        for event in events:
-            if web3.toChecksumAddress(poolAddress) in str(event['args']):
-                return getSymbol(web3,contract.address)
+    for token in [USDC,DOLA,DAI,crvFRAX,CRV3,USDT]:
+        contract = web3.eth.contract(address=token, abi=getABI(token))
+        filters = fixFromToFilters({"from":poolAddress})
+        topics = construct_event_topic_set(contract.events.Transfer().abi, web3.codec, {str(filters)})
+        logs = web3.eth.get_logs({"address":contract.address,"topics":topics,"blockHash": blockHash})
+        
+        if logs==[]:
+            continue
+        else:
+            events = contract.events.Transfer().processReceipt({"logs": logs})
+            for event in events:
+                if web3.toChecksumAddress(poolAddress) in str(event['args']):
+                    return getSymbol(web3,contract.address)
 
 # Common used functions
 def getBalance(web3,address, token_address):
@@ -45,8 +49,8 @@ def getBalance(web3,address, token_address):
 
 
 def getDecimals(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
-    if (address == web3.toChecksumAddress('0x0000000000000000000000000000000000000000')):
+    
+    if (address == web3.toChecksumAddress(ZERO_ADDRESS)):
         decimals = 1e18
     else:
         address = web3.toChecksumAddress(address)
@@ -59,7 +63,7 @@ def getDecimals(web3,address):
 
 
 def getSupply(web3, address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress(address)
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
@@ -73,8 +77,8 @@ def getSupply(web3, address):
 
 
 def getName(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
-    if (address == web3.toChecksumAddress('0x0000000000000000000000000000000000000000')):
+    
+    if (address == web3.toChecksumAddress(ZERO_ADDRESS)):
         name = 'Ether'
     else:
         address = web3.toChecksumAddress(address)
@@ -85,8 +89,8 @@ def getName(web3,address):
 
 
 def getSymbol(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
-    if (address == web3.toChecksumAddress('0x0000000000000000000000000000000000000000')):
+    
+    if (address == web3.toChecksumAddress(ZERO_ADDRESS)):
         symbol = 'ETH'
     else:
         address = web3.toChecksumAddress(address)
@@ -98,12 +102,12 @@ def getSymbol(web3,address):
 
 
 def getTransaction(web3,tx):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     tx = web3.eth.get_transaction(tx)
     return tx
 
 def getENS(web3, address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     ns = ENS.fromWeb3(web3)
     address = web3.toChecksumAddress(address)
 
@@ -116,7 +120,7 @@ def getENS(web3, address):
 
 # Governor Mills and multisig related function
 def getProposal(web3,proposal_id):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
     ABI = getABI(address)
 
@@ -129,7 +133,7 @@ def getProposal(web3,proposal_id):
     return proposal
 
 def getProposalCount(web3):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
@@ -142,7 +146,7 @@ def getProposalCount(web3):
 
 ## Sushi related functions
 def getSushiTokens(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     tokens = []
     address = web3.toChecksumAddress(address)
     ABI = getABI(address)
@@ -177,7 +181,7 @@ def getSushiBalance(web3,address):
 
 ## DOLA3CRV related functions
 def getCurveBalances(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     balances = []
     address = web3.toChecksumAddress(address)
 
@@ -187,7 +191,7 @@ def getCurveBalances(web3,address):
     return balances
 
 def getDola3crvTokens(web3,pooladdress):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     balances = []
     address = web3.toChecksumAddress(pooladdress)
     ABI = getABI(address)
@@ -216,7 +220,7 @@ def getDola3crvTokensSymbol(web3):
 
 # Comptroller related functions
 def getAllMarkets(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress(address)
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
@@ -226,7 +230,7 @@ def getAllMarkets(web3,address):
     return allMarkets
 
 def getComptroller(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+ 
     address = web3.toChecksumAddress(address)
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
@@ -236,7 +240,7 @@ def getComptroller(web3,address):
     return comptroller
 
 def getUnderlyingPrice(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress(address)
 
     oracle_name = web3.toChecksumAddress('0xe8929afd47064efd36a7fb51da3f8c5eb40c4cb4')
@@ -255,7 +259,7 @@ def getUnderlyingPrice(web3,address):
     return price
 
 def getUnderlyingPriceFuse(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress(address)
 
     oracle_name = web3.toChecksumAddress('0xe980efb504269ff53f7f4bc92a2bd1e31b43f632')
@@ -275,9 +279,9 @@ def getUnderlyingPriceFuse(web3,address):
     return price
 
 def getUnderlying(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     if address in ['0x697b4acAa24430F254224eB794d2a85ba1Fa1FB8','0x8e103Eb7a0D01Ab2b2D29C91934A9aD17eB54b86']:
-        underlying = '0x0000000000000000000000000000000000000000'
+        underlying = ZERO_ADDRESS
     else:
         address = web3.toChecksumAddress(address)
         ABI = getABI(address)
@@ -286,9 +290,9 @@ def getUnderlying(web3,address):
     return underlying
 
 def getUnderlyingFuse(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     if (address == web3.toChecksumAddress('0x26267e41ceca7c8e0f143554af707336f27fa051')):
-        underlying = '0x0000000000000000000000000000000000000000'
+        underlying = ZERO_ADDRESS
     else:
         address = web3.toChecksumAddress(address)
         ABI = getABI(address)
@@ -297,7 +301,7 @@ def getUnderlyingFuse(web3,address):
     return underlying
 
 def getCash(web3,address):
-    #web3 = Web3(Web3.HTTPProvider(os.getenv(env)))
+    
     address = web3.toChecksumAddress(address)
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
