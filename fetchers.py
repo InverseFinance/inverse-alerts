@@ -4,7 +4,6 @@ from ens import ENS
 from dotenv import load_dotenv
 from helpers import getABI
 from web3._utils.events import construct_event_topic_set
-#from web3 import Web3
 
 load_dotenv()
 

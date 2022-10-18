@@ -1,11 +1,9 @@
 import time,logging,random,json,sys,requests
 from threading import Thread
 from pycoingecko import CoinGeckoAPI
-from dotenv import load_dotenv
-from web3 import Web3
 from web3._utils.events import construct_event_topic_set
-from handlers import HandleTx, HandleEvent, HandleStateVariation, HandleCoingecko,HandleCoingeckoVolume
-from helpers import sendError, formatPercent
+from handlers import *
+from helpers import *
 
 
 # Define a Thread to listen separately on each contract/event in the contract file

@@ -70,7 +70,8 @@ def main():
                                          contract.address + '-' +
                                          state_function + '-' +
                                          str(n) + ' started listening at state function ' +
-                                         state_function + ' on contract ' +
+                                         state_function + ' with argument ' +
+                                         str(argument) + ' on contract ' +
                                          contract.address)
 
         for i in tx_alerts:

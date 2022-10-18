@@ -84,7 +84,7 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
                                "image": {"url": imageurl}}]}
             result = requests.post(webhook, json=data)
             result.raise_for_status()
-            time.sleep(random.uniform(5, 10))
+            time.sleep(random.uniform(2, 5))
         except requests.exceptions.HTTPError as err:
             logging.error(err)
             sendError("Error in sending message to webhook. Waiting 5 seconds to retry...")
@@ -204,9 +204,9 @@ def getABI(address):
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
         logging.info(f"Can't find ABI locally. Fetching ABI from Etherscan for contract{address}")
         contract_abi = requests.get('https://api.etherscan.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
-        logging.info(f'ABI Found : {contract_abi}')
+        #logging.info(f'ABI Found : {contract_abi}')
         # Then save it to the ABI folder
-        logging.info('Saving ABI...')
+        #logging.info('Saving ABI...')
         with open(f'ABI/{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
         logging.info(f'ABI Saved to ABI/{address}.json')

@@ -4,8 +4,8 @@ import pandas as pd
 from helpers import *
 from threading import Thread
 from web3 import Web3
-from web3._utils.events import construct_event_topic_set
-from dotenv import load_dotenv
+
+
 
 # Define event to handle and logs to the console/send to discord
 class HandleEvent(Thread):
@@ -810,11 +810,10 @@ class HandleStateVariation(Thread):
 
 
         except Exception as e:
-            logging.warning(f'Error in state variation handler {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
+            logging.warning(f'Error in state variation handler {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}-{str(self.state_argument)}')
             logging.error(e)
-            sendError(f'Error in state variation handler {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
+            sendError(f'Error in state variation handler {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}-{str(self.state_argument)}')
             sendError(e)
-            #sendError(f'Error in state variation handler : {str(e)}')
             pass
 
 # Define state change to handle and logs to the console/send to discord
@@ -984,5 +983,4 @@ class HandleCoingeckoVolume(Thread):
             logging.error(e)
             sendError(f'Error in coingecko volume variation handler')
             sendError(e)
-            #sendError(f'Error in coingecko volume variation handler : {str(e)}')
             pass
