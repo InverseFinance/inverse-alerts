@@ -15,3 +15,4 @@ messages.py
 *.env
 *.log
 test.py
+test_event_alert.py

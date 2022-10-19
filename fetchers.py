@@ -19,12 +19,13 @@ def getRemovedTokenSymbol(web3, txHash,poolAddress):
 
     tx = json.loads(web3.toJSON(web3.eth.get_transaction(txHash)))
     blockHash = tx["blockHash"]
+
     for token in [USDC,DOLA,DAI,crvFRAX,CRV3,USDT]:
         contract = web3.eth.contract(address=token, abi=getABI(token))
-        filters = fixFromToFilters({"from":poolAddress})
-        topics = construct_event_topic_set(contract.events.Transfer().abi, web3.codec, {str(filters)})
+        filters = {"from": poolAddress}
+
+        topics = construct_event_topic_set(contract.events.Transfer().abi, web3.codec, filters)
         logs = web3.eth.get_logs({"address":contract.address,"topics":topics,"blockHash": blockHash})
-        
         if logs==[]:
             continue
         else:
@@ -32,6 +33,7 @@ def getRemovedTokenSymbol(web3, txHash,poolAddress):
             for event in events:
                 if web3.toChecksumAddress(poolAddress) in str(event['args']):
                     return getSymbol(web3,contract.address)
+                    break
 
 # Common used functions
 def getBalance(web3,address, token_address):
@@ -300,13 +302,25 @@ def getUnderlyingFuse(web3,address):
         underlying = contract.functions.underlying().call()
     return underlying
 
-def getCash(web3,address):
-    
+
+def getCash(web3, address):
     address = web3.toChecksumAddress(address)
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     cash = contract.functions.getCash().call()
+    cash = cash / getDecimals(web3, contract.functions.underlying().call())
+
+    if (cash == 0): cash = 0
+
+    return cash
+def getExchangeRateStored(web3,address):
+
+    address = web3.toChecksumAddress(address)
+    ABI = getABI(address)
+    contract = web3.eth.contract(address=address, abi=ABI)
+
+    cash = contract.functions.exchangeRateStored().call()
     cash = cash / getDecimals(web3,contract.functions.underlying().call())
 
     if (cash == 0): cash = 0
