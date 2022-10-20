@@ -3,6 +3,11 @@ from dotenv import load_dotenv
 from web3 import Web3
 load_dotenv()
 
+
+def load_alerts():
+    a_file = open("alerts.json", "r")
+    alerts = json.load(a_file)
+    return alerts
 def fixFromToValue(string):
     """
     format the different version of 'from'/'to'/'value to one comprehensive output with from and to
@@ -40,6 +45,21 @@ def fixFromToFilters(string,token_address):
     if isinstance(string, str): string  = eval(string)
 
     return string
+
+def getWeb3(chainid):
+    """
+    Return an RPC based on the ChainId provided
+    """
+    if chainid==1:
+        rpc = os.getenv('QUICKNODE_ETH')
+        web3 = Web3(Web3.HTTPProvider(rpc))
+    elif chainid==10:
+        rpc = os.getenv('QUICKNODE_OPT')
+        web3 = Web3(Web3.HTTPProvider(rpc))
+    elif chainid==250:
+        rpc = os.getenv('QUICKNODE_FTM')
+        web3 = Web3(Web3.HTTPProvider(rpc))
+    return web3
 
 def getRPC(chainid):
     """

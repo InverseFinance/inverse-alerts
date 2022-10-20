@@ -23,6 +23,8 @@ class EventListener(Thread):
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
 
+        logging.info('Starting Event Listener '+str(alert)+'-'+str(contract.address)+'-'+str(event_name)+' with filters '+str(filters))
+
     def run(self):
         while True:
             try:
@@ -74,10 +76,68 @@ class StateChangeListener(Thread):
         self.argument = argument
         self.frequency = frequency
         # If condition to take into account state function with no input params
+
+        logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(state_function)+' with filters '+str(argument))
+
         if self.argument is None:
+            #print(f'''self.contract.functions.{self.state_function}().call()''')
             self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
         elif self.argument is not None:
+            #print(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
             self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
+
+    def run(self):
+        self.old_value = self.value
+        while True:
+            try:
+                if self.old_value > 0:
+                    # If condition to take into account state function with no input params
+                    if self.argument is None:
+                        self.value = eval(f'''self.contract.functions.{self.state_function}().call()''')
+                    elif self.argument is not None:
+                        self.value = eval(f'''self.contract.functions.{self.state_function}('{self.argument}').call()''')
+
+                    self.change = (self.value / self.old_value) - 1
+
+                    if abs(self.change) > 0 and self.value > 0:
+                        logging.info(f'State Change matching criteria found in {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}')
+                        logging.info(formatPercent(self.change))
+                        HandleStateVariation(self.web3,
+                                             self.old_value,
+                                             self.value,
+                                             self.change,
+                                             self.alert,
+                                             self.contract,
+                                             self.state_function,
+                                             self.argument).start()
+                    self.old_value = self.value
+                time.sleep(self.frequency)
+
+            except Exception as e:
+                logging.error(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
+                logging.error(str(e))
+                sendError(f'Error in State Change Listener : {self.alert}-{self.contract.address}-{self.state_function}-{self.argument}')
+                sendError(e)
+                time.sleep(random.uniform(5,11))
+                continue
+
+
+# Define a Thread to listen separately on each state change
+class StateChangeListener2(Thread):
+    def __init__(self, web3, alert, contract, state_function, argument, frequency, **kwargs):
+        super(StateChangeListener2, self).__init__(**kwargs)
+        self.web3 = web3
+        self.alert = alert
+        self.contract = contract
+        self.state_function = state_function
+        self.argument = argument
+        self.frequency = frequency
+        # If condition to take into account state function with no input params
+
+        logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(state_function)+' with filters '+str(argument))
+        function = eval(f'self.contract.functions.{self.state_function}')
+        print(f'function({self.argument}).call()')
+        self.value = function(self.argument).call()
 
     def run(self):
         self.old_value = self.value
@@ -126,6 +186,8 @@ class TxListener(Thread):
         self.frequency = frequency
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
+
+        logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(name))
     def run(self):
         while True:
             try:

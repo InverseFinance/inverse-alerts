@@ -1,117 +1,57 @@
 # import the following dependencies
 from helpers import *
+from fetchers import *
 from listeners import *
-from contracts import *
-from alerts import *
 from dotenv import load_dotenv
 from web3 import Web3
-import logging,fetchers
+import logging, fetchers, pickle
 
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
 
 def main():
-    try:
-        n = 0
+    for alert in alerts:
+        if alerts[alert]['type'] == 'event':
+            for contract in alerts[alert]['contracts']:
+                for chain_id in alerts[alert]['contracts'][contract]['chain_ids']:
+                    for event in alerts[alert]['events']:
+                        web3 = getWeb3(chain_id)
+                        contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
+                        contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
+                        filters = fixFromToFilters(alerts[alert]['events'][event]['filters'], contract_address)
+                        frequency = assignFrequency(chain_id)
+                        EventListener(web3, alert, contract_obj, event, filters, frequency).start()
 
-        for i in event_alerts:
-            alert = event_alerts[i]['name']
-            for j in contracts:
-                if event_alerts[i]['name'] in contracts[j]['alerts']['events']:
-                    for l in contracts[j]['chain_ids']:
+        if alerts[alert]['type'] == 'state':
+            for contract in alerts[alert]['contracts']:
+                for chain_id in alerts[alert]['contracts'][contract]['chain_ids']:
+                    for function in alerts[alert]['functions']:
+                        web3 = getWeb3(chain_id)
+                        arguments = eval(alerts[alert]['functions'][function]['arg'])
 
-                        rpc = getRPC(l)
-                        frequency = assignFrequency(l)
-                        web3 = Web3(Web3.HTTPProvider(rpc))
-                        contract_address = web3.toChecksumAddress(contracts[j]['address'])
-                        contract_abi = getABI(contracts[j]['address'])
+                        for argument in arguments or []:
+                            contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
+                            contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
+                            frequency = assignFrequency(chain_id)
+                            StateChangeListener(web3, alert, contract_obj, function, argument, frequency).start()
 
-                        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+        if alerts[alert]['type'] == 'transaction':
+            for contract in alerts[alert]['contracts']:
+                for chain_id in alerts[alert]['contracts'][contract]['chain_ids']:
+                    web3 = getWeb3(chain_id)
+                    contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
+                    contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
+                    frequency = assignFrequency(chain_id)
+                    TxListener(web3, alert, contract_obj, contract, frequency)
 
-                        for k in event_alerts[i]['events']:
-                            event_name = event_alerts[i]['events'][k]['name']
-                            event_filters = event_alerts[i]['events'][k]['filters']
-                            event_filters = fixFromToFilters(event_filters,contract_address)
-                            EventListener(web3, alert, contract, event_name,event_filters, frequency).start()
-                            n += 1
-                            logging.info(alert + '-' +
-                                         contract.address + '-' +
-                                         event_name + '-' +
-                                         str(n) + ' started listening at event ' +
-                                         event_name + ' with filters ' +
-                                         str(event_filters) + ' on contract ' +
-                                         contract.address)
-
-        for i in state_alerts:
-            alert = state_alerts[i]['name']
-
-            for j in contracts:
-                if state_alerts[i]['name'] in contracts[j]['alerts']['state']:
-                    for l in contracts[j]['chain_ids']:
-
-                        rpc = getRPC(l)
-                        frequency = assignFrequency(l)
-                        web3 = Web3(Web3.HTTPProvider(rpc))
-                        contract_address = web3.toChecksumAddress(contracts[j]['address'])
-                        contract_abi = getABI(contracts[j]['address'])
-
-                        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
-
-                        for k in state_alerts[i]['functions']:
-                            state_function = state_alerts[i]['functions'][k]['name']
-                            state_arguments = eval(str(state_alerts[i]['functions'][k]['arg']))
-
-                            for argument in state_arguments:
-                                StateChangeListener(web3, alert, contract, state_function, argument, frequency).start()
-
-                            n += 1
-                            logging.info(alert + '-' +
-                                         contract.address + '-' +
-                                         state_function + '-' +
-                                         str(n) + ' started listening at state function ' +
-                                         state_function + ' with argument ' +
-                                         str(argument) + ' on contract ' +
-                                         contract.address)
-
-        for i in tx_alerts:
-            alert = tx_alerts[i]['name']
-
-            for j in contracts:
-                if tx_alerts[i]['name'] in contracts[j]['alerts']['tx']:
-                    for l in contracts[j]['chain_ids']:
-                        rpc = getRPC(l)
-                        frequency = assignFrequency(l)
-                        contract_name = contracts[j]["name"]
-                        contract_address = web3.toChecksumAddress(contracts[j]["address"])
-                        n += 1
-                        TxListener(web3, alert, contract_address, contract_name, frequency).start()
-
-                        # Log alerts-contract
-                        logging.info(alert + '-' +
-                                     str(contract_name) + '-' +
-                                     str(n) + ' started listening at transactions on '
-                                     + str(contract_name))
-
-        for i in coingecko_alerts:
-            id = coingecko_alerts[i]['id']
-            if coingecko_alerts[i]['price']:
-                n += 1
-                CoinGeckoListener(id).start()
-                logging.info("Started Coingecko price Listener " + str(id))
-            if coingecko_alerts[i]['volume']:
-                n += 1
-                CoinGeckoVolumeListener(id).start()
-                logging.info("Started Coingecko volume Listener " + str(id))
-
-        logging.info(f'Total alerts running : {n}')
-
-    except Exception as e:
-        logging.error(e)
-        sendError(e)
-        pass
+        if alerts[alert]['type'] == 'link':
+            for id in alerts[alert]['ids']:
+                if alerts[alert]['ids'][id]['price'] == True:
+                    CoinGeckoListener(id)
+                if alerts[alert]['ids'][id]['volume'] == True:
+                    CoinGeckoListener(id)
 
 if __name__ == "__main__":
+    alerts = load_alerts()
     main()
-
-
