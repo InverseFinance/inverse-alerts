@@ -1,11 +1,7 @@
 # import the following dependencies
 import importlib
-import os,json,re,logging,requests,sys,time
-import pandas as pd
-from helpers import *
 from threading import Thread
-from web3 import Web3
-from fetchers import *
+from utils.fetchers import *
 
 
 
