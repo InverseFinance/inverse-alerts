@@ -1,6 +1,6 @@
 from pycoingecko import CoinGeckoAPI
 from handlers.handlers import *
-from helpers import *
+from utils.helpers import *
 
 
 # Define a Thread to listen separately on each contract/event in the contract file

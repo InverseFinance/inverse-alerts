@@ -5,7 +5,7 @@ load_dotenv()
 
 
 def load_alerts():
-    a_file = open("../alerts.json", "r")
+    a_file = open("alerts.json", "r")
     alerts = json.load(a_file)
     return alerts
 def fixFromToValue2(string):
@@ -238,7 +238,7 @@ def getABI(address):
     try:
         # First try to get the ABI from the ABI folder
         #logging.info('Loading ABI from file')
-        contract_abi = json.load(open(f'ABI/{address}.json'))
+        contract_abi = json.load(open(f'contracts/ABI/{address}.json'))
         #logging.info(contract_abi)
         #logging.info('ABI loaded from file')
         return contract_abi
@@ -249,9 +249,9 @@ def getABI(address):
         #logging.info(f'ABI Found : {contract_abi}')
         # Then save it to the ABI folder
         #logging.info('Saving ABI...')
-        with open(f'ABI/{address}.json', 'w') as outfile:
+        with open(f'contracts/ABI/{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
-        logging.info(f'ABI Saved to ABI/{address}.json')
+        logging.info(f'ABI Saved to contracts/ABI/{address}.json')
         #and return object
         return contract_abi
 

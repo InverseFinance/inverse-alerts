@@ -2,7 +2,7 @@ import json,os,requests
 import pandas as pd
 from ens import ENS
 from dotenv import load_dotenv
-from helpers import *
+from utils.helpers import *
 from web3._utils.events import construct_event_topic_set
 
 load_dotenv()

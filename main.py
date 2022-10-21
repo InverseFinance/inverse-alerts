@@ -1,5 +1,6 @@
 # import the following dependencies
 from utils.listeners import *
+from utils.helpers import *
 from dotenv import load_dotenv
 
 # Load locals and web3 provider
