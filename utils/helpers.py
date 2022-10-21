@@ -1,31 +1,20 @@
 import os,random,requests,logging,sys,json,time
 from dotenv import load_dotenv
 from web3 import Web3
+from pathlib import Path
 load_dotenv()
 
+def get_root_dir():
+    ROOT_DIR = Path(__file__).parent.parent
+    return ROOT_DIR
 
+def get_this_dir():
+    THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    return THIS_DIR
 def load_alerts():
-    a_file = open("alerts.json", "r")
+    a_file = open(f"{get_root_dir()}\\alerts.json", "r")
     alerts = json.load(a_file)
     return alerts
-def fixFromToValue2(string):
-    """
-    format the different version of 'from'/'to'/'value to one comprehensive output with from and to
-    """
-    string = str(string)
-
-    string = string.replace("_from","from")
-    string = string.replace("_to","to")
-    string = string.replace("_value","value")
-    string = string.replace("src","from")
-    string = string.replace("dst","to")
-    string = string.replace("wad","value")
-    string = string.replace("src","from")
-    string = string.replace("dst","to")
-    string = string.replace("wad","value")
-
-    string = json.loads(string)
-    return string
 def fixFromToValue(string):
     """
     format the different version of 'from'/'to'/'value to one comprehensive output with from and to
@@ -44,10 +33,6 @@ def fixFromToValue(string):
 
     if isinstance(string, str): string  = eval(string)
     return string
-
-def import_from(module, name):
-    module = __import__(module, fromlist=[name])
-    return getattr(module, name)
 
 def fixFromToFilters(string,token_address):
     """
@@ -238,7 +223,7 @@ def getABI(address):
     try:
         # First try to get the ABI from the ABI folder
         #logging.info('Loading ABI from file')
-        contract_abi = json.load(open(f'contracts/ABI/{address}.json'))
+        contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
         #logging.info(contract_abi)
         #logging.info('ABI loaded from file')
         return contract_abi
@@ -249,9 +234,9 @@ def getABI(address):
         #logging.info(f'ABI Found : {contract_abi}')
         # Then save it to the ABI folder
         #logging.info('Saving ABI...')
-        with open(f'contracts/ABI/{address}.json', 'w') as outfile:
+        with open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
-        logging.info(f'ABI Saved to contracts/ABI/{address}.json')
+        logging.info(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
         #and return object
         return contract_abi
 

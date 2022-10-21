@@ -55,6 +55,7 @@ class message():
                   {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'), "inline": False}]
 
         self.color = colors.dark_green
+
         if (self.tx["args"]["token_amounts"][0] + self.tx["args"]["token_amounts"][1]) / 1e18 > 500000:
             self.content = '<@&945071604642222110>'
         if (self.tx["args"]["token_amounts"][0] + self.tx["args"]["token_amounts"][1]) / 1e18 > 50000:

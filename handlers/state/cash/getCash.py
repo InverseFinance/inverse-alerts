@@ -27,7 +27,7 @@ class message():
             self.content = '<@&945071604642222110>'
             self.level = 3
             self.color = colors.red
-            send = True
+            self.send = True
         elif abs(self.change) > 0.1:
             self.level = 2
             self.color = colors.dark_orange
@@ -37,7 +37,7 @@ class message():
             self.color = colors.orange
             self.send = True
 
-        if send:
+        if self.send:
             logging.info(str(self.change) + '% change detected on ' + str(getName(self.web3, self.contract.address)) + ' balance')
 
             self.webhook = os.getenv('WEBHOOK_MARKETS')
