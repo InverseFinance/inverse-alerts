@@ -1,10 +1,6 @@
 # import the following dependencies
-from helpers import *
-from fetchers import *
-from listeners import *
+from utils.listeners import *
 from dotenv import load_dotenv
-from web3 import Web3
-import logging
 
 # Load locals and web3 provider
 load_dotenv()

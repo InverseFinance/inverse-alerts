@@ -1,6 +1,4 @@
-import os, json
-from helpers import *
-from fetchers import *
+from utils.fetchers import *
 from dotenv import load_dotenv
 
 load_dotenv()

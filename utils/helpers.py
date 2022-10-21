@@ -5,7 +5,7 @@ load_dotenv()
 
 
 def load_alerts():
-    a_file = open("alerts.json", "r")
+    a_file = open("../alerts.json", "r")
     alerts = json.load(a_file)
     return alerts
 def fixFromToValue2(string):
@@ -192,7 +192,7 @@ def LoggerParams():
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
-            logging.FileHandler("debug.log"),
+            logging.FileHandler("../debug.log"),
             logging.StreamHandler(sys.stdout)
         ]
     )
