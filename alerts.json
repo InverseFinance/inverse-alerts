@@ -165,6 +165,15 @@
             "DOLA":{"address": "0x865377367054516e17014CcdED1e7d814EDC9ce4","chain_ids": [1]}
         }},
 
+    "test": {
+        "type":"event",
+         "events": {
+             "Transfer": {"name": "Transfer", "filters": [{}]}
+         },
+        "contracts":{
+            "USDC":{"address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48","chain_ids": [1]}
+        }},
+
     "profits": {
         "type":"event",
          "events": {
@@ -202,7 +211,7 @@
         "type":"state",
         "functions": {
             "getUnderlyingPrice": {
-                "arg": "fetchers.getAllMarkets(web3, \"0x4dcf7407ae5c07f8681e1659f626e114a7667339\")"}},
+                "arg": "getAllMarkets(web3, \"0x4dcf7407ae5c07f8681e1659f626e114a7667339\")"}},
         "contracts":{
             "Inverse Oracle":{"address": "0xe8929afd47064efd36a7fb51da3f8c5eb40c4cb4","chain_ids": [1]}
         }},
@@ -266,7 +275,7 @@
                     "Fantom Treasury Multisig":{"address":"0x7f063F7B7A1326eE8B64ACFdc81Bf544ecc974bC","chain_ids":[250]}
                     }},
     "coingecko":{
-        "type":"link",
+        "type":"coingecko",
         "ids":{
             "inverse-finance":{"price": true,"volume":true},
             "lp-3pool-curve":{"price": true,"volume":false},

@@ -184,7 +184,7 @@ class FriendlyJsonSerde:
 
     When encoding or decoding fails, this class collects
     information on which fields failed, to show more
-    helpful information in the raised error messages.
+    helpful information in the raised error handlers.
     """
     def _json_mapping_errors(self, mapping: Dict[Any, Any]) -> Iterable[str]:
         for key, val in mapping.items():

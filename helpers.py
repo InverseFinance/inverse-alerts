@@ -8,7 +8,7 @@ def load_alerts():
     a_file = open("alerts.json", "r")
     alerts = json.load(a_file)
     return alerts
-def fixFromToValue(string):
+def fixFromToValue2(string):
     """
     format the different version of 'from'/'to'/'value to one comprehensive output with from and to
     """
@@ -26,6 +26,28 @@ def fixFromToValue(string):
 
     string = json.loads(string)
     return string
+def fixFromToValue(string):
+    """
+    format the different version of 'from'/'to'/'value to one comprehensive output with from and to
+    """
+    string = str(string)
+
+    string = string.replace("_from","from")
+    string = string.replace("_to","to")
+    string = string.replace("_value","value")
+    string = string.replace("src","from")
+    string = string.replace("dst","to")
+    string = string.replace("wad","value")
+    string = string.replace("src","from")
+    string = string.replace("dst","to")
+    string = string.replace("wad","value")
+
+    if isinstance(string, str): string  = eval(string)
+    return string
+
+def import_from(module, name):
+    module = __import__(module, fromlist=[name])
+    return getattr(module, name)
 
 def fixFromToFilters(string,token_address):
     """
