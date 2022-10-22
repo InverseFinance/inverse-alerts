@@ -4,7 +4,7 @@ from ens import ENS
 from dotenv import load_dotenv
 from utils.helpers import *
 from web3._utils.events import construct_event_topic_set
-
+from brownie import ZERO_ADDRESS
 load_dotenv()
 ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 

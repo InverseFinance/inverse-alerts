@@ -45,7 +45,7 @@ class handler():
 
         self.color = colors.red
         self.send = True
-        title = token_0 + token_1 + " Pool Liquidity Removal event detected"
+        self.title = token_0 + token_1 + " Pool Liquidity Removal event detected"
         self.fields = [
             {"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'), "inline": False},
             {"name": 'Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False},

@@ -70,7 +70,7 @@ class handler():
             self.send = True
 
 
-        self.color = colors.red
+        self.color = colors.dark_green
 
         self.result = {"webhook": self.webhook,
                        "title": self.title,

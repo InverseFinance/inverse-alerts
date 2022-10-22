@@ -35,7 +35,7 @@ class handler():
                   {"name": 'DOLA Amount :', "value": str(formatCurrency(self.tx["args"]["dolaAmount"] / 1e18)),
                    "inline": True},
                   {"name": 'Underlying Amount :', "value": str(formatCurrency(
-                      self.tx["args"]["underlyingAmount"] / getDecimals(self.web3, self.tx["args"]["anToken"]))),
+                      self.tx["args"]["underlyingAmount"] / getDecimals(self.web3, getUnderlying(self.web3,self.tx["args"]["anToken"])))),
                    "inline": True},
                   {"name": 'Transaction :',
                    "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'), "inline": False},

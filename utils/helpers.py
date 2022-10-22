@@ -17,6 +17,21 @@ def load_alerts():
     alerts = json.load(a_file)
     return alerts
 
+def load_contracts():
+    a_file = open(f"{get_root_dir()}\\contracts\\contracts.json", "r")
+    alerts = json.load(a_file)
+    return alerts
+
+def save_contracts(data):
+    with open(f"{get_root_dir()}\\contracts\\contracts.json", "w") as outfile:
+        json.dump(data, outfile)
+       # print(f"File successfully saved to {get_root_dir()}\\contracts\\contracts.json")
+
+def save_alerts(data):
+    with open(f"{get_root_dir()}\\alerts\\alerts.json", "w") as outfile:
+        json.dump(data, outfile)
+        #print(f"File successfully saved to {get_root_dir()}\\alerts\\alerts.json")
+
 def fixFromToValue(string):
     """
     format the different version of 'from'/'to'/'value to one comprehensive output with from and to
@@ -228,6 +243,33 @@ def hex_and_pad(i):
 
 
 # Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
+def getABI2(address,chainid):
+    try:
+        if chainid==1:
+            explorer = "etherscan"
+        if chainid==10:
+            explorer = "optimism.etherscan"
+        if chainid==1:
+            explorer = "ftmscan"
+        # First try to get the ABI from the ABI folder
+        #logging.info('Loading ABI from file')
+        contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
+        #logging.info(contract_abi)
+        #logging.info('ABI loaded from file')
+        return contract_abi
+    except:
+        # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
+        logging.info(f"Can't find ABI locally. Fetching ABI from {explorer} for contract{address}")
+        contract_abi = requests.get(f'https://api.{explorer}.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
+        #logging.info(f'ABI Found : {contract_abi}')
+        # Then save it to the ABI folder
+        with open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json', 'w') as outfile:
+            outfile.write(str(contract_abi))
+        print(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
+        #and return object
+        return contract_abi
+
+# Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
 def getABI(address):
     try:
         # First try to get the ABI from the ABI folder
@@ -248,15 +290,3 @@ def getABI(address):
         logging.info(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
         #and return object
         return contract_abi
-
-# A simple Contract Class with name, address and ABI
-class Contract(object):
-    def __init__(self,address):
-        self.address = Web3.toChecksumAddress(address)
-        self.ABI = getABI(self.address)
-
-    def get_address(self):
-        return self.address
-
-    def get_ABI(self):
-        return self.ABI

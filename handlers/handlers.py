@@ -16,23 +16,22 @@ class HandleEvent(Thread):
         self.contract=contract
 
     def run(self):
-        while True:
-            try:
-                self.tx = json.loads(Web3.toJSON(self.event))
+        try:
+            self.tx = json.loads(Web3.toJSON(self.event))
 
-                handler = getattr(importlib.import_module(f"handlers.events.{self.alert}.{self.event_name}"), "handler")
-                message_obj = handler(self.web3,self.tx).compose()
+            handler = getattr(importlib.import_module(f"handlers.events.{self.alert}.{self.event_name}"), "handler")
+            message_obj = handler(self.web3,self.tx).compose()
 
-                if message_obj['send']:
-                    sendWebhook(message_obj)
+            if message_obj['send']:
+                sendWebhook(message_obj)
 
-            except Exception as e:
-                logging.warning(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                logging.error(e)
-                sendError(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                sendError(e)
-                continue
-            break
+        except Exception as e:
+            logging.warning(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
+            logging.error(e)
+            sendError(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
+            sendError(e)
+            pass
+
 
 # Define state change to handle and logs to the console/send to discord
 class HandleStateVariation(Thread):
