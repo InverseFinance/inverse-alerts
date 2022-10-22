@@ -20,20 +20,11 @@ class HandleEvent(Thread):
             try:
                 self.tx = json.loads(Web3.toJSON(self.event))
 
-                message = getattr(importlib.import_module(f"handlers.events.{self.alert}.{self.event_name}"), "message")
+                handler = getattr(importlib.import_module(f"handlers.events.{self.alert}.{self.event_name}"), "handler")
+                message_obj = handler(self.web3,self.tx).compose()
 
-                message_obj = message(self.web3,self.tx).compose()
-
-                webhook = message_obj['webhook']
-                title = message_obj['title']
-                content = message_obj['content']
-                fields = message_obj['fields']
-                color = message_obj['color']
-                image = message_obj['image']
-                send = message_obj['send']
-
-                if send:
-                    sendWebhook(webhook, title, fields, content, image, color)
+                if message_obj['send']:
+                    sendWebhook(message_obj)
 
             except Exception as e:
                 logging.warning(f'Error in event handler {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
@@ -58,20 +49,11 @@ class HandleStateVariation(Thread):
 
     def run(self):
         try:
-            message = getattr(importlib.import_module(f"handlers.state.{self.alert}.{self.state_function}"), "message")
+            handler = getattr(importlib.import_module(f"handlers.state.{self.alert}.{self.state_function}"), "handler")
+            message_obj = handler(self.web3, self.contract,self.state_function,self.state_argument,self.change,self.value,self.old_value).compose()
 
-            message_obj = message(self.web3, self.contract,self.state_function,self.state_argument,self.change,self.value,self.old_value).compose()
-
-            webhook = message_obj['webhook']
-            title = message_obj['title']
-            content = message_obj['content']
-            fields = message_obj['fields']
-            color = message_obj['color']
-            image = message_obj['image']
-            send = message_obj['send']
-
-            if send:
-                sendWebhook(webhook, title, fields, content, image, color)
+            if message_obj['send']:
+                sendWebhook(message_obj)
 
         except Exception as e:
             logging.warning(f'Error in state variation handler {str(self.alert)}-{str(self.contract.address)}-{str(self.state_function)}-{str(self.state_argument)}')
@@ -94,20 +76,11 @@ class HandleTx(Thread):
         try:
             self.tx = json.loads(Web3.toJSON(self.event))
 
-            message = getattr(importlib.import_module(f"handlers.tx.{self.alert}.{self.alert}"), "message")
+            handler = getattr(importlib.import_module(f"handlers.tx.{self.alert}.{self.alert}"), "handler")
+            message_obj = handler(self.web3, self.tx,self.name).compose()
 
-            message_obj = message(self.web3, self.tx,self.name).compose()
-
-            webhook = message_obj['webhook']
-            title = message_obj['title']
-            content = message_obj['content']
-            fields = message_obj['fields']
-            color = message_obj['color']
-            image = message_obj['image']
-            send = message_obj['send']
-
-            if send:
-                sendWebhook(webhook, title, fields, content, image, color)
+            if message_obj['send']:
+                sendWebhook(message_obj)
 
         except Exception as e:
             logging.warning(f'Error in tx handler {str(self.alert)}-{str(self.contract.address)}-{str(self.name)}')
@@ -128,21 +101,11 @@ class HandleCoingecko(Thread):
     def run(self):
         try:
             if abs(self.change) > 0:
+                handler = getattr(importlib.import_module(f"handlers.coingecko.price"),"handler")
+                message_obj = handler(self.id, self.value, self.old_value, self.change).compose()
 
-                message = getattr(importlib.import_module(f"handlers.coingecko.price"),"message")
-
-                message_obj = message(self.id, self.value, self.old_value, self.change).compose()
-
-                webhook = message_obj['webhook']
-                title = message_obj['title']
-                content = message_obj['content']
-                fields = message_obj['fields']
-                color = message_obj['color']
-                image = message_obj['image']
-                send = message_obj['send']
-
-                if send:
-                    sendWebhook(webhook, title, fields, content, image, color)
+                if message_obj['send']:
+                    sendWebhook(message_obj)
 
         except Exception as e:
             logging.warning(f'Error in coingecko variation handler')
@@ -164,21 +127,11 @@ class HandleCoingeckoVolume(Thread):
     def run(self):
         try:
             if abs(self.change) > 0:
+                handler = getattr(importlib.import_module(f"handlers.coingecko.volume"),"handler")
+                message_obj = handler(self.id, self.value, self.old_value, self.change).compose()
 
-                message = getattr(importlib.import_module(f"handlers.coingecko.volume"),"message")
-
-                message_obj = message(self.id, self.value, self.old_value, self.change).compose()
-
-                webhook = message_obj['webhook']
-                title = message_obj['title']
-                content = message_obj['content']
-                fields = message_obj['fields']
-                color = message_obj['color']
-                image = message_obj['image']
-                send = message_obj['send']
-
-                if send:
-                    sendWebhook(webhook, title, fields, content, image, color)
+                if message_obj['send']:
+                    sendWebhook(message_obj)
 
         except Exception as e:
             logging.warning(f'Error in coingecko volume variation handler')

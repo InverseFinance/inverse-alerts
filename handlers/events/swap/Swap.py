@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class message():
+class handler():
     def __init__(self, web3, tx):
         self.web3 = web3
         self.tx = tx
@@ -22,9 +22,9 @@ class message():
         transactionHash = self.tx["transactionHash"]
 
         self.webhook = os.getenv('WEBHOOK_SWAP')
-        self.tx = fixFromToValue(self.tx)
 
         self.image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/838610/1466237/8e64e858-5db5-4692-922d-5f9fe6b7a8c6.jpg"
+
         if self.tx["args"]['amount0In'] == 0:
             operation = 'Buy ' + str(formatCurrency(self.tx["args"]['amount0Out'] / getDecimals(self.web3,getSushiTokens(self.web3, address)[0]))) + " " + str(getSushiTokensSymbol(self.web3, address)[0])
             self.color = colors.dark_green

@@ -11,10 +11,12 @@ def get_root_dir():
 def get_this_dir():
     THIS_DIR = os.path.dirname(os.path.abspath(__file__))
     return THIS_DIR
+
 def load_alerts():
-    a_file = open(f"{get_root_dir()}\\alerts.json", "r")
+    a_file = open(f"{get_root_dir()}\\alerts\\alerts.json", "r")
     alerts = json.load(a_file)
     return alerts
+
 def fixFromToValue(string):
     """
     format the different version of 'from'/'to'/'value to one comprehensive output with from and to
@@ -89,7 +91,7 @@ def assignFrequency(chainid):
         frequency = random.uniform(10,15)
     return frequency
 
-def sendWebhook(webhook, title, fields, content, imageurl, color):
+def sendWebhook(object):
     """
     Send a webhook with embed (title,fields,image,url,color)
     content is used for the body of the message and tagging roles
@@ -101,6 +103,13 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
     :param color: color of the embed message in discord
     :return:
     """
+    webhook=object['webhook']
+    title = object['title']
+    fields = object['fields']
+    content = object['content']
+    image = object['image']
+    color= object['color']
+
     error = True
     while error:
         try:
@@ -108,7 +117,7 @@ def sendWebhook(webhook, title, fields, content, imageurl, color):
                     "embeds":[{"fields": fields,
                                "title": title,
                                "color": color,
-                               "image": {"url": imageurl}}]}
+                               "image": {"url": image}}]}
             result = requests.post(webhook, json=data)
             result.raise_for_status()
             time.sleep(random.uniform(2, 5))

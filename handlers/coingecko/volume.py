@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class message():
+class handler():
     def __init__(self, id, value, old_value, change):
         self.id = id
         self.change = change

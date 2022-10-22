@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class message():
+class handler():
     def __init__(self,web3,contract,state_function,state_argument,change,value,old_value):
         self.web3 = web3
         self.webhook = ''

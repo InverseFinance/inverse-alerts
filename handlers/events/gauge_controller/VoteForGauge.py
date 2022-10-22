@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class message():
+class handler():
     def __init__(self, web3, tx):
         self.web3 = web3
         self.tx = tx
@@ -37,7 +37,7 @@ class message():
                 token_0 = "DOLA"
                 token_1 = "crvFRAX"
                 self.image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1349566/2302403/6731fd1b-9cb1-4ca8-a321-1025b786a010.jpg"
-                self.content = ''#'<@&945071604642222110>'
+                self.content = '<@&945071604642222110>'
                 self.color = colors.dark_green
                 self.send = True
             elif gauge_address == "0x8Fa728F393588E8D8dD1ca397E9a710E53fA553a":
@@ -46,10 +46,9 @@ class message():
                 token_0 = "DOLA"
                 token_1 = "3CRV"
                 self.image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1348784/2301280/9afceee3-e958-441a-b77a-5558a7a08595.jpg"
-                self.content = ''#'<@&945071604642222110>'
+                self.content = '<@&945071604642222110>'
                 self.color = colors.dark_green
                 self.send = True
-
 
             self.title = token_0 + token_1 + " Pool Vote For Gauge detected"
             self.fields = [

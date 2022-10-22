@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class message():
+class handler():
     def __init__(self, web3, tx):
         self.web3 = web3
         self.tx = tx
@@ -22,7 +22,6 @@ class message():
         transactionHash = self.tx["transactionHash"]
 
         self.webhook = os.getenv('WEBHOOK_SWAP')
-        self.tx = fixFromToValue(self.tx)
 
         self.title = "Sushi New Liquidity Removal detected"
 

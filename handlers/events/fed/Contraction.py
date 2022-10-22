@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class message():
+class handler():
     def __init__(self, web3, tx):
         self.web3 = web3
         self.tx = tx
