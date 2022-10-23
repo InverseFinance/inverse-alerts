@@ -77,13 +77,17 @@ def getWeb3(chainid):
     if chainid==1:
         rpc = os.getenv('QUICKNODE_ETH')
         web3 = Web3(Web3.HTTPProvider(rpc))
+        return web3
     elif chainid==10:
         rpc = os.getenv('QUICKNODE_OPT')
         web3 = Web3(Web3.HTTPProvider(rpc))
+        return web3
     elif chainid==250:
         rpc = os.getenv('QUICKNODE_FTM')
         web3 = Web3(Web3.HTTPProvider(rpc))
-    return web3
+        return web3
+    else:
+        print(f"This chain does not exist. Can't find web3 provider, please amend helper/getWeb3 function.")
 
 def getRPC(chainid):
     """
@@ -91,11 +95,15 @@ def getRPC(chainid):
     """
     if chainid==1:
         rpc = os.getenv('QUICKNODE_ETH')
+        return rpc
     elif chainid==10:
         rpc = os.getenv('QUICKNODE_OPT')
+        return rpc
     elif chainid==250:
         rpc = os.getenv('QUICKNODE_FTM')
-    return rpc
+        return rpc
+    else:
+        print(f"This chain does not exist. Can't find web3 provider, please amend helper/getWeb3 function.")
 
 def assignFrequency(chainid):
     if chainid==1:

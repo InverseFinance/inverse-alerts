@@ -19,7 +19,7 @@ class HandleEvent(Thread):
         try:
             self.tx = json.loads(Web3.toJSON(self.event))
 
-            handler = getattr(importlib.import_module(f"handlers.events.{self.alert}.{self.event_name}"), "handler")
+            handler = getattr(importlib.import_module(f"handlers.event.{self.alert}.{self.event_name}"), "handler")
             message_obj = handler(self.web3,self.tx).compose()
 
             if message_obj['send']:
@@ -75,7 +75,7 @@ class HandleTx(Thread):
         try:
             self.tx = json.loads(Web3.toJSON(self.event))
 
-            handler = getattr(importlib.import_module(f"handlers.tx.{self.alert}.{self.alert}"), "handler")
+            handler = getattr(importlib.import_module(f"handlers.transaction.{self.alert}.{self.alert}"), "handler")
             message_obj = handler(self.web3, self.tx,self.name).compose()
 
             if message_obj['send']:

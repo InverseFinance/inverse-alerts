@@ -11,9 +11,15 @@ class Contract:
             self.chain_id = int(chain_id)
             self.ABI = getABI2(self.address,self.chain_id)
             self.web3 = getWeb3(chain_id)
+            self.exists = False
+            for c in contracts:
+                if contracts[c]['address']==address:
+                    self.name = c
+                    self.exists = True
 
-        except Exception as e:
+        except AttributeError as e:
             logging.error(e)
+            logging.info(f"Contract is not registered in contracts.json file. Add it first before adding it to your alert.")
     def add_to_json(self):
         contracts = (load_contracts())
         create_contract = True
