@@ -22,8 +22,8 @@ class handler():
         transactionHash = self.tx["transactionHash"]
 
         if self.web3.eth.chainId==1:explorer='etherscan'
-        elif self.web3.eth.chainId==1:explorer='optimistic.etherscan'
-        elif self.web3.eth.chainId==1:explorer='ftmscan'
+        elif self.web3.eth.chainId==10:explorer='optimistic.etherscan'
+        elif self.web3.eth.chainId==250:explorer='ftmscan'
 
 
         logging.info(str('Tx detected on ' + str(self.name)))

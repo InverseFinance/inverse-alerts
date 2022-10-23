@@ -1,10 +1,11 @@
-import json,os,requests
+import json,os,requests,logging
 import pandas as pd
 from ens import ENS
 from dotenv import load_dotenv
 from utils.helpers import *
 from web3._utils.events import construct_event_topic_set
-from brownie import ZERO_ADDRESS
+
+LoggerParams()
 load_dotenv()
 ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 

@@ -77,8 +77,9 @@ class EventListener(Thread):
         self.events = tuple()
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
+        self.name =str(alert)+'-'+str(contract.address)+'-'+str(event_name)
 
-        logging.info('Starting Event Listener '+str(alert)+'-'+str(contract.address)+'-'+str(event_name)+' with filters '+str(filters))
+        logging.info('Starting Event Listener '+self.name+' with filters '+str(filters))
 
     def run(self):
         while True:
@@ -186,11 +187,11 @@ class TxListener(Thread):
         while True:
             try:
                 self.block1 = self.block0
-                self.tx_filter = self.web3.eth.filter({"fromBlock": self.block0, "address": self.contract})
+                self.tx_filter = self.web3.eth.filter({"fromBlock": self.block0, "address": self.contract.address})
                 self.block0 = self.web3.eth.get_block_number()
                 for tx in self.tx_filter.get_all_entries():
                     logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
-                    HandleTx(self.web3,tx, self.alert, self.contract,self.name).start()
+                    HandleTx(self.web3,tx, self.alert, self.contract, self.name).start()
                 time.sleep(self.frequency)
 
             except Exception as e:

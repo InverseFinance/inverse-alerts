@@ -1,7 +1,10 @@
 # import the following dependencies
 from utils.listeners import *
 from utils.helpers import *
+from contracts.contracts import Contract
 from dotenv import load_dotenv
+import logging
+import asyncio
 
 # Load locals and web3 provider
 load_dotenv()
@@ -41,14 +44,15 @@ def main():
                         contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
                         contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
                         frequency = assignFrequency(chain_id)
-                        TxListener(web3, alert, contract_obj, contract, frequency)
+                        TxListener(web3, alert, contract_obj, contract, frequency).start()
 
             if alerts[alert]['type'] == 'coingecko':
                 for id in alerts[alert]['ids']:
                     if alerts[alert]['ids'][id]['price'] == True:
-                        CoinGeckoListener(id)
+                        CoinGeckoListener(id).start()
                     if alerts[alert]['ids'][id]['volume'] == True:
-                        CoinGeckoVolumeListener(id)
+                        CoinGeckoVolumeListener(id).start()
+
 
 if __name__ == "__main__":
     alerts = load_alerts()

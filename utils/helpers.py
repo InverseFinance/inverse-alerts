@@ -54,6 +54,7 @@ def fixFromToValue(string):
 def fixFromToFilters(string,token_address):
     """
     Amend the from/to filter depending on the token to produce valid filters
+    This is used for transfer Events coded with different standards
     """
 
     if token_address in["0xD533a949740bb3306d119CC777fa900bA034cd52"]:
@@ -209,7 +210,7 @@ def LoggerParams():
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
-            logging.FileHandler("../debug.log"),
+            logging.FileHandler(f"{get_root_dir()}//debug.log"),
             logging.StreamHandler(sys.stdout)
         ]
     )
@@ -251,50 +252,51 @@ def hex_and_pad(i):
 
 
 # Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
+# Option 2 with chain id selects correct explorer
 def getABI2(address,chainid):
     try:
         if chainid==1:
             explorer = "etherscan"
         if chainid==10:
             explorer = "optimism.etherscan"
-        if chainid==1:
+        if chainid==250:
             explorer = "ftmscan"
-        # First try to get the ABI from the ABI folder
-        #logging.info('Loading ABI from file')
+        if chainid==5:
+            explorer = "goerli.etherscan"
+
         contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
-        #logging.info(contract_abi)
-        #logging.info('ABI loaded from file')
+
         return contract_abi
-    except:
+
+    except ValueError:
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
-        logging.info(f"Can't find ABI locally. Fetching ABI from {explorer} for contract{address}")
+        logging.info(f"Can't find ABI locally. Fetching ABI from {explorer} for contract {address}")
         contract_abi = requests.get(f'https://api.{explorer}.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
-        #logging.info(f'ABI Found : {contract_abi}')
-        # Then save it to the ABI folder
+
         with open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
         print(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
-        #and return object
+
         return contract_abi
+    except Exception as e:
+        logging.error(e)
 
 # Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
 def getABI(address):
     try:
         # First try to get the ABI from the ABI folder
-        #logging.info('Loading ABI from file')
         contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
-        #logging.info(contract_abi)
-        #logging.info('ABI loaded from file')
         return contract_abi
-    except:
+    except ValueError:
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
         logging.info(f"Can't find ABI locally. Fetching ABI from Etherscan for contract{address}")
+
         contract_abi = requests.get('https://api.etherscan.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
-        #logging.info(f'ABI Found : {contract_abi}')
-        # Then save it to the ABI folder
-        #logging.info('Saving ABI...')
+
         with open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
         logging.info(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
-        #and return object
+
         return contract_abi
+    except Exception as e:
+        logging.error(e)

@@ -16,11 +16,14 @@ class Contract:
                 if contracts[c]['address']==address:
                     self.name = c
                     self.exists = True
+            if not self.exists:
+                self.name = ''
 
         except AttributeError as e:
             logging.error(e)
-            logging.info(f"Contract is not registered in contracts.json file. Add it first before adding it to your alert.")
-    def add_to_json(self):
+            logging.info(f"Contract is not registered in  contracts.json. Add it first before adding it to your alert.")
+    def add_to_json(self,name):
+        self.name = name
         contracts = (load_contracts())
         create_contract = True
         add_chain = True
@@ -86,7 +89,7 @@ class Contract:
                     remove_contract = False
 
             if remove_contract:
-                print(f"Contract doesnt exist")
+                print(f"Contract does not exist")
                 remove_contract = False
 
         save_contracts(contracts)
@@ -99,7 +102,7 @@ class Contract:
                 is_in_list = True
                 return contracts[c]
         if not is_in_list :
-            print("Contract is not in contracts.json file. Please add your contract first")
+            print("Contract is not in contracts.json file. Add your contract first")
             return None
     def list_events(self):
         events = []
@@ -113,7 +116,7 @@ class Contract:
             if item["type"] == 'function':
                 events.append(item['name'])
         return(events)
-    def get(self):
+    def get_web3_object(self):
         contract = self.web3.eth.contract(address=self.address, abi=self.ABI)
         return contract
 

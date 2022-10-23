@@ -41,6 +41,8 @@ class handler():
             token_0_total = getBalance(self.web3, pool_address, token_0_address)
             token_1_total = getBalance(self.web3, pool_address, token_1_address)
             self.image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/1300762/2228671/f10870d8-4e95-474d-a47a-d75b05cd2a99.jpg"
+        else:
+            return
 
 
         self.title = token_0 + token_1 + " Pool Liquidity Add event detected"

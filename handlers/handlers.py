@@ -2,6 +2,7 @@
 import importlib
 from threading import Thread
 from utils.fetchers import *
+LoggerParams()
 
 
 
@@ -73,7 +74,7 @@ class HandleTx(Thread):
 
     def run(self):
         try:
-            self.tx = json.loads(Web3.toJSON(self.event))
+            self.tx = json.loads(Web3.toJSON(self.tx))
 
             handler = getattr(importlib.import_module(f"handlers.transaction.{self.alert}.{self.alert}"), "handler")
             message_obj = handler(self.web3, self.tx,self.name).compose()
