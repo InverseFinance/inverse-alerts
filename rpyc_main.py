@@ -4,6 +4,7 @@ from utils.helpers import *
 from contracts.contracts import Contract
 from dotenv import load_dotenv
 from rpyc.utils.server import ThreadedServer
+import threading
 from threading import Thread
 import rpyc,platform,signal,ctypes
 
@@ -12,7 +13,7 @@ load_dotenv()
 LoggerParams()
 
 class Launchers():
-    def start(self):
+    def start_all(self):
         alerts = load_alerts()
         for alert in alerts:
             if alert != 'test':
@@ -66,7 +67,6 @@ class Launchers():
         TxListener(web3, alert, contract_obj, contract, frequency).start()
         return
 
-# start the rpyc server
 class MyService(rpyc.Service):
     """
     def on_connect(self, conn):
@@ -78,7 +78,7 @@ class MyService(rpyc.Service):
         pass
     """
     def start(self):
-        return main.start()
+        return main.start_all()
 
     def exposed_add_event_listener(self,web3, alert, contract_obj, event, filters, frequency):
         return main.add_event_listener(web3, alert, contract_obj, event, filters, frequency)
@@ -95,21 +95,28 @@ class MyService(rpyc.Service):
         if platform.system() == 'Windows':
             PROCESS_TERMINATE = 1
             handle = ctypes.windll.kernel32.OpenProcess(PROCESS_TERMINATE, False, pid)
+            logging.info("Closing server and all listeners.")
             ctypes.windll.kernel32.TerminateProcess(handle, -1)
             ctypes.windll.kernel32.CloseHandle(handle)
         else:
             os.kill(pid, signal.SIGTERM)
 
-server = ThreadedServer(MyService,
-                        port = 8080,
-                        protocol_config={'allow_public_attrs': True,
-                                         "allow_all_attrs": True,
-                                         "sync_request_timeout":None})
+if __name__ == '__main__':
+    server = ThreadedServer(MyService,
+                            port = 8080,
+                            protocol_config={'allow_public_attrs': True,
+                                             "allow_all_attrs": True,
+                                             "sync_request_timeout":None})
 
-t = Thread(target = server.start)
-t.daemon = True
-t.start()
+    threaded_server = Thread(target = server.start)
+    threaded_server.daemon = True
+    threaded_server.start()
 
-main = Launchers()
-main.start()
+    main = Launchers()
+    main.start_all()
+"""
+    for thread in threading.enumerate():
+        print(thread.name)
+"""
+
 
