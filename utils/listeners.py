@@ -132,7 +132,7 @@ class StateChangeListener(Thread):
         self.argument = argument
         self.frequency = frequency
         # If condition to take into account state function with no input params
-
+        self.name = str(alert)+'-'+str(contract.address)+'-'+str(state_function)
         logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(state_function)+' with filters '+str(argument))
 
         if self.argument is None: self.value = eval(f"self.contract.functions.{self.state_function}().call()")
@@ -181,6 +181,7 @@ class TxListener(Thread):
         self.frequency = frequency
         self.block0 = self.web3.eth.get_block_number()
         self.block1 = self.block0
+        self.name = str(alert)+'-'+str(contract.address)+'-'+str(name)
 
         logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(name))
     def run(self):
@@ -195,10 +196,10 @@ class TxListener(Thread):
                 time.sleep(self.frequency)
 
             except Exception as e:
-                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract)}-{str(self.name)}')
+                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract.address)}-{str(self.name)}')
                 logging.error(e)
                 self.block0 = self.block1
-                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract)}-{str(self.name)}')
+                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract.address)}-{str(self.name)}')
                 sendError(e)
                 time.sleep(random.uniform(5,11))
                 continue
