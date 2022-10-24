@@ -12,7 +12,7 @@ import rpyc,platform,signal,ctypes
 load_dotenv()
 LoggerParams()
 
-class Launchers():
+class Launchers:
     def start_all(self):
         alerts = load_alerts()
         for alert in alerts:

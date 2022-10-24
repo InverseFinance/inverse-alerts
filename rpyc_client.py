@@ -19,13 +19,15 @@ def stop_server():
             logging.error(e)
 
 def add_event_listener(web3, alert, contract_obj, event, filters, frequency):
-
-    conn = rpyc.connect("localhost", 8080,
-                        config={'allow_public_attrs': True,
-                                "allow_all_attrs": True,
-                                "sync_request_timeout": None})
-    c = conn.root
-    c.add_event_listener(web3, alert, contract_obj, event, filters, frequency)
+    try:
+        conn = rpyc.connect("localhost", 8080,
+                            config={'allow_public_attrs': True,
+                                    "allow_all_attrs": True,
+                                    "sync_request_timeout": None})
+        c = conn.root
+        c.add_event_listener(web3, alert, contract_obj, event, filters, frequency)
+    except Exception as e:
+            logging.error(e)
 
 def add_state_listener(web3, alert, contract_obj, function, argument, frequency):
 
@@ -52,4 +54,5 @@ event = 'AddLiquidity'
 filters = {}
 frequency = 5
 
-add_event_listener()
+add_event_listener(web3, alert, contract_obj, event, filters, frequency)
+stop_server()
