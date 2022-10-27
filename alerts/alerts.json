@@ -16,6 +16,16 @@
         "filters": [
           {}
         ]
+      },
+      "TokenExchange": {
+        "filters": [
+          {}
+        ]
+      },
+      "TokenExchangeUnderlying": {
+        "filters": [
+          {}
+        ]
       }
     },
     "contracts": {

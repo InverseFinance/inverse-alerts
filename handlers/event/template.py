@@ -20,12 +20,23 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
+        arg1 = self.tx["args"]["arg1"]
+        arg2 = self.tx["args"]["arg2"]
+        arg3 = self.tx["args"]["arg3"]
+        arg4 = self.tx["args"]["arg4"]
+
         self.webhook = os.getenv("WEBHOOK_TESTING")
         self.tx = fixFromToValue(self.tx)
 
         self.title = ""
         self.content = ""
-        self.fields = ""
+        self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'), "inline": False},
+                       {"name": 'Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False},
+                       {"name": 'Arg1 :', "value": str(arg1),"inline": False},
+                       {"name": 'Arg2 :', "value": str(arg2), "inline": True},
+                       {"name": 'Arg3 :', "value": str(arg3), "inline": True},
+                       {"name": 'Arg4 :', "value": str(arg4), "inline": True},
+                       {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False}]
         self.image = ""
         self.color = colors.dark_orange
         self.send = True
