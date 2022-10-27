@@ -61,65 +61,6 @@ class EventListener(Thread):
                 self.block0 = self.block1
                 time.sleep(random.uniform(5,11))
                 continue
-# Define a Thread to listen separately on each contract/event in the contract file
-class EventListener(Thread):
-    def __init__(self, web3, alert, contract, event_name,filters, frequency, **kwargs):
-        super(EventListener, self).__init__(**kwargs)
-        self.web3 = web3
-        self.alert = alert
-        self.contract = contract
-        self.event_name = event_name
-        self.filters = filters
-        self.frequency = frequency
-        self.subtopics = list()
-        self.topics = list()
-        self.logs = list()
-        self.events = tuple()
-        self.block0 = self.web3.eth.get_block_number()
-        self.block1 = self.block0
-        self.name =str(alert)+'-'+str(contract.address)+'-'+str(event_name)
-
-        logging.info('Starting Event Listener '+self.name+' with filters '+str(filters))
-
-    def run(self):
-        while True:
-            try:
-                self.topics = []
-
-                #create a topic for every filter in alerts.py and bundle them in self.topics
-                for filter in self.filters:
-                    self.block1 = self.block0
-                    self.sub_topic = eval(f'construct_event_topic_set(self.contract.events.{self.event_name}().abi, self.web3.codec, {str(filter)})')
-                    self.topics.append(self.sub_topic)
-
-                # Fetch logs for every subtopic and bundle logs together
-                for subtopic in self.topics:
-                    new_logs = self.web3.eth.get_logs({"address": self.contract.address, "topics": subtopic, "fromBlock": self.block0})
-                    if new_logs != []:
-                        for item in new_logs:
-                            self.logs.append(item)
-
-                self.block0 = self.web3.eth.get_block_number()
-
-                # Fetch for event in the filtered logs
-                if self.logs != []:
-                    self.events = eval(f'self.contract.events.{self.event_name}().processReceipt({{"logs": self.logs}})')
-                    for event in self.events:
-                        logging.info(f'Event found in {self.alert}-{self.contract.address}-{self.event_name}')
-                        logging.info(event)
-                        HandleEvent(self.web3, event, self.alert,self.contract, self.event_name).start()
-
-                self.logs = list()
-                time.sleep(self.frequency)
-
-            except Exception as e:
-                logging.warning(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                logging.error(e)
-                sendError(f'Error in Event Listener {str(self.alert)}-{str(self.contract.address)}-{str(self.event_name)}')
-                sendError(e)
-                self.block0 = self.block1
-                time.sleep(random.uniform(5,11))
-                continue
 
 # Define a Thread to listen separately on each contract/statefunction change
 class StateChangeListener(Thread):
@@ -171,35 +112,36 @@ class StateChangeListener(Thread):
 
 # Define a Thread to listen separately on each contract/event in the contract file
 class TxListener(Thread):
-    def __init__(self, web3, alert, contract, name, frequency, **kwargs):
+    def __init__(self, web3, alert, contract, contract_name, frequency, **kwargs):
         super(TxListener, self).__init__(**kwargs)
         self.web3 = web3
         self.alert = alert
         self.contract = contract
-        self.name = name
+        self.contract_name = contract_name
         self.tx_filter = []
         self.frequency = frequency
-        self.block0 = self.web3.eth.get_block_number()
+        self.block0 = self.web3.eth.get_block_number()-5
         self.block1 = self.block0
-        self.name = str(alert)+'-'+str(contract.address)+'-'+str(name)
+        self.name = f'{str(self.alert)}-{str(self.contract.address)}-{str(self.contract_name)}'
 
-        logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(name))
+        logging.info('Starting State Listener '+str(alert)+'-'+str(contract.address)+'-'+str(contract_name))
     def run(self):
         while True:
             try:
                 self.block1 = self.block0
                 self.tx_filter = self.web3.eth.filter({"fromBlock": self.block0, "address": self.contract.address})
                 self.block0 = self.web3.eth.get_block_number()
-                for tx in self.tx_filter.get_all_entries():
-                    logging.info(f'Tx found in {str(self.alert)}-{str(self.name)}')
-                    HandleTx(self.web3,tx, self.alert, self.contract, self.name).start()
+                if self.tx_filter.get_all_entries()!=[]:
+                    for tx in self.tx_filter.get_all_entries():
+                        logging.info(f'Tx found in {str(self.alert)}-{str(self.contract_name)}')
+                        HandleTx(self.web3, tx, self.alert, self.contract, self.contract_name).start()
                 time.sleep(self.frequency)
 
             except Exception as e:
-                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract.address)}-{str(self.name)}')
+                logging.warning(f'Error in tx listener {str(self.alert)}-{str(self.contract.address)}-{str(self.contract_name)}')
                 logging.error(e)
                 self.block0 = self.block1
-                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract.address)}-{str(self.name)}')
+                sendError(f'Error in tx listener {str(self.alert)}-{str(self.contract.address)}-{str(self.contract_name)}')
                 sendError(e)
                 time.sleep(random.uniform(5,11))
                 continue

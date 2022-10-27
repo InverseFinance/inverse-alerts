@@ -134,8 +134,9 @@ def sendWebhook(object):
     image = object['image']
     color= object['color']
 
-    error = True
-    while error:
+    i = 0
+    while  i<5 :
+        i += 1
         try:
             data = {"content": content,
                     "embeds":[{"fields": fields,
@@ -172,7 +173,7 @@ def sendError(content):
     error = True
     replacers = {'{': '(', '}': ')',']': ')','[': ')',':': '='}  # etc....
     i = 0
-    while error and i<5 :
+    while i<5 :
         try:
             i = i+ 1
             for a, b in replacers.items():
@@ -182,10 +183,9 @@ def sendError(content):
             result.raise_for_status()
         except requests.exceptions.HTTPError as err:
             logging.error(err)
-            logging.info("Error in sending message to webhook. Waiting 10 seconds to retry... code {}.".format(result.status_code))
+            logging.info("Error in sending message to webhook. Waiting 5 seconds to retry... code {}.".format(result.status_code))
             # time sleep is used to avoid throttling the error webhook w/ too many attempts
-
-            time.sleep(10)
+            time.sleep(5)
             error = True
         else:
             error = False

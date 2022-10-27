@@ -67,7 +67,7 @@ class Launchers:
         TxListener(web3, alert, contract_obj, contract, frequency).start()
         return
 
-class MyService(rpyc.Service):
+class Server(rpyc.Service):
     """
     def on_connect(self, conn):
         print('Connected')
@@ -102,7 +102,7 @@ class MyService(rpyc.Service):
             os.kill(pid, signal.SIGTERM)
 
 if __name__ == '__main__':
-    server = ThreadedServer(MyService,
+    server = ThreadedServer(Server,
                             port = 8080,
                             protocol_config={'allow_public_attrs': True,
                                              "allow_all_attrs": True,
