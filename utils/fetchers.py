@@ -28,7 +28,7 @@ def getRemovedTokenSymbol(web3, txHash,poolAddress):
         topics = construct_event_topic_set(contract.events.Transfer().abi, web3.codec, filters)
         logs = web3.eth.get_logs({"address":contract.address,"topics":topics,"blockHash": blockHash})
         if logs==[]:
-            continue
+            pass
         else:
             events = contract.events.Transfer().processReceipt({"logs": logs})
             for event in events:

@@ -43,6 +43,24 @@
       }
     }
   },
+  "bal_dola_bb_a_usd": {
+    "type": "event",
+    "contracts": {
+      "anETHv2": {
+        "address": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+        "chain_ids": [
+          1
+        ]
+      }
+    },
+    "events": {
+      "PoolBalanceChanged": {
+        "filters": [
+          {}
+        ]
+      }
+    }
+  },
   "gauge_controller": {
     "type": "event",
     "events": {
@@ -446,6 +464,18 @@
         "chain_ids": [
           1
         ]
+      },
+      "VelodromeFed": {
+        "address": "0xfEd533e0Ec584D6FF40281a7850c4621D258b43d",
+        "chain_ids": [
+          1
+        ]
+      },
+      "AuraFed": {
+        "address": "0x5D5392505ee69f9FE7a6a1c1AF14f17Db3B3e364",
+        "chain_ids": [
+          1
+        ]
       }
     }
   },
@@ -573,34 +603,6 @@
       "DOLA": {
         "address": "0x865377367054516e17014CcdED1e7d814EDC9ce4",
         "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
-  "test": {
-    "type": "event",
-    "events": {
-      "Transfer": {
-        "name": "Transfer",
-        "filters": [
-          {}
-        ]
-      }
-    },
-    "contracts": {
-      "Debt Converter": {
-        "address": "0x1ff9c712B011cBf05B67A6850281b13cA27eCb2A",
-        "chain_ids": [
-          2,
-          1,
-          3
-        ]
-      },
-      "test": {
-        "address": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
-        "chain_ids": [
-          2,
           1
         ]
       }
@@ -951,17 +953,5 @@
         "volume": false
       }
     }
-  },
-  "test2": {
-    "type": "state",
-    "contracts": {
-      "anETHv2": {
-        "address": "0x8e103Eb7a0D01Ab2b2D29C91934A9aD17eB54b86",
-        "chain_ids": [
-          1
-        ]
-      }
-    },
-    "functions": {}
   }
 }

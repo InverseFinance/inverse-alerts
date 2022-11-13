@@ -19,6 +19,7 @@ class HandleEvent(Thread):
     def run(self):
         try:
             self.tx = json.loads(Web3.toJSON(self.event))
+            logging.info(self.tx)
 
             handler = getattr(importlib.import_module(f"handlers.event.{self.alert}.{self.event_name}"), "handler")
             message_obj = handler(self.web3,self.tx).compose()

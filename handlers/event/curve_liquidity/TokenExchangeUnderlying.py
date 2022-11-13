@@ -49,22 +49,30 @@ class handler():
         bought_id = self.tx["args"]["bought_id"]
         tokens_bought = self.tx["args"]["tokens_bought"]/1e18
 
+        if sold_id==0:
+            tokens_sold_symbol = token_0
+            tokens_bought_symbol = token_1
+        else:
+            tokens_sold_symbol = token_1
+            tokens_bought_symbol = token_0
+
         self.title = token_0 + token_1 + " Pool Swap event detected"
         self.content = ""
         self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'), "inline": False},
                        {"name": 'Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False},
                        {"name": 'Trader :', "value": str(f'[{buyer}](https://etherscan.io/address/{buyer})'),"inline": False},
-                       {"name": 'Bought', "value": str(formatCurrency(tokens_bought)), "inline": True},
-                       {"name": 'Bought ID', "value": str(bought_id), "inline": True},
-                       {"name": 'Sold', "value": str(formatCurrency(tokens_sold)), "inline": True},
-                       {"name": 'Sold ID', "value": str(sold_id), "inline": True},
+                       {"name": tokens_bought_symbol+' Bought', "value": str(formatCurrency(tokens_bought)), "inline": True},
+                       {"name": tokens_sold_symbol+' Sold', "value": str(formatCurrency(tokens_sold)), "inline": True},
                        {"name": token_0 + ' in Pool :', "value": str(formatCurrency(token_0_total)), "inline": True},
                        {"name": token_1 + ' in Pool :', "value": str(formatCurrency(token_1_total)), "inline": True},
                        {"name": token_0 + '+' + token_1 + ' in Pool',"value": str(formatCurrency(token_0_total + token_1_total)), "inline": False},
                        {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False}]
 
         self.color = colors.dark_orange
-        self.send = True
+
+        if tokens_sold > 500000 or tokens_bought > 500000:
+            self.send = True
+
 
         self.result = {"webhook":self.webhook,
                   "title":self.title,
