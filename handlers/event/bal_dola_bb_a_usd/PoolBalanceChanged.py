@@ -21,40 +21,43 @@ class handler():
         print(self.tx)
         dola_address = "0x865377367054516e17014CcdED1e7d814EDC9ce4"
         composable_stable_pool = "0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64"
+        tokens = self.tx['args']['tokens']
 
-        if dola_address in self.tx['args']['tokens'] or composable_stable_pool in self.tx['args']['tokens']:
+        if self.tx["args"]["poolId"][0:42]=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
 
-            address = self.tx["address"]
             blockNumber = self.tx["blockNumber"]
             transactionHash = self.tx["transactionHash"]
-            event = "Liquidity"
-            arg1 = self.tx["args"]["poolId"]
-            arg2 = getENS(self.web3,self.tx["args"]["liquidityProvider"])
-            arg2_bis = self.tx["args"]["liquidityProvider"]
-            #arg3 = self.tx["args"]["tokens"]
-            arg4 = self.tx["args"]["deltas"][0]
-            arg5 = self.tx["args"]["deltas"][1]
-            #arg5 = self.tx["args"]["protocolFeeAmounts"]
 
-            if arg4<0 or arg5 < 0:
-                event = 'Withdrawal'
-                self.color = colors.dark_red
-            if arg4>0 or arg5 > 0 :
-                event = 'Deposit'
-                self.color = colors.dark_green
+            address = self.tx["args"]["poolId"][0:42]
+            provider_address = getENS(self.web3,self.tx["args"]["liquidityProvider"])
 
             self.webhook = os.getenv("WEBHOOK_BAL_DOLA")
 
-            self.title = "BAL_DOLA_BB_A_USD "+event+" Detected"
 
             self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'), "inline": False},
-                           {"name": 'Pool Address :', "value": str(f'[0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64](https://etherscan.io/address/0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64)'),"inline": False},
-                           {"name": 'Provider :', "value": str(f'[{arg2}](https://etherscan.io/address/{arg2_bis})'), "inline": False},
-                           {"name": 'DOLA amount :', "value": str(formatCurrency(arg4/1e18)), "inline": False},
-                           {"name": 'DOLA bb-a-usd amount :', "value": str(formatCurrency(arg5/1e18)), "inline": False},
-                           {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False}]
-            self.image = ""
-            self.color = colors.dark_orange
+                           {"name": 'Pool Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False},
+                           {"name": 'Provider :', "value": str(f'[{provider_address}](https://etherscan.io/address/{provider_address})'), "inline": False}]
+            i =0
+            deltas_sum = 0
+            for token in self.tx["args"]["tokens"]:
+                self.fields.append({"name":str(getSymbol(self.web3,token)),"value":str(formatCurrency(self.tx["args"]["deltas"][i]/getDecimals(self.web3,token))),"inline":True})
+                deltas_sum =deltas_sum + self.tx["args"]["deltas"][i]/getDecimals(self.web3,token)
+                i = i+ 1
+
+            self.fields.append({"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
+
+            if deltas_sum > 0:
+                self.color = colors.dark_green
+                event = "Add"
+            elif deltas_sum <0:
+                self.color = colors.dark_red
+                event = "Withdraw"
+            else:
+                self.color = colors.blurple
+                event = "Other"
+
+            self.title = "Balancer Liquidity "+event+" Event Detected"
+
             self.send = True
 
         self.result = {"webhook":self.webhook,

@@ -269,7 +269,7 @@ def getABI2(address,chainid):
 
         return contract_abi
 
-    except ValueError:
+    except Exception as e:
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
         logging.info(f"Can't find ABI locally. Fetching ABI from {explorer} for contract {address}")
         contract_abi = requests.get(f'https://api.{explorer}.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
@@ -288,7 +288,7 @@ def getABI(address):
         # First try to get the ABI from the ABI folder
         contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
         return contract_abi
-    except ValueError:
+    except Exception as e:
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
         logging.info(f"Can't find ABI locally. Fetching ABI from Etherscan for contract{address}")
 
@@ -299,5 +299,3 @@ def getABI(address):
         logging.info(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
 
         return contract_abi
-    except Exception as e:
-        logging.error(e)

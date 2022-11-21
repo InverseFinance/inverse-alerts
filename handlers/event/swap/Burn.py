@@ -21,22 +21,34 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
-        self.webhook = os.getenv('WEBHOOK_SWAP')
+        amount_a = self.tx["args"]["amount0"]/1e18
+        amount_b = self.tx["args"]["amount1"]/1e18
+        total_amount = abs(amount_a + amount_b)
 
-        self.title = "Sushi New Liquidity Removal detected"
+        token_a = getSymbol(self.web3, getSushiTokens(self.web3, address)[0])
+        token_b = getSymbol(self.web3, getSushiTokens(self.web3, address)[1])
+        balance_a = getBalance(self.web3, address, getSushiTokens(self.web3, address)[0])
+        balance_b = getBalance(self.web3, address, getSushiTokens(self.web3, address)[1])
 
-        self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},
-                  {"name": 'Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": True},
+        self.webhook = os.getenv('WEBHOOK_VELOUSDC')
+
+        self.title = "Velo New Liquidity Removal detected"
+
+        self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://optimistic.etherscan.io/block/{blockNumber})'),"inline": False},
+                  {"name": 'Address :', "value": str(f'[{address}](https://optimistic.etherscan.io/address/{address})'),"inline": True},
                   {"name": 'Name :', "value": str(getName(self.web3, address)), "inline": True},
                   {"name": 'Symbol :', "value": str(getSymbol(self.web3, address)), "inline": False},
-                  {"name": 'Amount 0 :', "value": str(self.tx["args"]["amount0"] / 1e18), "inline": True},
-                  {"name": 'Amount 1 :', "value": str(self.tx["args"]["amount1"] / 1e18), "inline": True},
-                  {"name": 'Total Reserves 0 :', "value": str(getBalance(self.web3, address, getSushiTokens(self.web3, address)[0])), "inline": True},
-                  {"name": 'Total Reserves 1 :',"value": str(getBalance(self.web3, address, getSushiTokens(self.web3, address)[1])), "inline": True},
-                  {"name": 'Total Supply :', "value": str(getSupply(self.web3, address)), "inline": True},
-                  {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'), "inline": False}]
+                  {"name": 'Amount 0 :', "value": str(formatCurrency(amount_a)), "inline": True},
+                  {"name": 'Amount 1 :', "value": str(formatCurrency(amount_b)), "inline": True},
+                  {"name": token_a+ ' balance',"value": str(formatCurrency(balance_a)),"inline": True},
+                  {"name": token_b+ ' balance', "value": str(formatCurrency(balance_b)), "inline": True},
+                  {"name": 'Total Supply :', "value": str(formatCurrency(getSupply(self.web3, address))), "inline": True},
+                  {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://optimistic.etherscan.io/tx/{transactionHash})'), "inline": False}]
         self.color = colors.dark_red
-        self.send = True
+        if total_amount > 50000:
+            self.send = True
+        if total_amount>500000:
+            self.content = '<@&945071604642222110>'
 
         self.result = {"webhook": self.webhook,
                        "title": self.title,

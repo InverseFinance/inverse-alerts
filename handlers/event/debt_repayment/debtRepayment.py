@@ -35,7 +35,7 @@ class handler():
         exchange_rate = getExchangeRateStored(self.web3, antoken)
         received_amount = self.tx["args"]["receiveAmount"] / getDecimals(self.web3, self.tx["args"]["underlying"])
         paid_amount = self.tx["args"]["paidAmount"]
-        paid_amount_underlying = exchange_rate / paid_amount
+        paid_amount_underlying = exchange_rate * paid_amount / 1e18
 
         self.title = "Debt Repayment detected"
 

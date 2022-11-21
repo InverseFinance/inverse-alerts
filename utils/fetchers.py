@@ -53,7 +53,7 @@ def getBalance(web3,address, token_address):
 
 def getDecimals(web3,address):
     
-    if (address == web3.toChecksumAddress(ZERO_ADDRESS)):
+    if (address in [web3.toChecksumAddress(ZERO_ADDRESS),"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]):
         decimals = 1e18
     else:
         address = web3.toChecksumAddress(address)
@@ -321,9 +321,9 @@ def getExchangeRateStored(web3,address):
     ABI = getABI(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
-    cash = contract.functions.exchangeRateStored().call()
-    cash = cash / getDecimals(web3,contract.functions.underlying().call())
+    rate = contract.functions.exchangeRateStored().call()
+    rate = rate / getDecimals(web3,getUnderlying(web3,contract.address))
 
-    if (cash == 0): cash = 0
+    if (rate == 0): rate = 0
 
-    return cash
+    return rate

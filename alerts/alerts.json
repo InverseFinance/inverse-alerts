@@ -160,239 +160,6 @@
       }
     }
   },
-  "lending1": {
-    "type": "event",
-    "events": {
-      "Mint": {
-        "filters": [
-          {}
-        ]
-      },
-      "Redeem": {
-        "filters": [
-          {}
-        ]
-      }
-    },
-    "contracts": {
-      "XINV": {
-        "address": "0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anYvCrvDOLA": {
-        "address": "0x3cFd8f5539550cAa56dC901f09C69AC9438E0722",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anYvDAI": {
-        "address": "0xD79bCf0AD38E06BC0be56768939F57278C7c42f7",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anYvUSDT": {
-        "address": "0x4597a4cf0501b853b029cE5688f6995f753efc04",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anYvUSDC": {
-        "address": "0x7e18AB8d87F3430968f0755A623FB35017cB3EcA",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anyvYFI": {
-        "address": "0xE809aD1577B7fF3D912B9f90Bf69F8BeCa5DCE32",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anyvWETH": {
-        "address": "0xD924Fc65B448c7110650685464c8855dd62c30c0",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anyvcrvcvxeth": {
-        "address": "0xa6F1a358f0C2e771a744AF5988618bc2E198d0A0",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anStETH": {
-        "address": "0xeA0c959BBb7476DDD6cD4204bDee82b790AA1562",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anDOLA": {
-        "address": "0x7fcb7dac61ee35b3d4a51117a7c58d53f0a8a670",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anXSUSHI": {
-        "address": "0xd60b06b457bff7fc38ac5e7ece2b5ad16b288326",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anWBTC": {
-        "address": "0x17786f3813e6ba35343211bd8fe18ec4de14f28b",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anYFI": {
-        "address": "0xde2af899040536884e062d3a334f2dd36f34b4a4",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anETH": {
-        "address": "0x697b4acaa24430f254224eb794d2a85ba1fa1fb8",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anWBTCv2": {
-        "address": "0xE8A2eb30E9AB1b598b6a5fc4aa1B80dfB6F90753",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anETHv2": {
-        "address": "0x8e103Eb7a0D01Ab2b2D29C91934A9aD17eB54b86",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
-  "lending2": {
-    "type": "event",
-    "events": {
-      "Borrow": {
-        "filters": [
-          {}
-        ]
-      },
-      "RepayBorrow": {
-        "filters": [
-          {}
-        ]
-      },
-      "LiquidateBorrow": {
-        "filters": [
-          {}
-        ]
-      }
-    },
-    "contracts": {
-      "anDOLA": {
-        "address": "0x7fcb7dac61ee35b3d4a51117a7c58d53f0a8a670",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anXSUSHI": {
-        "address": "0xd60b06b457bff7fc38ac5e7ece2b5ad16b288326",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anWBTC": {
-        "address": "0x17786f3813e6ba35343211bd8fe18ec4de14f28b",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anYFI": {
-        "address": "0xde2af899040536884e062d3a334f2dd36f34b4a4",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anETH": {
-        "address": "0x697b4acaa24430f254224eb794d2a85ba1fa1fb8",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anWBTCv2": {
-        "address": "0xE8A2eb30E9AB1b598b6a5fc4aa1B80dfB6F90753",
-        "chain_ids": [
-          1
-        ]
-      },
-      "anETHv2": {
-        "address": "0x8e103Eb7a0D01Ab2b2D29C91934A9aD17eB54b86",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
-  "lendingfuse127": {
-    "type": "event",
-    "events": {
-      "Mint": {
-        "filters": [
-          {}
-        ]
-      },
-      "Redeem": {
-        "filters": [
-          {}
-        ]
-      },
-      "Borrow": {
-        "filters": [
-          {}
-        ]
-      },
-      "RepayBorrow": {
-        "filters": [
-          {}
-        ]
-      },
-      "LiquidateBorrow": {
-        "filters": [
-          {}
-        ]
-      }
-    },
-    "contracts": {
-      "fAPE-127": {
-        "address": "0x8d68d8301fe02654791e6ef5e9ec240865bb79cd",
-        "chain_ids": [
-          1
-        ]
-      },
-      "fETH-127": {
-        "address": "0x26267e41ceca7c8e0f143554af707336f27fa051",
-        "chain_ids": [
-          1
-        ]
-      },
-      "ftUSD-127": {
-        "address": "0xf138c6f8832e405a35391fa3ef62a4b27299f2d4",
-        "chain_ids": [
-          1
-        ]
-      },
-      "fDOLA-127": {
-        "address": "0xc1fb01415f08fbd71623aded6ac8ec74f974fdc1",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
   "fed": {
     "type": "event",
     "events": {
@@ -479,49 +246,6 @@
       }
     }
   },
-  "swap": {
-    "type": "event",
-    "events": {
-      "Swap": {
-        "name": "Swap",
-        "filters": [
-          {}
-        ]
-      },
-      "Burn": {
-        "name": "Burn",
-        "filters": [
-          {}
-        ]
-      },
-      "Mint": {
-        "name": "Mint",
-        "filters": [
-          {}
-        ]
-      }
-    },
-    "contracts": {
-      "Sushiswap INV/DOLA": {
-        "address": "0x5ba61c0a8c4dcccc200cd0ccc40a5725a426d002",
-        "chain_ids": [
-          1
-        ]
-      },
-      "Sushiswap INV/WETH": {
-        "address": "0x328dfd0139e26cb0fef7b0742b49b0fe4325f821",
-        "chain_ids": [
-          1
-        ]
-      },
-      "Uniswap INV/DOLA": {
-        "address": "0xb268C1c44a349D06a42cf24988162DADc48D839e",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
   "debt_repayment": {
     "type": "event",
     "events": {
@@ -566,42 +290,6 @@
     "contracts": {
       "Debt Converter": {
         "address": "0x1ff9c712B011cBf05B67A6850281b13cA27eCb2A",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
-  "concave": {
-    "type": "event",
-    "events": {
-      "Transfer": {
-        "name": "Transfer",
-        "filters": [
-          {
-            "from": "0x6fF51547f69d05d83a7732429cfe4ea1E3299E10"
-          },
-          {
-            "from": "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"
-          },
-          {
-            "to": "0x6fF51547f69d05d83a7732429cfe4ea1E3299E10"
-          },
-          {
-            "to": "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"
-          }
-        ]
-      }
-    },
-    "contracts": {
-      "3CRV": {
-        "address": "0x6c3f90f043a72fa612cbac8115ee7e52bde6e490",
-        "chain_ids": [
-          1
-        ]
-      },
-      "DOLA": {
-        "address": "0x865377367054516e17014CcdED1e7d814EDC9ce4",
         "chain_ids": [
           1
         ]
@@ -702,6 +390,31 @@
       }
     }
   },
+  "swap": {
+    "type": "event",
+    "events": {
+      "Burn": {
+        "name": "Burn",
+        "filters": [
+          {}
+        ]
+      },
+      "Mint": {
+        "name": "Mint",
+        "filters": [
+          {}
+        ]
+      }
+    },
+    "contracts": {
+      "Velo USDC/DOLA": {
+        "address": "0x6c5019d345ec05004a7e7b0623a91a0d9b8d590d",
+        "chain_ids": [
+          10
+        ]
+      }
+    }
+  },
   "oracle": {
     "type": "state",
     "functions": {
@@ -712,6 +425,28 @@
     "contracts": {
       "Inverse Oracle": {
         "address": "0xe8929afd47064efd36a7fb51da3f8c5eb40c4cb4",
+        "chain_ids": [
+          1
+        ]
+      }
+    }
+  },
+  "supply": {
+    "type": "state",
+    "functions": {
+      "totalSupply": {
+        "arg": "[None]"
+      }
+    },
+    "contracts": {
+      "DOLAFRAXBP Pool": {
+        "address": "0xE57180685E3348589E9521aa53Af0BCD497E884d",
+        "chain_ids": [
+          1
+        ]
+      },
+      "DOLA3CRV Pool": {
+        "address": "0xaa5a67c256e27a5d80712c51971408db3370927d",
         "chain_ids": [
           1
         ]
@@ -818,28 +553,6 @@
       },
       "anETHv2": {
         "address": "0x8e103Eb7a0D01Ab2b2D29C91934A9aD17eB54b86",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
-  "supply": {
-    "type": "state",
-    "functions": {
-      "totalSupply": {
-        "arg": "[None]"
-      }
-    },
-    "contracts": {
-      "DOLAFRAXBP Pool": {
-        "address": "0xE57180685E3348589E9521aa53Af0BCD497E884d",
-        "chain_ids": [
-          1
-        ]
-      },
-      "DOLA3CRV Pool": {
-        "address": "0xaa5a67c256e27a5d80712c51971408db3370927d",
         "chain_ids": [
           1
         ]
