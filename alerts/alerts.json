@@ -102,21 +102,7 @@
           {}
         ]
       },
-      "NewSupplyCap": {
-        "filters": [
-          {}
-        ]
-      },
-      "MarketUnlisted": {
-        "filters": [
-          {}
-        ]
-      },
-      "MarketListed": {
-        "filters": [
-          {}
-        ]
-      }
+
     },
     "contracts": {
       "Anchor Unitroller": {
