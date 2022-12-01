@@ -19,7 +19,7 @@ def main():
                         for event in alerts[alert]['events']:
                             web3 = getWeb3(chain_id)
                             contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
-                            contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
+                            contract_obj = web3.eth.contract(address=contract_address, abi=getABI2(contract_address))
                             filters = fixFromToFilters(alerts[alert]['events'][event]['filters'], contract_address)
                             frequency = assignFrequency(chain_id)
                             EventListener(web3, alert, contract_obj, event, filters, frequency).start()
@@ -33,7 +33,7 @@ def main():
 
                             for argument in arguments or []:
                                 contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
-                                contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
+                                contract_obj = web3.eth.contract(address=contract_address, abi=getABI2(contract_address))
                                 frequency = assignFrequency(chain_id)
                                 StateChangeListener(web3, alert, contract_obj, function, argument, frequency).start()
 
@@ -42,7 +42,7 @@ def main():
                     for chain_id in alerts[alert]['contracts'][contract]['chain_ids']:
                         web3 = getWeb3(chain_id)
                         contract_address = web3.toChecksumAddress(alerts[alert]['contracts'][contract]['address'])
-                        contract_obj = web3.eth.contract(address=contract_address, abi=getABI(contract_address))
+                        contract_obj = web3.eth.contract(address=contract_address, abi=getABI2(contract_address))
                         frequency = assignFrequency(chain_id)
                         TxListener(web3, alert, contract_obj, contract, frequency).start()
 

@@ -22,7 +22,7 @@ def getRemovedTokenSymbol(web3, txHash,poolAddress):
     blockHash = tx["blockHash"]
 
     for token in [USDC,DOLA,DAI,crvFRAX,CRV3,USDT]:
-        contract = web3.eth.contract(address=token, abi=getABI(token))
+        contract = web3.eth.contract(address=token, abi=getABI2(token))
         filters = {"from": poolAddress}
 
         topics = construct_event_topic_set(contract.events.Transfer().abi, web3.codec, filters)
@@ -41,7 +41,7 @@ def getBalance(web3,address, token_address):
 
     address = web3.toChecksumAddress(address)
     token_address = web3.toChecksumAddress(token_address)
-    token_ABI = getABI(token_address)
+    token_ABI = getABI2(token_address)
     contract = web3.eth.contract(address=token_address, abi=token_ABI)
 
     balance = contract.functions.balanceOf(address).call()
@@ -57,7 +57,7 @@ def getDecimals(web3,address):
         decimals = 1e18
     else:
         address = web3.toChecksumAddress(address)
-        ABI = getABI(address)
+        ABI = getABI2(address)
         contract = web3.eth.contract(address=address, abi=ABI)
 
         decimals = contract.functions.decimals().call()
@@ -68,7 +68,7 @@ def getDecimals(web3,address):
 def getSupply(web3, address):
     
     address = web3.toChecksumAddress(address)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     supply = contract.functions.totalSupply().call()
@@ -85,7 +85,7 @@ def getName(web3,address):
         name = 'Ether'
     else:
         address = web3.toChecksumAddress(address)
-        ABI = getABI(address)
+        ABI = getABI2(address)
         contract = web3.eth.contract(address=address, abi=ABI)
         name = contract.functions.name().call()
     return name
@@ -97,7 +97,7 @@ def getSymbol(web3,address):
         symbol = 'ETH'
     else:
         address = web3.toChecksumAddress(address)
-        ABI = getABI(address)
+        ABI = getABI2(address)
         contract = web3.eth.contract(address=address, abi=ABI)
         symbol = contract.functions.symbol().call()
 
@@ -125,7 +125,7 @@ def getENS(web3, address):
 def getProposal(web3,proposal_id):
     
     address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
-    ABI = getABI(address)
+    ABI = getABI2(address)
 
     contract = web3.eth.contract(address=address, abi=ABI)
 
@@ -138,7 +138,7 @@ def getProposal(web3,proposal_id):
 def getProposalCount(web3):
     
     address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     proposal = contract.functions.proposalCount().call()
@@ -152,7 +152,7 @@ def getSushiTokens(web3,address):
     
     tokens = []
     address = web3.toChecksumAddress(address)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
     tokens.append(contract.functions.token0().call())
     tokens.append(contract.functions.token1().call())
@@ -197,7 +197,7 @@ def getDola3crvTokens(web3,pooladdress):
     
     balances = []
     address = web3.toChecksumAddress(pooladdress)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
     balances.append(contract.functions.coins(0).call())
     balances.append(contract.functions.coins(1).call())
@@ -225,7 +225,7 @@ def getDola3crvTokensSymbol(web3):
 def getAllMarkets(web3,address):
     
     address = web3.toChecksumAddress(address)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     allMarkets = contract.functions.getAllMarkets().call()
@@ -235,7 +235,7 @@ def getAllMarkets(web3,address):
 def getComptroller(web3,address):
  
     address = web3.toChecksumAddress(address)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     comptroller = contract.functions.comptroller().call()
@@ -247,7 +247,7 @@ def getUnderlyingPrice(web3,address):
     address = web3.toChecksumAddress(address)
 
     oracle_name = web3.toChecksumAddress('0xe8929afd47064efd36a7fb51da3f8c5eb40c4cb4')
-    oracle_ABI = getABI(oracle_name)
+    oracle_ABI = getABI2(oracle_name)
 
     contract = web3.eth.contract(address=oracle_name, abi=oracle_ABI)
     underlying_decimals = getDecimals(web3,getUnderlying(web3,address))
@@ -266,7 +266,7 @@ def getUnderlyingPriceFuse(web3,address):
     address = web3.toChecksumAddress(address)
 
     oracle_name = web3.toChecksumAddress('0xe980efb504269ff53f7f4bc92a2bd1e31b43f632')
-    oracle_ABI = getABI(address)
+    oracle_ABI = getABI2(address)
 
     contract = web3.eth.contract(address=oracle_name, abi=oracle_ABI)
     underlying_decimals = getDecimals(web3,getUnderlying(web3,address))
@@ -287,7 +287,7 @@ def getUnderlying(web3,address):
         underlying = ZERO_ADDRESS
     else:
         address = web3.toChecksumAddress(address)
-        ABI = getABI(address)
+        ABI = getABI2(address)
         contract = web3.eth.contract(address=address, abi=ABI)
         underlying = contract.functions.underlying().call()
     return underlying
@@ -298,7 +298,7 @@ def getUnderlyingFuse(web3,address):
         underlying = ZERO_ADDRESS
     else:
         address = web3.toChecksumAddress(address)
-        ABI = getABI(address)
+        ABI = getABI2(address)
         contract = web3.eth.contract(address=address, abi=ABI)
         underlying = contract.functions.underlying().call()
     return underlying
@@ -306,7 +306,7 @@ def getUnderlyingFuse(web3,address):
 
 def getCash(web3, address):
     address = web3.toChecksumAddress(address)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     cash = contract.functions.getCash().call()
@@ -318,7 +318,7 @@ def getCash(web3, address):
 def getExchangeRateStored(web3,address):
 
     address = web3.toChecksumAddress(address)
-    ABI = getABI(address)
+    ABI = getABI2(address)
     contract = web3.eth.contract(address=address, abi=ABI)
 
     rate = contract.functions.exchangeRateStored().call()
