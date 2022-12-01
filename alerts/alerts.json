@@ -544,34 +544,6 @@
       }
     }
   },
-  "liquidation_incentive": {
-    "type": "state",
-    "functions": {
-      "liquidationIncentiveMantissa": {
-        "arg": "[None]"
-      }
-    },
-    "contracts": {
-      "Fuse Pool 127 Unitroller": {
-        "address": "0xe3952d770fb26cc61877cd34fbc3a3750881e9a1",
-        "chain_ids": [
-          1
-        ]
-      },
-      "Fuse Pool 22 Unitroller": {
-        "address": "0xe3952d770fb26cc61877cd34fbc3a3750881e9a1",
-        "chain_ids": [
-          1
-        ]
-      },
-      "Fuse Pool 6 Unitroller": {
-        "address": "0x814b02c1ebc9164972d888495927fe1697f0fb4c",
-        "chain_ids": [
-          1
-        ]
-      }
-    }
-  },
   "multisig": {
     "type": "transaction",
     "contracts": {
