@@ -7,9 +7,9 @@ class Contract:
     def __init__(self,address,chain_id):
         try:
             contracts = load_contracts()
-            self.address = Web3.toChecksumAddress(address)
             self.chain_id = int(chain_id)
             self.ABI = getABI2(self.address,self.chain_id)
+            self.address = Web3.toChecksumAddress(address)
             self.web3 = getWeb3(chain_id)
             self.exists = False
             for c in contracts:
