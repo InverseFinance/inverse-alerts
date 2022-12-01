@@ -13,24 +13,24 @@ def get_this_dir():
     return THIS_DIR
 
 def load_alerts():
-    a_file = open(f"{get_root_dir()}\\alerts\\alerts.json", "r")
+    a_file = open(f"{get_root_dir()}/alerts/alerts.json", "r")
     alerts = json.load(a_file)
     return alerts
 
 def load_contracts():
-    a_file = open(f"{get_root_dir()}\\contracts\\contracts.json", "r")
+    a_file = open(f"{get_root_dir()}/contracts/contracts.json", "r")
     alerts = json.load(a_file)
     return alerts
 
 def save_contracts(data):
-    with open(f"{get_root_dir()}\\contracts\\contracts.json", "w") as outfile:
+    with open(f"{get_root_dir()}/contracts/contracts.json", "w") as outfile:
         json.dump(data, outfile)
-       # print(f"File successfully saved to {get_root_dir()}\\contracts\\contracts.json")
+       # print(f"File successfully saved to {get_root_dir()}/contracts/contracts.json")
 
 def save_alerts(data):
-    with open(f"{get_root_dir()}\\alerts\\alerts.json", "w") as outfile:
+    with open(f"{get_root_dir()}/alerts/alerts.json", "w") as outfile:
         json.dump(data, outfile)
-        #print(f"File successfully saved to {get_root_dir()}\\alerts\\alerts.json")
+        #print(f"File successfully saved to {get_root_dir()}/alerts/alerts.json")
 
 def fixFromToValue(string):
     """
@@ -265,7 +265,7 @@ def getABI2(address,chainid):
         if chainid==5:
             explorer = "goerli.etherscan"
 
-        contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
+        contract_abi = json.load(open(f'{get_root_dir()}/contracts/ABI/{address}.json'))
 
         return contract_abi
 
@@ -274,9 +274,9 @@ def getABI2(address,chainid):
         logging.info(f"Can't find ABI locally. Fetching ABI from {explorer} for contract {address}")
         contract_abi = requests.get(f'https://api.{explorer}.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
 
-        with open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json', 'w') as outfile:
+        with open(f'{get_root_dir()}/contracts/ABI/{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
-        print(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
+        print(f'ABI Saved to {get_root_dir()}/contracts/ABI/{address}.json')
 
         return contract_abi
     except Exception as e:
@@ -286,7 +286,7 @@ def getABI2(address,chainid):
 def getABI(address):
     try:
         # First try to get the ABI from the ABI folder
-        contract_abi = json.load(open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json'))
+        contract_abi = json.load(open(f'{get_root_dir()}/contracts/ABI/{address}.json'))
         return contract_abi
     except Exception as e:
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
@@ -294,8 +294,8 @@ def getABI(address):
 
         contract_abi = requests.get('https://api.etherscan.io/api?module=contract&action=getabi&address=' + address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
 
-        with open(f'{get_root_dir()}\\contracts\\ABI\\{address}.json', 'w') as outfile:
+        with open(f'{get_root_dir()}/contracts/ABI/{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
-        logging.info(f'ABI Saved to {get_root_dir()}\\contracts\\ABI\\{address}.json')
+        logging.info(f'ABI Saved to {get_root_dir()}/contracts/ABI/{address}.json')
 
         return contract_abi
