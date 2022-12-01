@@ -254,30 +254,21 @@ def hex_and_pad(i):
 
 # Check if contract ABI is present in the working folder otherwise download from etherscan and stores it
 # Option 2 with chain id selects correct explorer
-def getABI2(address,chainid):
+def getABI2(address):
     try:
-        if chainid==1:
-            explorer = "etherscan"
-        if chainid==10:
-            explorer = "optimism.etherscan"
-        if chainid==250:
-            explorer = "ftmscan"
-        if chainid==5:
-            explorer = "goerli.etherscan"
-
         contract_abi = json.load(open(f'{get_root_dir()}/contracts/ABI/{address}.json'))
 
         return contract_abi
 
     except Exception as e:
         # Else get the ABI from Etherscan, be warry of the query rate to etherscan API (5/sec)
-        logging.info(f"Can't find ABI locally. Fetching ABI from {explorer} for contract {address}")
+        logging.info(f"Can't find ABI locally. Fetching ABI from etherscan for contract {address}")
         if address=='0x4dCf7407AE5C07f8681e1659f626E114A7667339':
             query_address = '0x48c5e896d241afd1aee73ae19259a2e234256a85'
         else :
             query_address = address
 
-        contract_abi = requests.get(f'https://api.{explorer}.io/api?module=contract&action=getabi&address=' + query_address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
+        contract_abi = requests.get(f'https://api.etherscan.io/api?module=contract&action=getabi&address=' + query_address + '&apikey=' + os.getenv('ETHERSCAN')).json()['result']
 
         with open(f'{get_root_dir()}/contracts/ABI/{address}.json', 'w') as outfile:
             outfile.write(str(contract_abi))
