@@ -21,13 +21,15 @@ class handler():
         dola_address = "0x865377367054516e17014CcdED1e7d814EDC9ce4"
         composable_stable_pool = "0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64"
         tokens = self.tx['args']['tokens']
+        address = str(self.tx["args"]["poolId"])[0:42]
+        print(address)
 
-        if self.tx["args"]["poolId"][0:42].decode('utf-8')=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
+        if address=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
 
             blockNumber = self.tx["blockNumber"]
             transactionHash = self.tx["transactionHash"]
 
-            address = self.tx["args"]["poolId"][0:42]
+
             provider_address = getENS(self.web3,self.tx["args"]["liquidityProvider"])
 
             self.webhook = os.getenv("WEBHOOK_BAL_DOLA")
