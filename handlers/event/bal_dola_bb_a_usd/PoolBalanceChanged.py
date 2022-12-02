@@ -18,12 +18,11 @@ class handler():
         self.send = False
 
     def compose(self):
-        print(self.tx)
         dola_address = "0x865377367054516e17014CcdED1e7d814EDC9ce4"
         composable_stable_pool = "0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64"
         tokens = self.tx['args']['tokens']
 
-        if self.tx["args"]["poolId"][0:42]=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
+        if self.tx["args"]["poolId"][0:42].decode('utf-8')=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
 
             blockNumber = self.tx["blockNumber"]
             transactionHash = self.tx["transactionHash"]
