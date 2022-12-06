@@ -327,3 +327,12 @@ def getExchangeRateStored(web3,address):
     if (rate == 0): rate = 0
 
     return rate
+
+def getBalancerVaultBalances(web3,poolId):
+    address = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+    ABI = getABI2(address)
+    contract = web3.eth.contract(address=address, abi=ABI)
+
+    balances = contract.functions.getPoolTokens(poolId).call()
+
+    return balances

@@ -20,6 +20,7 @@ class handler():
     def compose(self):
         dola_address = "0x865377367054516e17014CcdED1e7d814EDC9ce4"
         composable_stable_pool = "0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64"
+
         tokens = self.tx['args']['tokens']
         address = str(self.tx["args"]["poolId"])[0:42]
         print(address)
@@ -45,6 +46,18 @@ class handler():
                 deltas_sum =deltas_sum + self.tx["args"]["deltas"][i]/getDecimals(self.web3,token)
                 i = i+ 1
 
+
+            balances = getBalancerVaultBalances("0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e6400000000000000000000037b")
+
+            i = 0
+            balances_sum = 0
+            for token in self.tx["args"]["tokens"]:
+                self.fields.append({"name": 'Total ' + str(getSymbol(self.web3, token)), "value": str(
+                    formatCurrency(balances["balances"][i] / getDecimals(self.web3, token))), "inline": True})
+                balances_sum = balances_sum + balances["balances"][i] / getDecimals(self.web3, token)
+                i = i + 1
+
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balances_sum)),"inline": False})
             self.fields.append({"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
 
             if deltas_sum > 0:
