@@ -59,7 +59,11 @@ class handler():
 
             self.title = "Balancer Liquidity "+event+" Event Detected"
 
-            self.send = True
+            if abs(deltas_sum)>50000:
+                self.send = True
+
+            if abs(deltas_sum)>300000:
+                self.content = '<@&945071604642222110>'
 
         self.result = {"webhook":self.webhook,
                   "title":self.title,
