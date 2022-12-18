@@ -40,8 +40,7 @@ class handler():
                 "0x4d7928e993125A9Cefe7ffa9aB637653654222E2",
                 "0x57D59a73CDC15fe717D2f1D433290197732659E2"]
 
-        if (self.event_name in ["Transfer"] and (
-                from_address in feds and to_address == '0x926dF14a23BE491164dCF93f4c468A50ef659D5B')):
+        if (from_address in feds and to_address == '0x926dF14a23BE491164dCF93f4c468A50ef659D5B'):
             self.title = "Profit Taking detected"
             self.fields = [
                 {"name": 'Block Number :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},
