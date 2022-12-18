@@ -43,6 +43,49 @@
       }
     }
   },
+  "curve_liquidity": {
+    "type": "event",
+    "events": {
+      "Borrow": {
+        "filters": [
+          {}
+        ]
+      },
+      "Repay": {
+        "filters": [
+          {}
+        ]
+      },
+      "Deposit": {
+        "filters": [
+          {}
+        ]
+      },
+      "Withdraw": {
+        "filters": [
+          {}
+        ]
+      },
+      "Liquidate": {
+        "filters": [
+          {}
+        ]
+      },
+      "CreateEscrow": {
+        "filters": [
+          {}
+        ]
+      }
+    },
+    "contracts": {
+      "WETH Market": {
+        "address": "0x63Df5e23Db45a2066508318f172bA45B9CD37035",
+        "chain_ids": [
+          1
+        ]
+      }
+    }
+  },
   "bal_dola_bb_a_usd": {
     "type": "event",
     "contracts": {
