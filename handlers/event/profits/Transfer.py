@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class handler():
     def __init__(self, web3, tx):
         self.web3 = web3

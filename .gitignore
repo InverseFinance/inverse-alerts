@@ -13,3 +13,5 @@ messages.py
 *.env
 *.log
 
+utils/test.py
+utils/test.py
