@@ -43,7 +43,7 @@
       }
     }
   },
-  "curve_liquidity": {
+  "firm": {
     "type": "event",
     "events": {
       "Borrow": {

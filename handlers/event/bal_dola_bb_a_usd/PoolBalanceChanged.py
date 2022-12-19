@@ -49,9 +49,9 @@ class handler():
 
             balances = getBalancerVaultBalances(self.web3,"0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e6400000000000000000000037b")
 
-            i = 0
+            i = 1
             balances_sum = 0
-            for token in self.tx["args"]["tokens"]:
+            for token in self.tx["args"]["tokens"][1:2]:
                 self.fields.append({"name": 'Total ' + str(getSymbol(self.web3, token)), "value": str(
                     formatCurrency(balances[1][i] / getDecimals(self.web3, token))), "inline": True})
                 balances_sum = balances_sum + balances[1][i] / getDecimals(self.web3, token)
