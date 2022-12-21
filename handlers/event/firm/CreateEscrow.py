@@ -34,9 +34,13 @@ class handler():
                         "inline": False},
                        {"name": 'Market Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),
                         "inline": False}]
-
-        for arg in self.tx["args"]:
-            self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]), "inline": True})
+                        
+        if str(arg)=='amount':
+            for arg in self.tx["args"]:
+                self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]/1e18), "inline": True})   
+        else:
+            for arg in self.tx["args"]:
+                self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]), "inline": True})
 
         self.fields.append(
             {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),
