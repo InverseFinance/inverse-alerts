@@ -4,3 +4,4 @@ pandas~=1.4.2
 python-dotenv~=0.20.0
 pycoingecko~=3.0.0
 openpyxl~=3.0.10
+python-dotenvv

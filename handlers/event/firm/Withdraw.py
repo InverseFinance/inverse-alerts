@@ -28,7 +28,7 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
-        self.webhook = os.getenv("WEBHOOK_BAL_DOLA")
+        self.webhook = os.getenv("WEBHOOK_FIRM")
 
         self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),
                         "inline": False},
