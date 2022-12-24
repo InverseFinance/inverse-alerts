@@ -40,12 +40,25 @@ class handler():
                 else:
                     self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]), "inline": True})
 
+
+            balances = getBalancerVaultBalances(self.web3,"0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e6400000000000000000000037b")
+
+            i = 1
+            balances_sum = 0
+            for token in balances["tokens"][1:2]:
+                self.fields.append({"name": 'Total ' + str(getSymbol(self.web3, token)), "value": str(
+                    formatCurrency(balances[1][i] / getDecimals(self.web3, token))), "inline": True})
+                balances_sum = balances_sum + balances[1][i] / getDecimals(self.web3, token)
+                i = i + 1
+
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balances_sum)),"inline": False})
+
             self.fields.append(
                 {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),
                  "inline": False})
 
             self.image = ""
-            self.color = colors.dark_orange
+            self.color = colors.dark_red
             self.send = True
 
         self.result = {"webhook": self.webhook,

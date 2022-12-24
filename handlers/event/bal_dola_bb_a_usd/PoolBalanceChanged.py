@@ -30,11 +30,8 @@ class handler():
             blockNumber = self.tx["blockNumber"]
             transactionHash = self.tx["transactionHash"]
 
-
             provider_address = getENS(self.web3,self.tx["args"]["liquidityProvider"])
-
             self.webhook = os.getenv("WEBHOOK_BAL_DOLA")
-
 
             self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'), "inline": False},
                            {"name": 'Pool Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False},
