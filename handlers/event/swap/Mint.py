@@ -48,6 +48,7 @@ class handler():
         self.color = colors.dark_green
         if total_amount > 50000:
             self.send = True
+            
         if total_amount>500000:
             self.content = '<@&945071604642222110>'
 

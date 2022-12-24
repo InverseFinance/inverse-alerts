@@ -119,6 +119,11 @@
         "filters": [
           {}
         ]
+      },
+      "Withdrawn": {
+        "filters": [
+          {}
+        ]
       }
     }
   },

@@ -23,10 +23,12 @@ class handler():
 
         amount_a = self.tx["args"]["amount0"]/1e18
         amount_b = self.tx["args"]["amount1"]/1e18
+
         total_amount = abs(amount_a + amount_b)
 
         token_a = getSymbol(self.web3, getSushiTokens(self.web3, address)[0])
         token_b = getSymbol(self.web3, getSushiTokens(self.web3, address)[1])
+
         balance_a = getBalance(self.web3, address, getSushiTokens(self.web3, address)[0])
         balance_b = getBalance(self.web3, address, getSushiTokens(self.web3, address)[1])
 
@@ -45,8 +47,10 @@ class handler():
                   {"name": 'Total Supply :', "value": str(formatCurrency(getSupply(self.web3, address))), "inline": True},
                   {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://optimistic.etherscan.io/tx/{transactionHash})'), "inline": False}]
         self.color = colors.dark_red
+
         if total_amount > 50000:
             self.send = True
+            
         if total_amount>500000:
             self.content = '<@&945071604642222110>'
 
