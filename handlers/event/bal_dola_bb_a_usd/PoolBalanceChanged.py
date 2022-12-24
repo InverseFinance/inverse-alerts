@@ -72,7 +72,7 @@ class handler():
 
             self.title = "Balancer Liquidity "+event+" Event Detected"
 
-            if abs(deltas_sum)>50000:
+            if abs(deltas_sum)>10000:
                 self.send = True
 
             if abs(deltas_sum)>300000:
