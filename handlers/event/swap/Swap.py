@@ -21,7 +21,7 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
-        self.webhook = os.getenv('WEBHOOK_SWAP')
+        self.webhook = os.getenv('WEBHOOK_VELOUSDC')
 
         self.image = "https://dune.com/api/screenshot?url=https://dune.com/embeds/838610/1466237/8e64e858-5db5-4692-922d-5f9fe6b7a8c6.jpg"
 

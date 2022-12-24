@@ -104,6 +104,24 @@
       }
     }
   },
+  "bal_dola_deposit": {
+    "type": "event",
+    "contracts": {
+      "AuraBooster": {
+        "address": "0xa57b8d98dae62b26ec3bcc4a365338157060b234",
+        "chain_ids": [
+          1
+        ]
+      }
+    },
+    "events": {
+      "Deposited": {
+        "filters": [
+          {}
+        ]
+      }
+    }
+  },
   "gauge_controller": {
     "type": "event",
     "events": {
@@ -268,6 +286,18 @@
       },
       "AuraFed": {
         "address": "0x5D5392505ee69f9FE7a6a1c1AF14f17Db3B3e364",
+        "chain_ids": [
+          1
+        ]
+      },
+      "AuraFed2": {
+        "address": "0xc6279A7Cd38819ebbF6ad3a05a0998f887DF2740",
+        "chain_ids": [
+          1
+        ]
+      },
+      "FirmFed": {
+        "address": "0x2b34548b865ad66a2b046cb82e59ee43f75b90fd",
         "chain_ids": [
           1
         ]
