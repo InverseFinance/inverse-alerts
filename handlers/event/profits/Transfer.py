@@ -47,8 +47,8 @@ class handler():
                 {"name": 'From :', "value": str(f'[{from_address}](https://etherscan.io/address/{from_address})'),"inline": False},
                 {"name": 'To :', "value": str(f'[{to_address}](https://etherscan.io/address/{to_address})'),"inline": False},
                 {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'), "inline": False}]
-            self.content = '<@&945071604642222110>'
-            self.color = colors.dark_orange
+            
+            self.color = colors.dark_green
             self.send = True
 
         self.result = {"webhook": self.webhook,
