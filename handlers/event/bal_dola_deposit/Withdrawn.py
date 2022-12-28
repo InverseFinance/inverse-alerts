@@ -27,16 +27,12 @@ class handler():
             self.tx = fixFromToValue(self.tx)
             self.webhook = os.getenv("WEBHOOK_BAL_DOLA")
 
-            self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),
-                            "inline": False},
-                           {"name": 'Market Address :',
-                            "value": str(f'[{address}](https://etherscan.io/address/{address})'),
-                            "inline": False}]
+            self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},
+                           {"name": 'Market Address :',"value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False}]
 
             for arg in self.tx["args"]:
                 if str(arg) == 'amount':
-                    self.fields.append(
-                        {"name": str(arg), "value": str(formatCurrency(self.tx["args"][arg] / 1e18)), "inline": True})
+                    self.fields.append({"name": str(arg), "value": str(formatCurrency(self.tx["args"][arg] / 1e18)), "inline": True})
                 else:
                     self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]), "inline": True})
 
@@ -52,10 +48,7 @@ class handler():
                 i = i + 1
 
             self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balances_sum)),"inline": False})
-
-            self.fields.append(
-                {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),
-                 "inline": False})
+            self.fields.append({"name": 'Transaction :', "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
 
             self.image = ""
             self.color = colors.dark_red

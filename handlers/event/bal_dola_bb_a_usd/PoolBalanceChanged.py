@@ -69,10 +69,10 @@ class handler():
 
             self.title = "Balancer Liquidity "+event+" Event Detected"
 
-            if abs(deltas_sum)>10000:
+            if abs(deltas_sum)>os.getenv("SEND_THRESHOLD"):
                 self.send = True
 
-            if abs(deltas_sum)>300000:
+            if abs(deltas_sum)>os.getenv("RISK_THRESHOLD"):
                 self.content = '<@&945071604642222110>'
 
         self.result = {"webhook":self.webhook,
