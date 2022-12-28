@@ -2,8 +2,8 @@ import pandas as pd
 from dotenv import load_dotenv
 from web3 import Web3
 from web3._utils.events import construct_event_topic_set
-from handlers import HandleEvent
-from helpers import LoggerParams
+from handlers.handlers import HandleEvent
+from utils.helpers import LoggerParams
 import  os, sys, requests,warnings,json
 
 # Load locals and web3 provider
@@ -13,10 +13,10 @@ LoggerParams()
 web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
-alert = 'governance'
-event_name = 'ProposalCreated'
-tx_hash= '0x0acc8bc3ab3574875a82719885bcbb6880ce5993dbdf681634a13ba733697c74'
-contract_address = web3.toChecksumAddress('0xBeCCB6bb0aa4ab551966A7E4B97cec74bb359Bf6')
+alert = 'bal_dola_deposit'
+event_name = 'Deposited'
+tx_hash= '0x9ca239eff9286e0448c5829517fcc4c26ad967105faa67a05619f2e743147394'
+contract_address = web3.toChecksumAddress('0xa57b8d98dae62b26ec3bcc4a365338157060b234')
 
 # Fetch tx_info to get blockHash for log filter
 tx_info = json.loads(Web3.toJSON(web3.eth.get_transaction(tx_hash)))

@@ -27,11 +27,8 @@ class handler():
             self.tx = fixFromToValue(self.tx)
             self.webhook = os.getenv("WEBHOOK_BAL_DOLA")
 
-            self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),
-                            "inline": False},
-                           {"name": 'Market Address :',
-                            "value": str(f'[{address}](https://etherscan.io/address/{address})'),
-                            "inline": False}]
+            self.fields = [{"name": 'Block :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},
+                           {"name": 'Market Address :',"value": str(f'[{address}](https://etherscan.io/address/{address})'),"inline": False}]
 
             for arg in self.tx["args"]:
                 if str(arg) == 'amount':
@@ -45,7 +42,7 @@ class handler():
 
             i = 1
             balances_sum = 0
-            for token in balances["tokens"][1:2]:
+            for token in balances[0][1:2]:
                 self.fields.append({"name": 'Total ' + str(getSymbol(self.web3, token)), "value": str(
                     formatCurrency(balances[1][i] / getDecimals(self.web3, token))), "inline": True})
                 balances_sum = balances_sum + balances[1][i] / getDecimals(self.web3, token)

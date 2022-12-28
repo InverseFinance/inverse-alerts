@@ -45,7 +45,7 @@ class handler():
 
             i = 1
             balances_sum = 0
-            for token in balances["tokens"][1:2]:
+            for token in balances[0][1:2]:
                 self.fields.append({"name": 'Total ' + str(getSymbol(self.web3, token)), "value": str(
                     formatCurrency(balances[1][i] / getDecimals(self.web3, token))), "inline": True})
                 balances_sum = balances_sum + balances[1][i] / getDecimals(self.web3, token)
