@@ -46,8 +46,7 @@ class handler():
                   {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://optimistic.etherscan.io/tx/{transactionHash})'), "inline": False}]
 
         self.color = colors.dark_green
-        if total_amount > 50000:
-            self.send = True
+        self.send = True
             
         if total_amount>500000:
             self.content = '<@&945071604642222110>'
