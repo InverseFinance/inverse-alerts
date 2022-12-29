@@ -21,7 +21,7 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
-        amount_a = self.tx["args"]["amount0"]/1e18
+        amount_a = self.tx["args"]["amount0"]/1e6
         amount_b = self.tx["args"]["amount1"]/1e18
 
         total_amount = abs(amount_a + amount_b)
@@ -40,15 +40,16 @@ class handler():
                   {"name": 'Address :', "value": str(f'[{address}](https://optimistic.etherscan.io/address/{address})'),"inline": True},
                   {"name": 'Name :', "value": str(getName(self.web3, address)), "inline": True},
                   {"name": 'Symbol :', "value": str(getSymbol(self.web3, address)), "inline": False},
-                  {"name": 'Amount 0 :', "value": str(formatCurrency(amount_a)), "inline": True},
-                  {"name": 'Amount 1 :', "value": str(formatCurrency(amount_b)), "inline": True},
+                  {"name": token_a+ ' amount', "value": str(formatCurrency(amount_a)), "inline": True},
+                  {"name": token_b+ ' amount', "value": str(formatCurrency(amount_b)), "inline": True},
                   {"name": token_a+ ' balance',"value": str(formatCurrency(balance_a)),"inline": True},
                   {"name": token_b+ ' balance', "value": str(formatCurrency(balance_b)), "inline": True},
                   {"name": 'Total Supply :', "value": str(formatCurrency(getSupply(self.web3, address))), "inline": True},
                   {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://optimistic.etherscan.io/tx/{transactionHash})'), "inline": False}]
         self.color = colors.dark_red
 
-        self.send = True
+        if total_amount>1000:
+            self.send = True
             
         if total_amount>500000:
             self.content = '<@&945071604642222110>'
