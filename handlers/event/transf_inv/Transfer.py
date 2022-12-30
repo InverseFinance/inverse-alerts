@@ -33,7 +33,7 @@ class handler():
                                     "0x41d5d79431a913c4ae7d69a668ecdfe5ff9dfb68")
 
             self.title = "Alameda - INV activity detected"
-            #self.content = '<@&945071604642222110>'
+            self.content = '<@&945071604642222110>'
             self.fields = [
                 {"name": 'Block Number :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},
                 {"name": 'From :', "value": str(f'[{from_address}](https://etherscan.io/address/{from_address})'),"inline": False},

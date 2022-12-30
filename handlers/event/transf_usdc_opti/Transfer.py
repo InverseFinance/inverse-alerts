@@ -29,7 +29,7 @@ class handler():
         usdc_balance = getBalance(self.web3, "0xe8537b6ff1039cb9ed0b71713f697ddbadbb717d",
                                   "0x7f5c764cbc14f9669b88837ca1490cca17c31607")
         ratio = float(value) / float(usdc_balance)
-        if ratio > 0.01:
+        if ratio > os.getenv('FRAX_USDC_RATIO'):
             self.title = "VELOUSDC High activity detected"
             self.content = '<@&945071604642222110>'
             self.fields = [

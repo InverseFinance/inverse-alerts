@@ -47,10 +47,10 @@ class handler():
 
         self.color = colors.dark_green
         
-        if total_amount>1000:
+        if total_amount>os.getenv("SENDING_THRESHOLD_OPTI"):
             self.send = True
             
-        if total_amount>500000:
+        if total_amount>os.getenv("RISK_THRESHOLD_OPTI"):
             self.content = '<@&945071604642222110>'
 
         self.result = {"webhook": self.webhook,
