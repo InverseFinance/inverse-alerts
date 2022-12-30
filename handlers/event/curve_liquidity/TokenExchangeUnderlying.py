@@ -70,7 +70,7 @@ class handler():
 
         self.color = colors.dark_orange
 
-        if tokens_sold > 500000 or tokens_bought > os.getenv("RISK_THRESHOLD_ETH"):
+        if tokens_sold > 500000 or tokens_bought > int(os.getenv("RISK_THRESHOLD_ETH")):
             self.send = True
 
 

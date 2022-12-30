@@ -56,9 +56,9 @@ class handler():
             {"name": token_0 + '+' + token_1 + ' in Pool', "value": str(formatCurrency(token_0_total + token_1_total)),"inline": False},
             {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False}]
 
-        if (self.tx["args"]["coin_amount"] / 1e18) > os.getenv("SENDING_THRESHOLD_ETH"):
+        if (self.tx["args"]["coin_amount"] / 1e18) > int(os.getenv("SENDING_THRESHOLD_ETH")):
             self.send = True
-        if self.tx["args"]["coin_amount"] / 1e18 > os.getenv("RISK_THRESHOLD_ETH"):
+        if self.tx["args"]["coin_amount"] / 1e18 > int(os.getenv("RISK_THRESHOLD_ETH")):
             self.content = '<@&945071604642222110>'
 
         concave = ["0x6fF51547f69d05d83a7732429cfe4ea1E3299E10", "0x226e7AF139a0F34c6771DeB252F9988876ac1Ced"]
