@@ -5,25 +5,25 @@ from web3._utils.events import construct_event_topic_set
 from handlers.handlers import HandleEvent
 from utils.helpers import LoggerParams
 import  os, sys, requests,warnings,json
-
+from utils.fetchers import *
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
 
-web3 = Web3(Web3.HTTPProvider(os.getenv('QUICKNODE_ETH')))
+web3 = getWeb3(10)
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
-alert = 'transf_inv'
-event_name = 'Transfer'
-tx_hash= '0x74b7dae6a0fde13183f6002085b4a601839cd77b7a41ba5833aedb02a24201d2'
-contract_address = web3.toChecksumAddress('0x41d5d79431a913c4ae7d69a668ecdfe5ff9dfb68')
+alert = 'swap'
+event_name = 'Mint'
+tx_hash= '0xdea54c8c0360fef4c6714115872f73d4786df11cf536aa1988b5fffd99d31f63'
+contract_address = web3.toChecksumAddress('0x6c5019d345ec05004a7e7b0623a91a0d9b8d590d')
 
 # Fetch tx_info to get blockHash for log filter
 tx_info = json.loads(Web3.toJSON(web3.eth.get_transaction(tx_hash)))
 block_hash=tx_info["blockHash"]
 
 # Get ABI file from etherscan
-contract_abi = requests.get('https://api.etherscan.io/api?module=contract&action=getabi&address='+contract_address+'&apikey='+os.getenv('ETHERSCAN')).json()['result']
+contract_abi = getABI2(contract_address)
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 topics = eval(f'construct_event_topic_set(contract.events.{event_name}().abi, web3.codec, {{}})')
