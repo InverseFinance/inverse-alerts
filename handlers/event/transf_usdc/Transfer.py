@@ -29,7 +29,7 @@ class handler():
         usdc_balance = getBalance(self.web3, "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2",
                                   "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
         ratio = float(value) / float(usdc_balance)
-        if ratio > int(os.getenv("FRAX_USDC_RATIO")):
+        if ratio > float(os.getenv("FRAX_USDC_RATIO")):
             self.title = "fraxUSDC High activity detected"
             self.content = '<@&945071604642222110>'
             self.fields = [

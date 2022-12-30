@@ -23,16 +23,16 @@ class handler():
 
     def compose(self):
 
-        if abs(self.change) > int(os.getenv('HIGH_RISK_CHANGE')):
+        if abs(self.change) > float(os.getenv('HIGH_RISK_CHANGE')):
             self.content = '<@&945071604642222110>'
             self.level = 3
             self.color = colors.red
             self.send = True
-        elif abs(self.change) > int(os.getenv('MID_RISK_CHANGE')):
+        elif abs(self.change) > float(os.getenv('MID_RISK_CHANGE')):
             self.level = 2
             self.color = colors.dark_orange
             self.send = True
-        elif abs(self.change) > int(os.getenv('LOW_RISK_CHANGE')):
+        elif abs(self.change) > float(os.getenv('LOW_RISK_CHANGE')):
             self.level = 1
             self.color = colors.orange
             self.send = True
