@@ -6,6 +6,7 @@ from handlers.handlers import HandleEvent
 from utils.helpers import LoggerParams
 import  os, sys, requests,warnings,json
 from utils.fetchers import *
+
 # Load locals and web3 provider
 load_dotenv()
 LoggerParams()
