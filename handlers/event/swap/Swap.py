@@ -38,7 +38,6 @@ class handler():
 
         self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},
                   {"name": 'Address :', "value": str(f'[{address}](https://etherscan.io/address/{address})'), "inline": True},
-                  {"name": 'Name :', "value": str(getName(self.web3, address)), "inline": True},
                   {"name": 'Symbol :', "value": str(getSymbol(self.web3, address)), "inline": True},
                   {"name": 'Operation :', "value": str(operation), "inline": True},
                   {"name": 'USD value :', "value": str(formatCurrency(((self.tx["args"]["amount0Out"] + self.tx["args"]["amount0In"]) / getDecimals(self.web3,getSushiTokens(self.web3, address)[0])) * getUnderlyingPrice(self.web3, '0x1637e4e9941d55703a7a5e7807d6ada3f7dcd61b'))), "inline": True},

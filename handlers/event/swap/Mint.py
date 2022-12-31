@@ -36,13 +36,11 @@ class handler():
         self.title = "Velo New Liquidity Add event detected"
         self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://optimistic.etherscan.io/block/{blockNumber})'),"inline": False},
                   {"name": 'Address :', "value": str(f'[{address}](https://optimistic.etherscan.io/address/{address})'),"inline": False},
-                  {"name": 'Name :', "value": str(getName(self.web3, address)), "inline": True},
                   {"name": 'Symbol :', "value": str(getSymbol(self.web3, address)), "inline": True},
                   {"name": token_a+ ' amount', "value": str(formatCurrency(amount_a)), "inline": True},
                   {"name": token_b+ ' amount', "value": str(formatCurrency(amount_b)), "inline": True},
                   {"name": token_a+ ' balance',"value": str(formatCurrency(balance_a)),"inline": True},
                   {"name": token_b+ ' balance', "value": str(formatCurrency(balance_b)), "inline": True},
-                  {"name": 'Total Supply :', "value": str(formatCurrency(getSupply(self.web3, address))), "inline": True},
                   {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://optimistic.etherscan.io/tx/{transactionHash})'), "inline": False}]
 
         self.color = colors.dark_green
