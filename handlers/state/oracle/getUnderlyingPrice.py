@@ -29,6 +29,7 @@ class handler():
             self.color = colors.red
             self.send = True
         elif abs(self.change) > float(os.getenv('MID_RISK_CHANGE')):
+            self.content = '<@&945071604642222110>'
             self.level = 2
             self.color = colors.dark_orange
             self.send = True
