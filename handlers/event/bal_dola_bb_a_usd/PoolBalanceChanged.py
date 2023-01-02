@@ -69,7 +69,7 @@ class handler():
 
             self.title = "Balancer Liquidity "+event+" Event Detected"
 
-            if abs(deltas_sum)>float(os.getenv("SEND_THRESHOLD_ETH")):
+            if abs(deltas_sum)>float(os.getenv("SENDING_THRESHOLD_ETH")):
                 self.send = True
 
             if abs(deltas_sum)>float(os.getenv("RISK_THRESHOLD_ETH")):
