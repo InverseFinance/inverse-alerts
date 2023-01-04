@@ -710,7 +710,7 @@
     "ids": {
       "inverse-finance": {
         "price": true,
-        "volume": true
+        "volume": false
       },
       "lp-3pool-curve": {
         "price": true,
@@ -718,7 +718,7 @@
       },
       "dola-usd": {
         "price": true,
-        "volume": true
+        "volume": false
       },
       "frax": {
         "price": true,
