@@ -23,7 +23,7 @@ class handler():
         transactionHash = self.tx["transactionHash"]
 
         self.content = "<@&899302193608409178>"
-        self.webhook = os.getenv('WEBHOOK_GOVERNANCE')
+        self.webhook = os.getenv('WEBHOOK_GOVPUBLIC')
         self.title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(self.tx["event"]))
 
         self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),

@@ -286,3 +286,9 @@ class Web3JsonEncoder(json.JSONEncoder):
             return HexStr(HexBytes(obj).hex())
         return json.JSONEncoder.default(self, obj)
 
+
+def to_json(obj: Dict[Any, Any]) -> str:
+    '''
+    Convert a complex object (like a transaction object) to a JSON string
+    '''
+    return FriendlyJsonSerde().json_encode(obj, cls=Web3JsonEncoder)

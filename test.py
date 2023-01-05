@@ -13,10 +13,10 @@ LoggerParams()
 web3 = getWeb3(1)
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
-alert = 'firm'
-event_name = 'Borrow'
-tx_hash= '0x278397f6365cd697223065365e083ec5451ac39289c34c90aa7040502df3987b'
-contract_address = web3.toChecksumAddress('0x63Df5e23Db45a2066508318f172bA45B9CD37035')
+alert = 'governance'
+event_name = 'ProposalExecuted'
+tx_hash= '0xcddba54afa4433ac89507b01eeea4c4b5e825a8ddb95c5d0fe45e25ba3976d50'
+contract_address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
 
 # Fetch tx_info to get blockHash for log filter
 tx_info = json.loads(Web3.toJSON(web3.eth.get_transaction(tx_hash)))
@@ -34,4 +34,6 @@ events = eval(f'contract.events.{event_name}().processReceipt({{"logs": logs}})'
 for event in events:
     print(Web3.toJSON(event))
     HandleEvent(web3, event, alert, contract, event_name).start()
+    time.sleep(15)
 
+list
