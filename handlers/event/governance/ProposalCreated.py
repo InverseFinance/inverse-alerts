@@ -22,7 +22,7 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
-        self.content = "<@&1059938457578897448>"
+        self.content = "<@&1059938641822101634>"
         self.webhook = os.getenv('WEBHOOK_GOVPUBLIC')
         self.title = "Governor Mills : New " + re.sub(r"(\w)([A-Z])", r"\1 \2", str(self.tx["event"]))
 
