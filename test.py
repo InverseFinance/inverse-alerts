@@ -14,7 +14,7 @@ web3 = getWeb3(1)
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
 alert = 'governance'
-event_name = 'ProposalExecuted'
+event_name = 'ProposalCreated'
 tx_hash= '0xcddba54afa4433ac89507b01eeea4c4b5e825a8ddb95c5d0fe45e25ba3976d50'
 contract_address = web3.toChecksumAddress('0xbeccb6bb0aa4ab551966a7e4b97cec74bb359bf6')
 
