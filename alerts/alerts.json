@@ -502,6 +502,31 @@
       }
     }
   },
+  "swap_thena": {
+    "type": "event",
+    "events": {
+      "Burn": {
+        "name": "Burn",
+        "filters": [
+          {}
+        ]
+      },
+      "Mint": {
+        "name": "Mint",
+        "filters": [
+          {}
+        ]
+      }
+    },
+    "contracts": {
+      "Thena CUSD/DOLA": {
+        "address": "0x7061f52ed4942021924745d454d722e52e057e03",
+        "chain_ids": [
+          97
+        ]
+      }
+    }
+  },
   "oracle": {
     "type": "state",
     "functions": {

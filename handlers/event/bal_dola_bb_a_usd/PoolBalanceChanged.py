@@ -43,18 +43,13 @@ class handler():
                 deltas_sum =deltas_sum + self.tx["args"]["deltas"][i]/getDecimals(self.web3,token)
                 i = i+ 1
 
+            balance_0 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x865377367054516e17014ccded1e7d814edc9ce4")
+            balance_1 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64")
 
-            balances = getBalancerVaultBalances(self.web3,"0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e6400000000000000000000037b")
-
-            i = 1
-            balances_sum = 0
-            for token in balances[0][1:2]:
-                self.fields.append({"name": 'Total ' + str(getSymbol(self.web3, token)), "value": str(
-                    formatCurrency(balances[1][i] / getDecimals(self.web3, token))), "inline": True})
-                balances_sum = balances_sum + balances[1][i] / getDecimals(self.web3, token)
-                i = i + 1
-
-            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balances_sum)),"inline": False})
+            self.fields.append({"name": 'Total DOLA :', "value": str(formatCurrency(balance_0)), "inline": True})
+            self.fields.append({"name": 'Total dola_bb_a_usd :', "value": str(formatCurrency(balance_1)), "inline": True})
+               
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balance_0+balance_1)),"inline": False})
             self.fields.append({"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
 
             if deltas_sum > 0:

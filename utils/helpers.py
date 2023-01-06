@@ -83,6 +83,10 @@ def getWeb3(chainid):
         rpc = os.getenv('QUICKNODE_OPT')
         web3 = Web3(Web3.HTTPProvider(rpc))
         return web3
+    elif chainid==97:
+        rpc = os.getenv('QUICKNODE_BNB')
+        web3 = Web3(Web3.HTTPProvider(rpc))
+        return web3
     elif chainid==250:
         rpc = os.getenv('QUICKNODE_FTM')
         web3 = Web3(Web3.HTTPProvider(rpc))
@@ -100,6 +104,9 @@ def getRPC(chainid):
     elif chainid==10:
         rpc = os.getenv('QUICKNODE_OPT')
         return rpc
+    elif chainid==97:
+        rpc = os.getenv('QUICKNODE_BNB')
+        return rpc
     elif chainid==250:
         rpc = os.getenv('QUICKNODE_FTM')
         return rpc
@@ -110,6 +117,8 @@ def assignFrequency(chainid):
     if chainid==1:
         frequency = random.uniform(60,120)
     elif chainid==10:
+        frequency = random.uniform(10,15)
+    elif chainid==97:
         frequency = random.uniform(10,15)
     elif chainid==250:
         frequency = random.uniform(10,15)
