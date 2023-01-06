@@ -118,6 +118,8 @@ def assignFrequency(chainid):
         frequency = random.uniform(60,120)
     elif chainid==10:
         frequency = random.uniform(10,15)
+    elif chainid==97:
+        frequency = random.uniform(10,15)
     elif chainid==250:
         frequency = random.uniform(10,15)
     return frequency
