@@ -28,12 +28,12 @@ class handler():
         if self.tx["args"]['amount0In'] == 0:
             operation = 'Buy ' + str(formatCurrency(self.tx["args"]['amount0Out'] / getDecimals(self.web3,getSushiTokens(self.web3, address)[0]))) + " " + str(getSushiTokensSymbol(self.web3, address)[0])
             self.color = colors.dark_green
-            self.title = "Velo New Buy event detected"
+            self.title = "Thena New Buy event detected"
             self.send = True
         else:
             operation = 'Sell ' + str(formatCurrency(self.tx["args"]['amount0In'] / getDecimals(self.web3,getSushiTokens(self.web3, address)[0]))) + " " + str(getSushiTokensSymbol(self.web3, address)[0])
             self.color = colors.dark_red
-            self.title = "Velo New Sell event detected"
+            self.title = "Thena New Sell event detected"
             self.send = True
 
         self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://etherscan.io/block/{blockNumber})'),"inline": False},

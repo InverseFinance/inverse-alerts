@@ -34,7 +34,7 @@ class handler():
 
         self.webhook = os.getenv('WEBHOOK_SWAP_THENA')
 
-        self.title = "Velo New Liquidity Removal detected"
+        self.title = "Thena New Liquidity Removal detected"
 
         self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://optimistic.etherscan.io/block/{blockNumber})'),"inline": False},
                   {"name": 'Address :', "value": str(f'[{address}](https://optimistic.etherscan.io/address/{address})'),"inline": True},

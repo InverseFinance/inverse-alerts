@@ -33,7 +33,7 @@ class handler():
 
         self.webhook = os.getenv('WEBHOOK_SWAP_THENA')
 
-        self.title = "Velo New Liquidity Add event detected"
+        self.title = "Thena New Liquidity Add event detected"
         self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://optimistic.etherscan.io/block/{blockNumber})'),"inline": False},
                   {"name": 'Address :', "value": str(f'[{address}](https://optimistic.etherscan.io/address/{address})'),"inline": False},
                   {"name": 'Symbol :', "value": str(getSymbol(self.web3, address)), "inline": True},
