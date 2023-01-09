@@ -21,7 +21,7 @@ class handler():
         blockNumber = self.tx["blockNumber"]
         transactionHash = self.tx["transactionHash"]
 
-        amount_a = self.tx["args"]["amount0"]/1e6
+        amount_a = self.tx["args"]["amount0"]/1e18
         amount_b = self.tx["args"]["amount1"]/1e18
 
         total_amount = abs(amount_a + amount_b)
@@ -36,14 +36,14 @@ class handler():
 
         self.title = "Thena New Liquidity Removal detected"
 
-        self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://optimistic.etherscan.io/block/{blockNumber})'),"inline": False},
-                  {"name": 'Address :', "value": str(f'[{address}](https://optimistic.etherscan.io/address/{address})'),"inline": True},
+        self.fields = [{"name": 'Block Number :', "value": str(f'[{blockNumber}](https://bscscan.com/block/{blockNumber})'),"inline": False},
+                  {"name": 'Address :', "value": str(f'[{address}](https://bscscan.com/address/{address})'),"inline": True},
                   {"name": 'Symbol :', "value": str(getSymbol(self.web3, address)), "inline": False},
                   {"name": token_a+ ' amount', "value": str(formatCurrency(amount_a)), "inline": True},
                   {"name": token_b+ ' amount', "value": str(formatCurrency(amount_b)), "inline": True},
                   {"name": token_a+ ' balance',"value": str(formatCurrency(balance_a)),"inline": True},
                   {"name": token_b+ ' balance', "value": str(formatCurrency(balance_b)), "inline": True},
-                  {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://optimistic.etherscan.io/tx/{transactionHash})'), "inline": False}]
+                  {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://bscscan.com/tx/{transactionHash})'), "inline": False}]
         self.color = colors.dark_red
 
         if total_amount>float(os.getenv("SENDING_THRESHOLD_OPTI")):
