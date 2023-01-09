@@ -34,7 +34,7 @@ class handler():
                 if str(arg) == 'amount':
                     self.fields.append({"name": str(arg), "value": str(formatCurrency(self.tx["args"][arg] / 1e18)), "inline": True})
                 else:
-                    self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]), "inline": True})
+                    self.fields.append({"name": str(arg), "value": str(formatCurrency(self.tx["args"][arg]/1e18)), "inline": True})
 
 
             balance_0 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x865377367054516e17014ccded1e7d814edc9ce4")

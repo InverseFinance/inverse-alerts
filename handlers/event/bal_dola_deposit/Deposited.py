@@ -35,7 +35,7 @@ class handler():
                     self.fields.append(
                         {"name": str(arg), "value": str(formatCurrency(self.tx["args"][arg] / 1e18)), "inline": True})
                 else:
-                    self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]), "inline": True})
+                    self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg])/1e18, "inline": True})
 
 
             balances = getBalancerVaultBalances(self.web3,"0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e6400000000000000000000037b")
