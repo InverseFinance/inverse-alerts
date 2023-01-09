@@ -164,7 +164,7 @@ class CoinGeckoListener(Thread):
                 logging.info('change : ' + str(formatPercent(self.change))+ ' / price : ' + str(self.price) + ' / old price : ' + str(self.old_value))
                 HandleCoingecko(self.id, self.old_value, self.price, self.change).start()
                 self.old_value = self.price
-                time.sleep(60)
+                time.sleep(43200)
 
             except Exception as e:
                 logging.error(f'Error in CoinGecko Price Listener : {self.id}')
@@ -208,7 +208,7 @@ class CoinGeckoVolumeListener(Thread):
                                       self.change).start()
 
                 self.old_value = self.volume
-                time.sleep(60)
+                time.sleep(43200)
 
             except Exception as e:
                 logging.error(f'Error in CoinGecko Volume Listener : {self.id}')
