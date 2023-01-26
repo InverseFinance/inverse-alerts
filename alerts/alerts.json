@@ -83,6 +83,12 @@
         "chain_ids": [
           1
         ]
+      },
+      "stETH Market": {
+        "address": "0x743A502cf0e213F6FEE56cD9C6B03dE7Fa951dCf",
+        "chain_ids": [
+          1
+        ]
       }
     }
   },

@@ -19,10 +19,10 @@ class handler():
 
     def compose(self):
         dola_address = "0x865377367054516e17014CcdED1e7d814EDC9ce4"
-        composable_stable_pool = "0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64"
+        composable_stable_pool = "0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426 "
 
         tokens = self.tx['args']['tokens']
-        address = str(self.tx["args"]["poolId"])[0:42]
+        address = str(self.tx["args"]["poolId"])
         print(address)
 
         if address=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
@@ -43,13 +43,12 @@ class handler():
                 deltas_sum =deltas_sum + self.tx["args"]["deltas"][i]/getDecimals(self.web3,token)
                 i = i+ 1
 
-            balance_0 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x865377367054516e17014ccded1e7d814edc9ce4")
-            balance_1 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64")/1e12
+            balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426 ")
 
-            self.fields.append({"name": 'Total DOLA :', "value": str(formatCurrency(balance_0)), "inline": True})
-            self.fields.append({"name": 'Total dola_bb_a_usd :', "value": str(formatCurrency(balance_1)), "inline": True})
+            self.fields.append({"name": 'Total 1 :', "value": str(formatCurrency(balances[0]/1e18)), "inline": True})
+            self.fields.append({"name": 'Total 2 :', "value": str(formatCurrency(balances[1]/1e18)), "inline": True})
                
-            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balance_0+balance_1)),"inline": False})
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[0]+balances[1])/1e18)), "inline": False})
             self.fields.append({"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
 
             if deltas_sum > 0:
@@ -62,7 +61,7 @@ class handler():
                 self.color = colors.blurple
                 event = "Other"
 
-            self.title = "Balancer Liquidity "+event+" Event Detected"
+            self.title = "Balancer DOLA USDC "+event+" Event Detected"
 
             if abs(deltas_sum)>float(os.getenv("SENDING_THRESHOLD_ETH")):
                 self.send = True
