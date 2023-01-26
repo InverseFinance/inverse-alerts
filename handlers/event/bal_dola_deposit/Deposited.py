@@ -18,7 +18,7 @@ class handler():
 
     def compose(self):
         if self.tx["args"]["poolid"] == 8:
-            self.title = "Bal_dola " + self.tx["event"] + " Event Detected"
+            self.title = "Balancer DOLA USDC " + self.tx["event"] + " Event Detected"
 
             address = self.tx["address"]
             blockNumber = self.tx["blockNumber"]
@@ -38,15 +38,12 @@ class handler():
                     self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]/1e18), "inline": True})
 
 
-            balances = getBalancerVaultBalances(self.web3,"0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e6400000000000000000000037b")
+            balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426 ")
 
-            balance_0 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x865377367054516e17014ccded1e7d814edc9ce4")
-            balance_1 = getBalance(self.web3,"0xBA12222222228d8Ba445958a75a0704d566BF2C8","0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64")
-
-            self.fields.append({"name": 'Total DOLA :', "value": str(formatCurrency(balance_0)), "inline": True})
-            self.fields.append({"name": 'Total dola_bb_a_usd :', "value": str(formatCurrency(balance_1/1e9)), "inline": True})
+            self.fields.append({"name": 'Total 1 :', "value": str(formatCurrency(balances[0]/1e18)), "inline": True})
+            self.fields.append({"name": 'Total 2 :', "value": str(formatCurrency(balances[1]/1e18)), "inline": True})
                
-            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency(balance_0+balance_1/1e9)),"inline": False})
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[0]+balances[1])/1e18)), "inline": False})
 
             self.fields.append(
                 {"name": 'Transaction :', "value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),
