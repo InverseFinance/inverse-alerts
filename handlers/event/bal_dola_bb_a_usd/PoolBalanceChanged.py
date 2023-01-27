@@ -23,9 +23,8 @@ class handler():
 
         tokens = self.tx['args']['tokens']
         address = str(self.tx["args"]["poolId"])
-        print(address)
 
-        if address=="0x5b3240b6be3e7487d61cd1afdfc7fe4fa1d81e64":
+        if address==composable_stable_pool:
 
             blockNumber = self.tx["blockNumber"]
             transactionHash = self.tx["transactionHash"]
@@ -63,10 +62,10 @@ class handler():
 
             self.title = "Balancer DOLA USDC "+event+" Event Detected"
 
-            if abs(deltas_sum)>float(os.getenv("SENDING_THRESHOLD_ETH")):
+            if abs(deltas_sum)>float(os.getenv("SENDING_THRESHOLD_BAL")):
                 self.send = True
 
-            if abs(deltas_sum)>float(os.getenv("RISK_THRESHOLD_ETH")):
+            if abs(deltas_sum)>float(os.getenv("RISK_THRESHOLD_BAL")):
                 self.content = '<@&945071604642222110>'
 
         self.result = {"webhook":self.webhook,
