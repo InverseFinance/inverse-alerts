@@ -1,9 +1,11 @@
 from utils.fetchers import *
+from utils.helpers import *
 from dotenv import load_dotenv
 import sys
 import struct
 
 load_dotenv()
+LoggerParams()
 
 class handler():
     def __init__(self,web3,tx):
