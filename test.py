@@ -15,7 +15,7 @@ web3 = getWeb3(1)
 # Provide alert to be used, event Name, contract and transaction where the event happened
 alert = 'bal_dola_bb_a_usd'
 event_name = 'PoolBalanceChanged'
-tx_hash= '0xadf0e928f188f0088dfc677ed079ef2c7fd50c3efd9df3b6a0ae49b193bd5524'
+tx_hash= '0xa94e7a18abf47c26536cac8192dee0d9468aeea5c56f92f6cbb3929d80593575'
 contract_address = web3.toChecksumAddress('0xBA12222222228d8Ba445958a75a0704d566BF2C8')
 
 # Fetch tx_info to get blockHash for log filter
@@ -27,10 +27,17 @@ contract_abi = getABI2(contract_address)
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 topics = eval(f'construct_event_topic_set(contract.events.{event_name}().abi, web3.codec, {{}})')
-logs = web3.eth.get_logs({"blockhash": block_hash})
-events = eval(f'contract.events.{event_name}().processReceipt({{"logs": logs}})')
+logs = web3.eth.get_logs({"blockhash": block_hash,"transactionHash": tx_hash })
+
+for log in logs:
+    if  log['transactionHash'].hex()==tx_hash :
+        print('found it')
+        tx = contract.events.PoolBalanceChanged().processLog(log)
+        handler = HandleEvent(web3,tx,alert,event_name)
+        handler.compose()
 
 
-for event in events:
-    print(Web3.toJSON(event))
-    HandleEvent(web3, event, alert, contract, event_name).start()
+
+#events = eval(f'contract.events.{event_name}().processReceipt({{"logs": logs}})')
+
+    #HandleEvent(web3, event, alert, contract, event_name).start()
