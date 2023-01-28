@@ -10,13 +10,13 @@ from utils.fetchers import *
 load_dotenv()
 LoggerParams()
 
-web3 = getWeb3(97)
+web3 = getWeb3(1)
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
-alert = 'swap_thena'
-event_name = 'Mint'
-tx_hash= '0x13e35f9b933b3f928dbc8642194ce2f42282eded9e85ea9af53db9960bca0761'
-contract_address = web3.toChecksumAddress('0x7061f52ed4942021924745d454d722e52e057e03')
+alert = 'bal_dola_bb_a_usd'
+event_name = 'PoolBalanceChanged'
+tx_hash= '0xadf0e928f188f0088dfc677ed079ef2c7fd50c3efd9df3b6a0ae49b193bd5524'
+contract_address = web3.toChecksumAddress('0xBA12222222228d8Ba445958a75a0704d566BF2C8')
 
 # Fetch tx_info to get blockHash for log filter
 tx_info = json.loads(Web3.toJSON(web3.eth.get_transaction(tx_hash)))

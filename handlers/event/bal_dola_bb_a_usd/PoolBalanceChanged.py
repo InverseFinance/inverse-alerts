@@ -23,6 +23,7 @@ class handler():
 
         tokens = self.tx['args']['tokens']
         address = str(self.tx["args"]["poolId"])
+        logging.info("PoolBalanceChanged address: " + address,' type :',type(address))
 
         if address==composable_stable_pool:
 
