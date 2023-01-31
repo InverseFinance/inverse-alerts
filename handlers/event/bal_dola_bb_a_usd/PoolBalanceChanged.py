@@ -22,8 +22,6 @@ class handler():
     def compose(self):
         composable_stable_pool = "0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426"
         address = str(self.tx["args"]["poolId"])
-        
-        logging.info("PoolBalanceChanged address: " + address,' type :',type(address))
 
         if address==composable_stable_pool:
 
@@ -45,10 +43,11 @@ class handler():
 
             balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")
 
-            self.fields.append({"name": 'Total 1 :', "value": str(formatCurrency(balances[0]/1e18)), "inline": True})
-            self.fields.append({"name": 'Total 2 :', "value": str(formatCurrency(balances[1]/1e18)), "inline": True})
+            self.fields.append({"name": 'Total DOLA :', "value": str(formatCurrency(balances[1][0]/1e18)), "inline": True})
+            self.fields.append({"name": 'Total USDC :', "value": str(formatCurrency(balances[1][1]/1e8)), "inline": True})
+            logging.info(self.fields)
                
-            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[0]+balances[1])/1e18)), "inline": False})
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[1][0]/1e18+balances[1][1]/1e8))), "inline": False})
             self.fields.append({"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
 
             if deltas_sum > 0:
