@@ -17,7 +17,7 @@ class handler():
         self.send = False
 
     def compose(self):
-        if self.tx["args"]["poolid"] == 8:
+        if self.tx["args"]["poolid"] == "0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426":
             self.title = "Balancer DOLA USDC " + self.tx["event"] + " Event Detected"
 
             address = self.tx["address"]
