@@ -44,7 +44,7 @@ class handler():
             balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")
 
             self.fields.append({"name": 'Total DOLA :', "value": str(formatCurrency(balances[1][0]/1e18)), "inline": True})
-            self.fields.append({"name": 'Total USDC :', "value": str(formatCurrency(balances[1][1]/1e8)), "inline": True})
+            self.fields.append({"name": 'Total USDC :', "value": str(formatCurrency(balances[1][1]/1e6)), "inline": True})
             logging.info(self.fields)
                
             self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[1][0]/1e18+balances[1][1]/1e8))), "inline": False})
