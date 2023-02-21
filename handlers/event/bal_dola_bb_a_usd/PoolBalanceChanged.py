@@ -1,9 +1,11 @@
 from utils.fetchers import *
+from utils.helpers import *
 from dotenv import load_dotenv
 import sys
 import struct
 
 load_dotenv()
+LoggerParams()
 
 class handler():
     def __init__(self,web3,tx):
@@ -18,10 +20,7 @@ class handler():
         self.send = False
 
     def compose(self):
-        dola_address = "0x865377367054516e17014CcdED1e7d814EDC9ce4"
-        composable_stable_pool = "0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426 "
-
-        tokens = self.tx['args']['tokens']
+        composable_stable_pool = "0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426"
         address = str(self.tx["args"]["poolId"])
 
         if address==composable_stable_pool:
@@ -42,12 +41,13 @@ class handler():
                 deltas_sum =deltas_sum + self.tx["args"]["deltas"][i]/getDecimals(self.web3,token)
                 i = i+ 1
 
-            balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426 ")
+            balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")
 
-            self.fields.append({"name": 'Total 1 :', "value": str(formatCurrency(balances[0]/1e18)), "inline": True})
-            self.fields.append({"name": 'Total 2 :', "value": str(formatCurrency(balances[1]/1e18)), "inline": True})
+            self.fields.append({"name": 'Total DOLA :', "value": str(formatCurrency(balances[1][0]/1e18)), "inline": True})
+            self.fields.append({"name": 'Total USDC :', "value": str(formatCurrency(balances[1][1]/1e6)), "inline": True})
+            logging.info(self.fields)
                
-            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[0]+balances[1])/1e18)), "inline": False})
+            self.fields.append({"name": 'Total Balances :',"value": str(formatCurrency((balances[1][0]/1e18+balances[1][1]/1e8))), "inline": False})
             self.fields.append({"name": 'Transaction :',"value": str(f'[{transactionHash}](https://etherscan.io/tx/{transactionHash})'),"inline": False})
 
             if deltas_sum > 0:

@@ -10,13 +10,13 @@ from utils.fetchers import *
 load_dotenv()
 LoggerParams()
 
-web3 = getWeb3(97)
+web3 = getWeb3(1)
 
 # Provide alert to be used, event Name, contract and transaction where the event happened
-alert = 'swap_thena'
-event_name = 'Mint'
-tx_hash= '0x13e35f9b933b3f928dbc8642194ce2f42282eded9e85ea9af53db9960bca0761'
-contract_address = web3.toChecksumAddress('0x7061f52ed4942021924745d454d722e52e057e03')
+alert = 'bal_dola_bb_a_usd'
+event_name = 'PoolBalanceChanged'
+tx_hash= '0xff5007e394b2759a33f3308064a22be7fdd71abf84b42a7f2d1868817eb27367'
+contract_address = web3.toChecksumAddress('0xBA12222222228d8Ba445958a75a0704d566BF2C8')
 
 # Fetch tx_info to get blockHash for log filter
 tx_info = json.loads(Web3.toJSON(web3.eth.get_transaction(tx_hash)))
@@ -27,10 +27,11 @@ contract_abi = getABI2(contract_address)
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 topics = eval(f'construct_event_topic_set(contract.events.{event_name}().abi, web3.codec, {{}})')
-logs = web3.eth.get_logs({"blockhash": block_hash})
-events = eval(f'contract.events.{event_name}().processReceipt({{"logs": logs}})')
+logs = web3.eth.get_logs({"blockhash": block_hash,"transactionHash": tx_hash })
 
-
+#events = eval(f'contract.events.{event_name}().processReceipt({{"logs": logs}})')
+events = [{'args': {'poolId': '0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426', 'liquidityProvider': '0x71F12a5b0E60d2Ff8A87FD34E7dcff3c10c914b0', 'tokens': ['0x865377367054516e17014CcdED1e7d814EDC9ce4', '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'], 'deltas': [0, 159812814205], 'protocolFeeAmounts': [526411670823578783, 0]}, 'event': 'PoolBalanceChanged', 'logIndex': 55, 'transactionIndex': 29, 'transactionHash': '0xff5007e394b2759a33f3308064a22be7fdd71abf84b42a7f2d1868817eb27367', 'address': '0xBA12222222228d8Ba445958a75a0704d566BF2C8', 'blockHash': '0x35c77e35f3a3bd13373d5031332383c731c6529ce9fc045f99cdd1c4e601728e', 'blockNumber': 16516689}]
 for event in events:
-    print(Web3.toJSON(event))
-    HandleEvent(web3, event, alert, contract, event_name).start()
+    if event["transactionHash"]==tx_hash:
+        logging.info(event)
+        HandleEvent(web3, event, alert, contract, event_name).start()

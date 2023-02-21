@@ -483,6 +483,30 @@
       }
     }
   },
+  "transf_inv_dwf": {
+    "type": "event",
+    "events": {
+      "Transfer": {
+        "name": "Transfer",
+        "filters": [
+          {
+            "from": "0x834FF5670A72EAa0166c5E494f9c80F0E77F6551"
+          },
+          {
+            "to": "0x834FF5670A72EAa0166c5E494f9c80F0E77F6551"
+          }
+        ]
+      }
+    },
+    "contracts": {
+      "USDC": {
+        "address": "0x41d5d79431a913c4ae7d69a668ecdfe5ff9dfb68",
+        "chain_ids": [
+          1
+        ]
+      }
+    }
+  },
   "swap": {
     "type": "event",
     "events": {

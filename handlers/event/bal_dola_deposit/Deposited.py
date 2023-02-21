@@ -17,7 +17,7 @@ class handler():
         self.send = False
 
     def compose(self):
-        if self.tx["args"]["poolid"] == 8:
+        if self.tx["args"]["poolid"] == "0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426":
             self.title = "Balancer DOLA USDC " + self.tx["event"] + " Event Detected"
 
             address = self.tx["address"]
@@ -38,7 +38,7 @@ class handler():
                     self.fields.append({"name": str(arg), "value": str(self.tx["args"][arg]/1e18), "inline": True})
 
 
-            balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426 ")
+            balances = getBalancerVaultBalances(self.web3,"0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")
 
             self.fields.append({"name": 'Total 1 :', "value": str(formatCurrency(balances[0]/1e18)), "inline": True})
             self.fields.append({"name": 'Total 2 :', "value": str(formatCurrency(balances[1]/1e18)), "inline": True})
