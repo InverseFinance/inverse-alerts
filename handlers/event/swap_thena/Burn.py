@@ -46,11 +46,9 @@ class handler():
                   {"name": 'Transaction :',"value": str(f'[{transactionHash}](https://bscscan.com/tx/{transactionHash})'), "inline": False}]
         self.color = colors.dark_red
 
-        if total_amount>float(os.getenv("SENDING_THRESHOLD_OPTI")):
+        if total_amount>float(50000):
             self.send = True
             
-        if total_amount>float(os.getenv("RISK_THRESHOLD_OPTI")):
-            self.content = '<@&945071604642222110>'
 
         self.result = {"webhook": self.webhook,
                        "title": self.title,
